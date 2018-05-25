@@ -8,24 +8,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SystemClockTest {
 
+    private static final int THOUSAND = 1_000;
+    private static final int MILLION = 1_000_000;
+
+    private Clock clock = new SystemClock();
+
     @Test
     void currentTimeMillis() {
-        Clock clock = new SystemClock();
         assertTimeSequencing(System::currentTimeMillis, clock::currentTimeMillis);
     }
 
     @Test
     void currentTimeMicros() {
-        Clock clock = new SystemClock();
-        assertThat(clock.currentTimeMicros() % 1_000).isZero();
-        assertTimeSequencing(() -> System.currentTimeMillis() * 1_000, clock::currentTimeMicros);
+        assertThat(clock.currentTimeMicros() % THOUSAND).isZero();
+        assertTimeSequencing(() -> System.currentTimeMillis() * THOUSAND, clock::currentTimeMicros);
     }
 
     @Test
     void currentTimeNanos() {
-        Clock clock = new SystemClock();
-        assertThat(clock.currentTimeMicros() % 1_000_000).isZero();
-        assertTimeSequencing(() -> System.currentTimeMillis() * 1000000, clock::currentTimeNanos);
+        assertThat(clock.currentTimeNanos() % MILLION).isZero();
+        assertTimeSequencing(() -> System.currentTimeMillis() * MILLION, clock::currentTimeNanos);
     }
 
     private static void assertTimeSequencing(LongSupplier knownSource, LongSupplier testedSource) {
