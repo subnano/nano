@@ -1,0 +1,16 @@
+
+sudo: false
+language: java
+jdk: openjdk8
+
+cache:
+    directories:
+    - "$HOME/.m2"
+
+deploy:
+  -
+    provider: script
+    script: "mvn -s settings.xml -DskipTests deploy"
+    skip_cleanup: true
+    on:
+        tags: true
