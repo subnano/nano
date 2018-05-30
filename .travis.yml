@@ -7,6 +7,13 @@ cache:
     directories:
     - "$HOME/.m2"
 
+install:
+  - echo "$HOME/.m2/settings.xml"
+  - /bin/cat $HOME/.m2/settings.xml
+  - mvn -B --show-version dependency:resolve
+
+script: mvn -B verify
+
 deploy:
   -
     provider: script
