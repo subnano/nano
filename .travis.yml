@@ -8,16 +8,14 @@ cache:
     - "$HOME/.m2"
 
 install:
-  - echo "$HOME/.m2/settings.xml"
-  - /bin/cat $HOME/.m2/settings.xml
+  - /bin/cp settings.xml $HOME/.m2/settings.xml
   - mvn -B --show-version dependency:resolve
 
 script: mvn -B verify
 
 deploy:
-  -
-    provider: script
-    script: "mvn -s settings.xml -DskipTests deploy"
+  - provider: script
+    script: mvn -B -DskipTests deploy
     skip_cleanup: true
     on:
         tags: true
