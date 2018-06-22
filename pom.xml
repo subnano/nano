@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <packaging>jar</packaging>
-    <name>Nano Core</name>
+    <packaging>pom</packaging>
+    <name>Nano/</name>
     <groupId>io.nano</groupId>
-    <artifactId>nano-core</artifactId>
+    <artifactId>nano-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
@@ -18,46 +18,9 @@
         <surefire.plugin.version>2.21.0</surefire.plugin.version>
     </properties>
 
-    <build>
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.version}</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire.plugin.version}</version>
-            </plugin>
-
-        </plugins>
-    </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.nano</groupId>
-            <artifactId>nano-time</artifactId>
-            <version>${nano-time.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
+    <modules>
+        <module>time</module>
+        <module>core</module>
+        <module>fix</module>
+    </modules>
 </project>
