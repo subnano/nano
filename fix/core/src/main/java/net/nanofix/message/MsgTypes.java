@@ -6,6 +6,7 @@ package net.nanofix.message;
  * Time: 11:24
  */
 public final class MsgTypes {
+
     public static MsgType Logon = new MsgType("A", "Logon");
     public static MsgType Heartbeat = new MsgType("0", "HeartBeat");
     public static MsgType TestRequest = new MsgType("1", "TestRequest");

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import static net.nanofix.util.FIXBytes.PIPE;
 import static net.nanofix.util.FIXBytes.SOH;
@@ -23,7 +22,7 @@ class NanoFIXMessageTest {
     private final ByteBuffer messageBuffer = ByteBuffer.allocate(256);
     private final ByteBuffer buffer = ByteBuffer.allocate(1024);
     private final FIXMessageDecoder decoder = new NanoFIXMessageDecoder();
-    private MessageDecodeHandler visitor = new LoggingDecodeHandler();
+    private FIXMessageVisitor visitor = new LoggingDecodeHandler();
 
     @BeforeEach
     void setUp() {
@@ -53,7 +52,7 @@ class NanoFIXMessageTest {
 
     @Test
     void heartbeatMessage() {
-        FIXMessage msg = new NanoFIXMessage(header, buffer);
+        FIXMessage msg = new NanoFIXMessage(buffer);
         msg.header().beginString(BeginStrings.FIX_4_3);
         msg.header().msgType(MsgTypes.Heartbeat);
         msg.header().senderCompId(SENDER_COMP_ID);
@@ -69,7 +68,7 @@ class NanoFIXMessageTest {
     }
 
     private void assertBufferEncoding(FIXMessage msg, String expected) {
-        int length = msg.encode(buffer, 0);
+        int length = (int) msg.encode(buffer, 0);
         byte[] bytes = ByteBufferUtil.asByteArray(buffer, 0, length);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);

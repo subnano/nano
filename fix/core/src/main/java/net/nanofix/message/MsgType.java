@@ -40,4 +40,9 @@ public class MsgType extends ByteString {
     public int hashCode() {
         return value == null ? 0 : value.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return name == null ? value : name + '(' + value + ')';
+    }
 }

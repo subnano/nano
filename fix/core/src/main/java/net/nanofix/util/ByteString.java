@@ -12,11 +12,20 @@ public class ByteString {
         return new ByteString(ByteArrayUtil.asByteArray(string));
     }
 
+    public static ByteString of(byte[] bytes) {
+        return new ByteString(bytes);
+    }
+
     public byte[] bytes() {
         return bytes;
     }
 
-    public int lenth() {
+    public int length() {
         return bytes == null ? 0 : bytes.length;
     }
+
+//    @Override
+//    public String toString() {
+//        return "ByteString(" + length() + ')';
+//    }
 }

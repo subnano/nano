@@ -1,5 +1,6 @@
 package net.nanofix.message;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -7,15 +8,23 @@ import java.nio.ByteBuffer;
 public class DecodeMessagesTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
-    private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder(false);
-    private ByteBuffer headerBuffer = ByteBuffer.allocate(256);
-    private MessageHeaderAdapter messageHeader = new MessageHeaderAdapter(new MessageHeader(headerBuffer));
+    private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();
+    private final MessageHeader messageHeader = new MessageHeader();
+    private MessageTypeReader messageTypeReader = new MessageTypeReader(messageHeader);
 
     @Test
-    void decodeLogon() {
+    void decodeMsgType() {
         String msgText = FIXMessageStrings.HEARTBEAT;
         MessageTestHelper.prepareBuffer(buffer, msgText);
-        decoder.decode(buffer, messageHeader);
+        decoder.decode(buffer, messageTypeReader);
+        Assertions.assertThat(messageHeader.msgType()).isEqualTo(MsgTypes.Heartbeat);
+    }
 
+    @Test
+    void decodeHeartbeat() {
+        String msgText = FIXMessageStrings.HEARTBEAT;
+        MessageTestHelper.prepareBuffer(buffer, msgText);
+        decoder.decode(buffer, messageTypeReader);
+        Assertions.assertThat(messageHeader.msgType()).isEqualTo(MsgTypes.Heartbeat);
     }
 }

@@ -2,11 +2,10 @@ package net.nanofix.message.selector;
 
 import net.nanofix.field.StringField;
 import net.nanofix.message.FIXMessage;
-import org.junit.Test;
+import net.nanofix.message.NanoFIXMessage;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * User: Mark
@@ -15,15 +14,16 @@ import static org.hamcrest.Matchers.*;
  */
 public class FieldSelectorTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNullConstructor() {
         new FieldSelector(null);
     }
 
     @Test
     public void testIsSelected() throws Exception {
-        FIXMessage msg = mock(FIXMessage.class);
+        //FIXMessage msg = Mockito.mock(FIXMessage.class);
+        FIXMessage msg = new NanoFIXMessage(null);
         //TODO when(msg.getFieldValue(11)).thenReturn("abc");
-        assertThat(new FieldSelector(new StringField(11, "abc")).select(msg), is(true));
+        assertThat(new FieldSelector(new StringField(11, "abc")).select(msg)).isTrue();
     }
 }

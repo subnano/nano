@@ -1,16 +1,12 @@
 package net.nanofix.store;
 
 import net.nanofix.message.FIXMessage;
-import net.nanofix.message.MsgTypes;
-import net.nanofix.message.Tags;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
 
 /**
  * User: Mark
@@ -24,6 +20,7 @@ public class MemoryMessageStoreTest {
     private static final String TEST_VALUE = "test-value";
 
     private MessageStore store;
+/*
 
     @Before
     public void setup() {
@@ -104,6 +101,7 @@ public class MemoryMessageStoreTest {
         assertEquals("SeqNumIn", MessageStore.UNDEFINED, store.getMsgSeqNumIn());
         assertEquals("SeqNumOut", MessageStore.UNDEFINED, store.getMsgSeqNumOut());
     }
+*/
 
     private FIXMessage createTestMessage(String account) {
         throw new UnsupportedOperationException();

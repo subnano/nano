@@ -81,7 +81,7 @@ public class NanoSession implements Session, SocketListener {
     }
 
     private void sendLogon() {
-        FIXMessage msg = new NanoFIXMessage(null, null);
+        FIXMessage msg = new NanoFIXMessage( null);
         send(msg);
     }
 }

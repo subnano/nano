@@ -4,36 +4,24 @@ import net.nanofix.time.UtcDateTimeEncoder;
 import net.nanofix.util.ByteArrayUtil;
 import net.nanofix.util.ByteString;
 import net.nanofix.util.FIXBytes;
-import sun.misc.Unsafe;
 
 import java.nio.ByteBuffer;
 
 /**
  * Implements FixBuffer with an underlying ByteBuffer implementation.
  **/
-public class FixBuffer {
+public class FixBuffer implements MessageAssembler {
 
-    //private final UtcDateTimeEncoder timeEncoder = new UtcDateTimeEncoder();
+    private final UtcDateTimeEncoder timeEncoder = new UtcDateTimeEncoder();
 
     protected ByteBuffer buffer;
 
-    public void wrap(final ByteBuffer buffer) {
+    public FixBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 
-    @Override
-    public ByteBuffer buffer() {
-        return buffer;
-    }
-
-    @Override
-    public int offset() {
-        return 0;
-    }
-
-    @Override
-    public int length() {
-        return 0;
+    public void wrap(final ByteBuffer buffer) {
+        this.buffer = buffer;
     }
 
     @Override
@@ -84,6 +72,10 @@ public class FixBuffer {
         buffer.put(FIXBytes.EQUALS);
         buffer.put(bytes);
         buffer.put(FIXBytes.SOH);
+    }
+
+    protected ByteBuffer buffer() {
+        return buffer;
     }
 
 }

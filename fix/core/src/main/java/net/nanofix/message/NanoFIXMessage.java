@@ -2,20 +2,19 @@ package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
 import net.nanofix.message.util.ChecksumCalculator;
+import net.nanofix.util.ByteArrayUtil;
 
 import java.nio.ByteBuffer;
 
 /**
  * This class has mutable state so concurrent use is not advised.
  */
-public class NanoFIXMessage implements FIXMessage {
+public class NanoFIXMessage extends FixBuffer implements FIXMessage {
 
     private final MessageHeader header;
-    private final ByteBuffer messageBuffer;
 
     public NanoFIXMessage(ByteBuffer messageBuffer) {
-        this.messageBuffer = messageBuffer;
-        // every message has a header
+        super(messageBuffer);
         this.header = new MessageHeader();
     }
 
@@ -33,13 +32,15 @@ public class NanoFIXMessage implements FIXMessage {
     public long encode(final ByteBuffer buffer, final int offset) {
         int index = offset;
         int bodyLength = ByteBufferUtil.readableBytes(buffer);
-        index += header.encode(buffer, index, bodyLength);
+        header.encode(buffer, index, bodyLength);
 
-        buffer.put(messageBuffer);
+        // TODO offset / length ??
+        buffer.put(buffer());
 
         // update the checksum
-        byte[] checksumBytes = ChecksumCalculator.calculateChecksum(buffer);
-        addBytesField(Tags.CheckSum, checksumBytes);
+        int length = buffer.limit();
+        int checksum = ChecksumCalculator.calculateChecksum(buffer, offset, length);
+        addBytesField(Tags.CheckSum, ByteArrayUtil.as3ByteArray(checksum));
         return -1;
     }
 

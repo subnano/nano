@@ -87,21 +87,21 @@ public class MessageHeader {
     void encode(final ByteBuffer buffer, final int offset, final int bodyLength) {
         int index = offset;
         //buffer.clear();
-        int headerLength = msgType.lenth()
-                + senderCompId.lenth()
-                + targetCompId.lenth()
+        int headerLength = msgType.length()
+                + senderCompId.length()
+                + targetCompId.length()
                 + ByteArrayUtil.lengthOfInt(msgSeqNum)
                 + LENGTH_OF_SENDING_TIME;
         int fixBodyLength = headerLength + bodyLength;
 
-        index += FixBuffer.addStringField(Tags.BeginString, beginString);
-        index += addIntField(Tags.MsgSeqNum, fixBodyLength);
-        addStringField(Tags.MsgType, msgType);
-        addStringField(Tags.SenderCompID, senderCompId);
-        addStringField(Tags.TargetCompID, targetCompId);
-        addIntField(Tags.MsgSeqNum, msgSeqNum);
-        addTimestamp(Tags.SendingTime, sendingTime);
-        return index;
+//        index += FixBuffer.addStringField(Tags.BeginString, beginString);
+//        index += addIntField(Tags.MsgSeqNum, fixBodyLength);
+//        addStringField(Tags.MsgType, msgType);
+//        addStringField(Tags.SenderCompID, senderCompId);
+//        addStringField(Tags.TargetCompID, targetCompId);
+//        addIntField(Tags.MsgSeqNum, msgSeqNum);
+//        addTimestamp(Tags.SendingTime, sendingTime);
+//        return index;
     }
 
 }

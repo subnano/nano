@@ -16,7 +16,7 @@ class NanoFIXMessageDecoderTest {
     private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-    private MessageDecodeHandler decodeHandler;
+    private FIXMessageVisitor decodeHandler;
 
     @BeforeEach
     void setUp() {

@@ -12,11 +12,11 @@ public class SoakMessageEncoder {
     private static final long SENDING_TIME = System.currentTimeMillis();
     private static final ByteString USER = ByteString.of("user1");
     private static final ByteBuffer buffer = ByteBuffer.allocate(256);
+    private static final ByteBuffer encodeBuffer = ByteBuffer.allocate(1024);
 
 
     public static void main(String[] args) {
-        MessageHeader header = new MessageHeader(ByteBuffer.allocate(256));
-        FIXMessage msg = new NanoFIXMessage(header, buffer);
+        FIXMessage msg = new NanoFIXMessage(buffer);
         while (true) {
             encodeLogon(msg);
         }
@@ -34,7 +34,7 @@ public class SoakMessageEncoder {
         msg.addIntField(Tags.HeartBtInt, 30);
         msg.addBooleanField(Tags.ResetSeqNumFlag, true);
         msg.addStringField(Tags.Username, USER);
-        ByteBuffer[] buffers = msg.buffers();
+        msg.encode(encodeBuffer, 0);
     }
 
 }

@@ -1,10 +1,9 @@
 package net.nanofix.util;
 
 import io.nano.core.clock.SystemClock;
-import org.junit.Test;
-import org.mockito.internal.matchers.ArrayEquals;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * User: Mark
@@ -18,10 +17,10 @@ public class ByteArrayConverterTest {
 
     @Test
     public void testConvertToBytes() throws Exception {
-        assertThat(ByteArrayUtil.asByteArray(3), new ArrayEquals(new byte[]{'0' + 3}));
-        assertThat(ByteArrayUtil.asByteArray(34), new ArrayEquals(new byte[]{'0' + 3, '0' + 4}));
-        assertThat(ByteArrayUtil.asByteArray(345), new ArrayEquals(new byte[]{'0' + 3, '0' + 4, '0' + 5}));
-        assertThat(ByteArrayUtil.asByteArray(3456), new ArrayEquals(new byte[]{'0' + 3, '0' + 4, '0' + 5, '0' + 6}));
+        assertThat(ByteArrayUtil.asByteArray(3)).isEqualTo(new byte[]{'0' + 3});
+        assertThat(ByteArrayUtil.asByteArray(34)).isEqualTo(new byte[]{'0' + 3, '0' + 4});
+        assertThat(ByteArrayUtil.asByteArray(345)).isEqualTo(new byte[]{'0' + 3, '0' + 4, '0' + 5});
+        assertThat(ByteArrayUtil.asByteArray(3456)).isEqualTo(new byte[]{'0' + 3, '0' + 4, '0' + 5, '0' + 6});
     }
 
     @Test

@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
  * Creates a string representation of FIX message from decoding a ByteBuffer.
  * Not to be used in critical sections of code as allocation is poor.
  */
-public class MessageStringBuilder implements MessageDecodeHandler {
+public class MessageStringBuilder implements FIXMessageVisitor {
 
     private final StringBuilder sb;
     private final char delimiter;
@@ -30,6 +30,11 @@ public class MessageStringBuilder implements MessageDecodeHandler {
     @Override
     public void onError(int index, String message) {
         throw new IllegalArgumentException(String.format("Index %d - %s", index, message));
+    }
+
+    @Override
+    public boolean wantMoreTags() {
+        return true;
     }
 
     public String asString() {

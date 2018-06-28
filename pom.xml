@@ -22,5 +22,6 @@
         <module>time</module>
         <module>core</module>
         <module>fix</module>
+        <module>core-benchmarks</module>
     </modules>
 </project>

@@ -44,18 +44,8 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
     private static final int MIN_BODY_LEN = 5; // 8=FIX.4.x|9=NN|35=X|10=nnn|
     private static final int MAX_BODY_LEN = 1024 * 1024;
 
-    private final boolean decodeEntireMessage;
-
-    public NanoFIXMessageDecoder() {
-        this(true);
-    }
-
-    public NanoFIXMessageDecoder(final boolean decodeEntireMessage) {
-        this.decodeEntireMessage = decodeEntireMessage;
-    }
-
     @Override
-    public void decode(ByteBuffer buffer, MessageDecodeHandler handler) {
+    public void decode(ByteBuffer buffer, FIXMessageVisitor visitor) {
         // start at current position?
         int initialOffset = 0;
 
@@ -67,7 +57,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
         while (tagIndex < buffer.position()) {
             int equalIndex = ByteBufferUtil2.indexOf(buffer, tagIndex, EQUALS);
             if (equalIndex == NOT_FOUND_INDEX) {
-                handler.onError(tagIndex, EQUAL_NOT_FOUND_ERROR_MESSAGE);
+                visitor.onError(tagIndex, EQUAL_NOT_FOUND_ERROR_MESSAGE);
                 break;
             }
             int tagLen = equalIndex - tagIndex;
@@ -75,7 +65,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
             int startOfHeaderIndex = ByteBufferUtil2.indexOf(buffer, valueIndex, SOH);
             if (startOfHeaderIndex == NOT_FOUND_INDEX) {
-                handler.onError(valueIndex, SOH_NOT_FOUND_ERROR_MESSAGE);
+                visitor.onError(valueIndex, SOH_NOT_FOUND_ERROR_MESSAGE);
                 break;
             }
             int valueLen = startOfHeaderIndex - valueIndex;
@@ -83,24 +73,24 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
             // check first tag is the FIX BeginString
             if (tagCount == 0) {
                 if (!ByteBufferUtil2.hasBytes(buffer, tagIndex, FIXBytes.BEGIN_STRING_PREFIX)) {
-                    handler.onError(tagIndex, BEGIN_STRING_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, BEGIN_STRING_ERROR_MESSAGE);
                     break;
                 }
             }
             // check MsgBody
             else if (tagCount == 1) {
                 if (!ByteBufferUtil2.hasByte(buffer, tagIndex, FIXBytes.BODY_LEN_TAG)) {
-                    handler.onError(tagIndex, BODY_LEN_SECOND_FIELD_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, BODY_LEN_SECOND_FIELD_ERROR_MESSAGE);
                     break;
                 }
                 if (valueLen > 4) {
-                    handler.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
                     break;
                 }
                 bodyLen = ByteBufferUtil2.toInt(buffer, valueIndex, valueLen);
 
                 if (bodyLen < MIN_BODY_LEN || bodyLen > MAX_BODY_LEN) {
-                    handler.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
                     break;
                 }
 
@@ -113,7 +103,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
             // check MsgType is the third field
             else if (tagCount == 2) {
                 if (!ByteBufferUtil2.hasBytes(buffer, tagIndex, FIXBytes.MSG_TYPE_TAG_BYTES)) {
-                    handler.onError(tagIndex, MSG_TYPE_THIRD_FIELD_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, MSG_TYPE_THIRD_FIELD_ERROR_MESSAGE);
                     break;
                 }
             }
@@ -122,7 +112,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
             if (ByteBufferUtil2.hasBytes(buffer, tagIndex, FIXBytes.CHECKSUM_PREFIX)) {
                 int actualBodyLength = tagIndex - bodyStartIndex;
                 if (bodyLen != actualBodyLength) {
-                    handler.onError(tagIndex, BODY_LEN_INCORRECT_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, BODY_LEN_INCORRECT_ERROR_MESSAGE);
                     break;
                 }
                 // check that checksum value is correct
@@ -132,13 +122,13 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
                 if (checksum != calculatedChecksum) {
                     System.out.println("checksum:" + checksum + " calculatedChecksum: " + calculatedChecksum);
-                    handler.onError(tagIndex, CHECKSUM_INCORRECT_ERROR_MESSAGE);
+                    visitor.onError(tagIndex, CHECKSUM_INCORRECT_ERROR_MESSAGE);
                     break;
                 }
             }
 
-            // notify handler of next tag value pair
-            handler.onTag(buffer, tagIndex, tagLen, valueLen);
+            // notify visitor of next tag value pair
+            visitor.onTag(buffer, tagIndex, tagLen, valueLen);
 
             // move offset to next available byte
             tagIndex += (tagLen + valueLen + 2);
@@ -150,6 +140,11 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
             // increment the tag counter
             tagCount++;
+
+            // ask the visitor if message iteration should continue
+            if (!visitor.wantMoreTags()) {
+                break;
+            }
         }
     }
 

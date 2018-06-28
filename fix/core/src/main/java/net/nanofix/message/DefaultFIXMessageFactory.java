@@ -30,7 +30,7 @@ public class DefaultFIXMessageFactory implements FIXMessageFactory {
 
     @Override
     public FIXMessage createMessage() {
-        FIXMessage msg = new NanoFIXMessage(null, null);
+        FIXMessage msg = new NanoFIXMessage(null);
         if (recordTimestamps) {
             //msg.header().setTimestamp(System.nanoTime());
         }

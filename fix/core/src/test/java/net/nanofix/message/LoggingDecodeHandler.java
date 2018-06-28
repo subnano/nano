@@ -4,7 +4,7 @@ import io.nano.core.buffer.ByteBufferUtil;
 
 import java.nio.ByteBuffer;
 
-class LoggingDecodeHandler implements MessageDecodeHandler {
+class LoggingDecodeHandler implements FIXMessageVisitor {
 
     @Override
     public void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
@@ -27,5 +27,10 @@ class LoggingDecodeHandler implements MessageDecodeHandler {
                 index,
                 message
         ));
+    }
+
+    @Override
+    public boolean wantMoreTags() {
+        return true;
     }
 }

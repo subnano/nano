@@ -1,13 +1,14 @@
 package net.nanofix.util;
 
-import org.junit.Ignore;
+
+import org.junit.jupiter.api.Disabled;
 
 /**
  * User: Mark
  * Date: 01/05/12
  * Time: 17:41
  */
-@Ignore
+@Disabled
 public class TestHelper {
 
     public static final String BEGIN_STRING = "FIX.4.2";
@@ -20,7 +21,7 @@ public class TestHelper {
 
     public static void printResults(String msg, long loops, long elapsed) {
         System.out.println(loops + " x " + msg + " took " + elapsed + "ms @ "
-                + (double)elapsed * 1000 * 1000 / (double)loops + " ns");
+                + (double) elapsed * 1000 * 1000 / (double) loops + " ns");
     }
 
 }
