@@ -16,6 +16,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -25,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 3)
 @Fork(3)
 public class ThrownBench {
+
+    private static final Optional<String> OPTION_OK = Optional.of("Pass");
 
     public static void main(String[] args) throws RunnerException {
         System.setProperty("jmh.ignoreLock", "true");
@@ -45,11 +48,15 @@ public class ThrownBench {
 
     @Benchmark
     public void methodThatReturns(Blackhole hole) {
-        Result result = methodReturns();
+        hole.consume(methodReturns());
     }
 
     private void methodThrows() {
         throw new IllegalArgumentException("here");
+    }
+
+    private Optional<String> methodReturns() {
+        return OPTION_OK;
     }
 
 }
