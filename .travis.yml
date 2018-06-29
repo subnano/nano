@@ -10,7 +10,7 @@ cache:
 # https://raw.githubusercontent.com/nano-io/nano-time/master/settings.xml
 install:
   - /bin/cp settings.xml $HOME/.m2/settings.xml
-  - mvn -B --show-version dependency:resolve
+  #- mvn -B --show-version dependency:resolve
 
 script: mvn -B install
 
