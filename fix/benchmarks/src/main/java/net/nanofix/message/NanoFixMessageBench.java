@@ -51,9 +51,9 @@ public class NanoFixMessageBench {
 
     @State(Scope.Benchmark)
     public static class BenchmarkState {
-        MessageHeader header = new MessageHeader(ByteBuffer.allocate(256));
+        public ByteBuffer encodeBuffer = ByteBuffer.allocate(1024);
         ByteBuffer buffer = ByteBuffer.allocate(256);
-        FIXMessage msg = new NanoFIXMessage(header, buffer);
+        FIXMessage msg = new NanoFIXMessage(buffer);
     }
 
     @Benchmark
@@ -70,7 +70,7 @@ public class NanoFixMessageBench {
         msg.addIntField(Tags.HeartBtInt, 30);
         msg.addBooleanField(Tags.ResetSeqNumFlag, true);
         msg.addStringField(Tags.Username, USER);
-        hole.consume(msg.buffers());
+        hole.consume(msg.encode(state.encodeBuffer, 0));
     }
 
     //@Benchmark
@@ -78,7 +78,6 @@ public class NanoFixMessageBench {
         // 8=FIX.4.4|9=132|35=D|34=4|49=BANZAI|52=20120331-10:26:33.264|56=EXEC|11=1333189593005|21=1|38=100|40=1|54=1|
         // 55=GOOG.N|59=0|60=20120331-10:26:33.257|10=219|
         FIXMessage msg = state.msg;
-        msg.buffer(state.buffer);
         msg.header().beginString(BeginStrings.FIX_4_2);
         msg.header().msgType(MsgTypes.NewOrderSingle);
         msg.header().senderCompId(SENDER_COMP_ID);
@@ -88,13 +87,13 @@ public class NanoFixMessageBench {
         // 11 21 38 40 54 55 59 60
         msg.addStringField(Tags.ClOrdID, CL_ORD_ID);
         msg.addByteField(Tags.HandlInst, FIXBytes.HANDL_INST_AUTO);
-        msg.addLongField((Tags.OrderQty, 10_000);
+        msg.addLongField(Tags.OrderQty, 10_000);
         msg.addByteField(Tags.OrdType, FIXBytes.ORD_TYPE_MARKET);
         msg.addByteField(Tags.Side, FIXBytes.SIDE_SELL);
         msg.addStringField(Tags.Symbol, EURUSD);
         msg.addByteField(Tags.TimeInForce, FIXBytes.TIF_DAY);
         msg.addTimestamp(Tags.TransactTime, TRANSACT_TIME);
-        hole.consume(msg.buffers());
+        hole.consume(msg.encode(state.encodeBuffer, 0));
     }
 
 
