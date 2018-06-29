@@ -16,5 +16,5 @@ public interface FIXMessageVisitor {
     /**
      * Controls buffer iteration logic so that the visitor decides when enough data has been received.
      */
-    boolean wantMoreTags();
+    boolean complete();
 }

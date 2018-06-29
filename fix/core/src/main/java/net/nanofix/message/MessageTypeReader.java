@@ -30,13 +30,17 @@ public class MessageTypeReader implements FIXMessageVisitor {
         }
     }
 
+    public MsgType msgType() {
+        return messageHeader.msgType();
+    }
+
     @Override
     public void onError(int index, String message) {
         this.errorMessage = message;
     }
 
     @Override
-    public boolean wantMoreTags() {
+    public boolean complete() {
         return messageHeader.msgType() == null;
     }
 }

@@ -142,7 +142,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
             tagCount++;
 
             // ask the visitor if message iteration should continue
-            if (!visitor.wantMoreTags()) {
+            if (visitor.complete()) {
                 break;
             }
         }

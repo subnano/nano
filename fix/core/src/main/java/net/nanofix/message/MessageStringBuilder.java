@@ -33,7 +33,7 @@ public class MessageStringBuilder implements FIXMessageVisitor {
     }
 
     @Override
-    public boolean wantMoreTags() {
+    public boolean complete() {
         return true;
     }
 

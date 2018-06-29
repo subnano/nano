@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class DecodeMessagesTest {
+public class MessageTypeReaderTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
     private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();
@@ -20,11 +20,4 @@ public class DecodeMessagesTest {
         Assertions.assertThat(messageHeader.msgType()).isEqualTo(MsgTypes.Heartbeat);
     }
 
-    @Test
-    void decodeHeartbeat() {
-        String msgText = FIXMessageStrings.HEARTBEAT;
-        MessageTestHelper.prepareBuffer(buffer, msgText);
-        decoder.decode(buffer, messageTypeReader);
-        Assertions.assertThat(messageHeader.msgType()).isEqualTo(MsgTypes.Heartbeat);
-    }
 }
