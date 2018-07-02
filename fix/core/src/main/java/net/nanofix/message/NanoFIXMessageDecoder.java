@@ -2,6 +2,7 @@ package net.nanofix.message;
 
 import net.nanofix.message.util.ChecksumCalculator;
 import net.nanofix.util.FIXBytes;
+import net.nanofix.util.TagBytes;
 
 import java.nio.ByteBuffer;
 
@@ -25,7 +26,7 @@ import static net.nanofix.util.FIXBytes.SOH;
  * TODO body length value validation (all integer)
  * TODO only read as far as body length + checksum
  * TODO complain if checksum is missing
- *
+ * <p>
  * User: Mark Wardell
  * Date: 10/10/16
  * Time: 14:34
@@ -102,7 +103,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
             // check MsgType is the third field
             else if (tagCount == 2) {
-                if (!ByteBufferUtil2.hasBytes(buffer, tagIndex, FIXBytes.MSG_TYPE_TAG_BYTES)) {
+                if (!ByteBufferUtil2.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
                     visitor.onError(tagIndex, MSG_TYPE_THIRD_FIELD_ERROR_MESSAGE);
                     break;
                 }

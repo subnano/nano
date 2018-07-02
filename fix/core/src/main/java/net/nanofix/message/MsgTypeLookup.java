@@ -12,6 +12,11 @@ public class MsgTypeLookup {
         addToCache(MsgTypes.Logon);
         addToCache(MsgTypes.Logout);
         addToCache(MsgTypes.Heartbeat);
+        addToCache(MsgTypes.TestRequest);
+        addToCache(MsgTypes.ResendRequest);
+        addToCache(MsgTypes.Reject);
+        addToCache(MsgTypes.SequenceReset);
+        addToCache(MsgTypes.BusinessMessageReject);
         addToCache(MsgTypes.NewOrderSingle);
         addToCache(MsgTypes.ExecutionReport);
         // TODO enumerate all and add all single byte fields

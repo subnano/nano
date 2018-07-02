@@ -61,30 +61,6 @@ public class FIXMessageUtilTest {
         assertThat(FIXMessageUtil.isTrailerField(Tags.CheckSum)).isTrue();
     }
 
-    private long testIsAdminMessageAsString(String[] testMsgTypes) {
-        long start = System.nanoTime();
-        for (int i = 0; i < LOOP_COUNT; i++) {
-            for (String msgType : testMsgTypes) {
-                FIXMessageUtil.isAdminMessage(msgType);
-            }
-        }
-        long elapsed = TimeUtil2.getNanoTimeAsMillis(System.nanoTime() - start);
-        LOG.debug("string test complete in {} millis", elapsed);
-        return elapsed;
-    }
-
-    private long testIsAdminMessage(String[] testMsgTypes) {
-        long start = System.nanoTime();
-        for (int i = 0; i < LOOP_COUNT; i++) {
-            for (String msgType : testMsgTypes) {
-                isAdminMessageAsString(msgType);
-            }
-        }
-        long elapsed = TimeUtil2.getNanoTimeAsMillis(System.nanoTime() - start);
-        LOG.debug("case test complete in {} millis", elapsed);
-        return elapsed;
-    }
-
     private static boolean isAdminMessageAsString(String msgType) {
         return msgType.length() == 1 && "0A12345".contains(msgType);
     }

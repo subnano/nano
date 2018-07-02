@@ -2,7 +2,7 @@ package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
 import net.nanofix.util.ByteString;
-import net.nanofix.util.FIXBytes;
+import net.nanofix.util.TagBytes;
 
 import java.nio.ByteBuffer;
 
@@ -17,8 +17,9 @@ public class MessageTypeReader implements FIXMessageVisitor {
 
     @Override
     public void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
+
         // we only care about 35
-        if (ByteBufferUtil.hasBytes(buffer, tagIndex, FIXBytes.MSG_TYPE_TAG_BYTES)) {
+        if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
             if (valueLen == 1) {
                 byte msgTypeByte = buffer.get(tagIndex + tagLen + 1);
                 messageHeader.msgType(MsgTypeLookup.lookup(msgTypeByte));

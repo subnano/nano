@@ -2,8 +2,6 @@ package net.nanofix.message;
 
 import net.nanofix.settings.SessionSettings;
 import net.nanofix.util.ByteString;
-import net.nanofix.util.DateTimeGenerator;
-import net.nanofix.util.DefaultTimeGenerator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,13 +16,11 @@ public class DefaultFIXMessageFactory implements FIXMessageFactory {
     private final SessionSettings settings;
     private final boolean resetSeqNumOnLogon;
     private final MessageKey messageKey;
-    private DateTimeGenerator timeGenerator;
 
     public DefaultFIXMessageFactory(SessionSettings settings) {
         this.settings = settings;
         // TODO time generator created by a factory based on settings
         this.messageKey = new MessageKey();
-        this.timeGenerator = new DefaultTimeGenerator();
         this.resetSeqNumOnLogon = settings.isResetSeqNumOnLogon();
     }
 

@@ -12,7 +12,6 @@ public final class FIXBytes {
     public static final byte[] BEGIN_STRING_PREFIX = ByteArrayUtil.asByteArray("8=FIX.");
     public static final byte[] CHECKSUM_PREFIX = ByteArrayUtil.asByteArray("10=");
     public static final byte[] CHECKSUM_PLACEHOLDER = ByteArrayUtil.asByteArray("000");
-    public static final byte[] MSG_TYPE_TAG_BYTES = ByteArrayUtil.asByteArray("35");
 
     public static final byte HANDL_INST_AUTO = '1';
     public static final byte HANDL_INST_AUTO_PREFERRED = '2';

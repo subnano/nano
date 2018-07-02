@@ -2,6 +2,7 @@ package io.nano.core.buffer;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public final class ByteBufferUtil {
 
@@ -120,6 +121,10 @@ public final class ByteBufferUtil {
             buffer.put(offset + i, (byte) (digit + 0x30));
             value -= (digit * power);
         }
+    }
+
+    public static ByteBuffer wrap(final String text) {
+        return ByteBuffer.wrap(text.getBytes(StandardCharsets.US_ASCII));
     }
 
     public static String hexDump(final ByteBuffer buffer) {

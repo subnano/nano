@@ -1,10 +1,7 @@
 package io.nano.core.time;
 
-import java.time.Month;
 import java.time.Year;
 import java.util.concurrent.TimeUnit;
-
-import static java.time.Year.isLeap;
 
 public final class TimeUtil {
 
@@ -27,7 +24,7 @@ public final class TimeUtil {
         return Math.floorMod(epochMillis, MILLIS_PER_DAY);
     }
 
-    // Based code from https://github.com/ThreeTen
+    // Based on code from https://github.com/ThreeTen
     public static long estimateDayOfYear(final long zeroDay, final long yearEst) {
         return zeroDay - (365 * yearEst + yearEst / 4 - yearEst / 100 + yearEst / 400);
     }

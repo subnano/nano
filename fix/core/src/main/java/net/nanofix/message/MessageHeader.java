@@ -104,4 +104,13 @@ public class MessageHeader {
 //        return index;
     }
 
+    @Override
+    public String toString() {
+        return "35=" + msgType + "|"
+                + "49=" +new String(senderCompId.bytes()) + "|"
+                + "56=" + new String(targetCompId.bytes()) + "|"
+                + "34=" + msgSeqNum + "|"
+                + "52=" + sendingTime + "|"
+                ;
+    }
 }
