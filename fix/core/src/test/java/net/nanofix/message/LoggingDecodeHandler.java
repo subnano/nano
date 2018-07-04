@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 class LoggingDecodeHandler implements FIXMessageVisitor {
 
     @Override
-    public void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
+    public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
         int valueIndex = tagIndex + tagLen + 1;
         System.out.println(String.format(
                 "onTag: tagIndex=%d tagLen=%d (%s) valueIndex=%d valueLen=%d (%s)",
@@ -18,6 +18,7 @@ class LoggingDecodeHandler implements FIXMessageVisitor {
                 valueLen,
                 new String(ByteBufferUtil.asByteArray(buffer, valueIndex, valueLen))
         ));
+        return true;
     }
 
     @Override

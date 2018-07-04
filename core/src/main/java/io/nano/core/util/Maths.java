@@ -61,4 +61,20 @@ public class Maths {
         return 9;
     }
 
+    /** Return the least power of two greater than or equal to the specified value.
+     *
+     * @param x a long integer smaller than or equal to 2<sup>62</sup>.
+     * @return the least power of two greater than or equal to the specified value.
+     * Returns 1 when input argument is 0.
+     */
+    public static long nextPowerOfTwo( long x ) {
+        if ( x == 0 ) return 1;
+        x--;
+        x |= x >> 1;
+        x |= x >> 2;
+        x |= x >> 4;
+        x |= x >> 8;
+        x |= x >> 16;
+        return ( x | x >> 32 ) + 1;
+    }
 }

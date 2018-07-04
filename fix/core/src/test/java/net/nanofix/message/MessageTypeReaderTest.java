@@ -9,7 +9,7 @@ public class MessageTypeReaderTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
     private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();
-    private final MessageHeader messageHeader = new MessageHeader();
+    private final MessageHeader messageHeader = new NanoMessageHeader();
     private MessageTypeReader messageTypeReader = new MessageTypeReader(messageHeader);
 
     @Test

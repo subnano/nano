@@ -100,6 +100,14 @@ public final class ByteBufferUtil {
         return readableBytes;
     }
 
+    public static boolean toBoolean(ByteBuffer buffer, int offset, int len) {
+        if (len != 1) {
+            throw new IllegalArgumentException("Len should be 1 when decoding a boolean");
+        }
+        byte aByte = buffer.get(offset);
+        return (aByte & 0xff) == 1;
+    }
+
     public static int toInt(ByteBuffer buffer, int offset, int len) {
         int number = 0;
         int index = 0;

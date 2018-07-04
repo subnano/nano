@@ -9,6 +9,8 @@ public final class TagBytes {
     public static final byte[] TargetCompID = ByteArrayUtil.asByteArray(Tags.TargetCompID);
     public static final byte[] MsgSeqNum = ByteArrayUtil.asByteArray(Tags.MsgSeqNum);
     public static final byte[] SendingTime = ByteArrayUtil.asByteArray(Tags.SendingTime);
+    public static final byte[] EncryptMethod = ByteArrayUtil.asByteArray(Tags.EncryptMethod);
+    public static final byte[] HeartBtInt = ByteArrayUtil.asByteArray(Tags.HeartBtInt);
 
     private TagBytes() {
         // can't touch this

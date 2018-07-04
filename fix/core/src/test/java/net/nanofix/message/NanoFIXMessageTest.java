@@ -18,7 +18,7 @@ class NanoFIXMessageTest {
     private static final ByteString TARGET_COMP_ID = ByteString.of("BROKER");
     private static final long SENDING_TIME = System.currentTimeMillis();
 
-    private final MessageHeader header = new MessageHeader();
+    private final MessageHeader header = new NanoMessageHeader();
     private final ByteBuffer messageBuffer = ByteBuffer.allocate(256);
     private final ByteBuffer buffer = ByteBuffer.allocate(1024);
     private final FIXMessageDecoder decoder = new NanoFIXMessageDecoder();

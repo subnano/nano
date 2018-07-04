@@ -9,7 +9,7 @@ public interface FIXMessageVisitor {
      *
      * It can be assumed that valueIndex will be tagIndex + tagLen + 1
      */
-    void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen);
+    boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen);
 
     void onError(int index, String message);
 

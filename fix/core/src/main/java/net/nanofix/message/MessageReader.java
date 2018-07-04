@@ -11,13 +11,14 @@ public class MessageReader implements FIXMessageVisitor {
     }
 
     @Override
-    public void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
+    public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
         if (!messageTypeReader.complete())
             messageTypeReader.onTag(buffer, tagIndex, tagLen, valueLen);
         else {
             // determine suitable message reader for MsgType
             messageTypeReader.msgType();
         }
+        return true;
     }
 
     @Override

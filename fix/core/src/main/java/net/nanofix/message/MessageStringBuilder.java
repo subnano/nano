@@ -19,12 +19,13 @@ public class MessageStringBuilder implements FIXMessageVisitor {
     }
 
     @Override
-    public void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
+    public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
         int valueIndex = tagIndex + tagLen + 1;
         sb.append(new String(ByteBufferUtil2.asByteArray(buffer, tagIndex, tagLen)))
                 .append('=')
                 .append(new String(ByteBufferUtil2.asByteArray(buffer, valueIndex, valueLen)))
                 .append(delimiter);
+        return true;
     }
 
     @Override

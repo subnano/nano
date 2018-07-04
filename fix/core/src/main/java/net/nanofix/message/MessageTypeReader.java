@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 public class MessageTypeReader implements FIXMessageVisitor {
 
-    private final MessageHeader messageHeader;
+    protected final MessageHeader messageHeader;
     private String errorMessage;
 
     public MessageTypeReader(MessageHeader messageHeader) {
@@ -16,19 +16,22 @@ public class MessageTypeReader implements FIXMessageVisitor {
     }
 
     @Override
-    public void onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
-
+    public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
+        boolean handled = false;
         // we only care about 35
         if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
             if (valueLen == 1) {
                 byte msgTypeByte = buffer.get(tagIndex + tagLen + 1);
                 messageHeader.msgType(MsgTypeLookup.lookup(msgTypeByte));
+                handled = true;
             } else {
                 // TODO no -don't create an array here - wasteful
                 byte[] msgTypeBytes = ByteBufferUtil.asByteArray(buffer, tagIndex + tagLen + 1, valueLen);
                 messageHeader.msgType(new MsgType(ByteString.of(msgTypeBytes).toString()));
+                handled = true;
             }
         }
+        return handled;
     }
 
     public MsgType msgType() {

@@ -11,11 +11,11 @@ import java.nio.ByteBuffer;
  */
 public class NanoFIXMessage extends FixBuffer implements FIXMessage {
 
-    private final MessageHeader header;
+    private final NanoMessageHeader header;
 
     public NanoFIXMessage(ByteBuffer messageBuffer) {
         super(messageBuffer);
-        this.header = new MessageHeader();
+        this.header = new NanoMessageHeader();
     }
 
     @Override
