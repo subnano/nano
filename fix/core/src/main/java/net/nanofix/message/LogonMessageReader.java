@@ -1,7 +1,6 @@
 package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
-import io.nano.core.lang.MutableInteger;
 import net.nanofix.util.TagBytes;
 
 import java.nio.ByteBuffer;
@@ -9,9 +8,9 @@ import java.nio.ByteBuffer;
 public class LogonMessageReader extends MessageHeaderReader implements FIXMessageVisitor {
 
     // The Boolean wrapper never creates objects so is safe to use
-    private MutableBoolean encryptMethod = new MutableBoolean();
-    private MutableInteger heartBeatInterval = new MutableInteger();
-    private MutableBoolean resetSeqNumFlag = new MutableBoolean();
+    private boolean encryptMethod = false;
+    private int heartBeatInterval = 0;
+    private boolean resetSeqNumFlag = false;
 
     public LogonMessageReader() {
         super(new NanoMessageHeader());
@@ -32,9 +31,11 @@ public class LogonMessageReader extends MessageHeaderReader implements FIXMessag
         if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.EncryptMethod)) {
             encryptMethod = ByteBufferUtil.toBoolean(buffer, valueIndex, valueLen);
             handled = true;
-        }
-        else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.HeartBtInt)) {
+        } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.HeartBtInt)) {
             heartBeatInterval = ByteBufferUtil.toInt(buffer, valueIndex, valueLen);
+            handled = true;
+        } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.ResetSeqNumFlag)) {
+            resetSeqNumFlag = ByteBufferUtil.toBoolean(buffer, valueIndex, valueLen);
             handled = true;
         }
         return handled;
@@ -50,11 +51,15 @@ public class LogonMessageReader extends MessageHeaderReader implements FIXMessag
         return false;
     }
 
-    public boolean isEncryptMethod() {
+    public boolean encryptMethod() {
         return encryptMethod;
     }
 
-    public int getHeartBeatInterval() {
+    public int heartBeatInterval() {
         return heartBeatInterval;
+    }
+
+    public boolean resetSeqNumFlag() {
+        return resetSeqNumFlag;
     }
 }

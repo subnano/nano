@@ -45,6 +45,6 @@ public class MessageTypeReader implements FIXMessageVisitor {
 
     @Override
     public boolean complete() {
-        return messageHeader.msgType() == null;
+        return messageHeader.msgType() != null;
     }
 }

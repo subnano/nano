@@ -13,15 +13,10 @@ class MessageHeaderReaderTest {
     private MessageHeaderReader reader = new MessageHeaderReader(new NanoMessageHeader());
 
     @Test
-    void complete() {
-    }
-
-    @Test
-    void decodeHeartbeat() {
+    void decodeMessageHeader() {
         String msgText = FIXMessageStrings.HEARTBEAT;
         MessageTestHelper.prepareBuffer(buffer, msgText);
         decoder.decode(buffer, reader);
-        System.out.println(reader.toString());
         MessageHeaderAssert.assertThat(reader)
                 .hasMsgType(MsgTypes.Heartbeat)
                 .hasMsgSeqNum(2)

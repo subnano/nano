@@ -5,6 +5,10 @@ import io.nano.core.buffer.ByteBufferUtil;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * TODO Add support for with/without millis
+ * TODO Add support for micros (nanos?)
+ */
 public class UtcTimeDecoder {
 
     public static long decode(final ByteBuffer buffer, final int offset) {

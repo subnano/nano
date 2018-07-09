@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions;
 
 public class MessageHeaderAssert extends AbstractAssert<MessageHeaderAssert, MessageHeader> {
 
-    private MessageHeaderAssert(MessageHeader actual) {
+    protected MessageHeaderAssert(MessageHeader actual) {
         super(actual, MessageHeaderAssert.class);
     }
 
@@ -38,4 +38,5 @@ public class MessageHeaderAssert extends AbstractAssert<MessageHeaderAssert, Mes
         Assertions.assertThat(actual.sendingTime()).as("SendingTime").isEqualTo(expected);
         return this;
     }
+
 }
