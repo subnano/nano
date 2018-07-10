@@ -18,8 +18,14 @@ public class MessageTypeReader implements FIXMessageVisitor {
     @Override
     public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
         boolean handled = false;
-        // we only care about 35
-        if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
+        // only read up to tag 35
+        if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.BeginString)) {
+            messageHeader.beginString(MsgTypeLookup.lookup(msgTypeByte));
+
+        } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.BodyLength)) {
+            messageHeader.bL(MsgTypeLookup.lookup(msgTypeByte));
+
+        } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
             if (valueLen == 1) {
                 byte msgTypeByte = buffer.get(tagIndex + tagLen + 1);
                 messageHeader.msgType(MsgTypeLookup.lookup(msgTypeByte));

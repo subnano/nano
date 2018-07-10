@@ -1,6 +1,8 @@
 package net.nanofix.message;
 
+import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.time.TimeUtil;
+import net.nanofix.util.ByteArrayUtil;
 import net.nanofix.util.ByteString;
 import net.nanofix.util.FIXBytes;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -31,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(3)
 public class NanoFixMessageBench {
 
+    static final String LOGON_RESET = "8=FIX.4.0|9=61|35=A|34=1|49=BANZAI|52=20120331-10:25:15.000|56=EXEC|98=0|108=30|141=Y|10=255|";
+
     private static final ByteString SENDER_COMP_ID = ByteString.of("CLIENT");
     private static final ByteString TARGET_COMP_ID = ByteString.of("BROKER");
     private static final long SENDING_TIME = System.currentTimeMillis();
@@ -51,9 +55,12 @@ public class NanoFixMessageBench {
 
     @State(Scope.Benchmark)
     public static class BenchmarkState {
-        public ByteBuffer encodeBuffer = ByteBuffer.allocate(1024);
+        ByteBuffer encodeBuffer = ByteBuffer.allocate(1024);
         ByteBuffer buffer = ByteBuffer.allocate(256);
         FIXMessage msg = new NanoFIXMessage(buffer);
+        NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();
+        LogonMessageReader reader = new LogonMessageReader();
+        ByteBuffer decodeBuffer = NanoFixMessageBench.createBuffer(LOGON_RESET);
     }
 
     @Benchmark
@@ -73,7 +80,7 @@ public class NanoFixMessageBench {
         hole.consume(msg.encode(state.encodeBuffer, 0));
     }
 
-    //@Benchmark
+    @Benchmark
     public void encodeNewOrderSingle(BenchmarkState state, Blackhole hole) {
         // 8=FIX.4.4|9=132|35=D|34=4|49=BANZAI|52=20120331-10:26:33.264|56=EXEC|11=1333189593005|21=1|38=100|40=1|54=1|
         // 55=GOOG.N|59=0|60=20120331-10:26:33.257|10=219|
@@ -96,5 +103,17 @@ public class NanoFixMessageBench {
         hole.consume(msg.encode(state.encodeBuffer, 0));
     }
 
+    @Benchmark
+    public void decodeLogonMessage(BenchmarkState state) {
+        state.decodeBuffer.reset();
+        state.decoder.decode(state.decodeBuffer, state.reader);
+    }
 
+    static ByteBuffer createBuffer(String msgString) {
+        ByteBuffer buffer = ByteBuffer.allocate(msgString.length());
+        ByteBufferUtil.putBytes(buffer, ByteArrayUtil.asByteArray(msgString.replaceAll("\\|", String.valueOf((char) FIXBytes.SOH))));
+        buffer.flip();
+        buffer.mark();
+        return buffer;
+    }
 }
