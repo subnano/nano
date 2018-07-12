@@ -41,12 +41,12 @@ public class NanoObjObjMap<K, V> {
      */
     private int m_mask2;
 
-    public ObjObjMap(final int size, final float fillFactor) {
+    public NanoObjObjMap(final int size, final float fillFactor) {
         if (fillFactor <= 0 || fillFactor >= 1)
             throw new IllegalArgumentException("FillFactor must be in (0, 1)");
         if (size <= 0)
             throw new IllegalArgumentException("Size must be positive!");
-        final int capacity = Tools.arraySize(size, fillFactor);
+        final int capacity = NanoArrays.arraySize(size, fillFactor);
         m_mask = capacity - 1;
         m_mask2 = capacity * 2 - 1;
         m_fillFactor = fillFactor;

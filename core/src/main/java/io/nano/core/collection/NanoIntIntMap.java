@@ -42,6 +42,10 @@ public class NanoIntIntMap implements IntIntMap {
      * Mask to calculate the original position
      */
     private int mask;
+
+    /**
+     * Mask to wrap the actual array pointer
+     */
     private int mask2;
 
     public NanoIntIntMap(final int size, final float fillFactor) {
