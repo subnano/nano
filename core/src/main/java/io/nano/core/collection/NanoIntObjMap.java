@@ -6,7 +6,7 @@ import java.util.Arrays;
  * Int-Object map based on ObjObjMap from the following repo:
  * https://github.com/mikvor/hashmapTest
  */
-public class NanoIntObjMap<V> {
+public class NanoIntObjMap<V> implements IntObjectMap<V> {
 
     private static final int FREE_KEY = 0;
     private static final Object REMOVED_KEY = new Object();
@@ -28,7 +28,7 @@ public class NanoIntObjMap<V> {
     private final float fillFactor;
 
     /**
-     * We will resize a map once it reaches this size
+     * Resize map once it reaches this size
      */
     private int threshold;
 
@@ -66,9 +66,10 @@ public class NanoIntObjMap<V> {
     }
 
     public V get(final int key) {
-        if (key == null)
+        if (key == FREE_KEY)
             return (V) nullValue; //we null it on remove, so safe not to check a flag here
 
+/*
         int ptr = (key.hashCode() & mask) << 1;
         Object k = data[ptr];
 
@@ -84,9 +85,12 @@ public class NanoIntObjMap<V> {
             if (k.equals(key))
                 return (V) data[ptr + 1];
         }
+*/
+        return null;
     }
 
     public V put(final int key, final V value) {
+/*
         if (key == null)
             return insertNullKey(value);
 
@@ -135,9 +139,12 @@ public class NanoIntObjMap<V> {
                     firstRemoved = ptr;
             }
         }
+*/
+return null;
     }
 
     public V remove(final int key) {
+/*
         if (key == null)
             return removeNullKey();
 
@@ -172,6 +179,8 @@ public class NanoIntObjMap<V> {
                 return ret;
             }
         }
+*/
+    return null;
     }
 
     private V insertNullKey(final V value) {
@@ -215,11 +224,13 @@ public class NanoIntObjMap<V> {
 
         size = hasNull ? 1 : 0;
 
+/*
         for (int i = 0; i < oldCapacity; i += 2) {
             final int oldKey = oldData[i];
             if (oldKey != FREE_KEY && oldKey != REMOVED_KEY)
                 put(oldKey, (V) oldData[i + 1]);
         }
+*/
     }
 
     public int getStartIndex(final Object key) {

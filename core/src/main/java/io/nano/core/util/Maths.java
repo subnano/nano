@@ -61,6 +61,10 @@ public class Maths {
         return 9;
     }
 
+    public static boolean isPowerOfTwo(final long n) {
+        return (n & (n - 1)) == 0;
+    }
+
     /** Return the least power of two greater than or equal to the specified value.
      *
      * @param x a long integer smaller than or equal to 2<sup>62</sup>.

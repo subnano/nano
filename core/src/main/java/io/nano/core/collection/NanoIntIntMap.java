@@ -1,7 +1,12 @@
 package io.nano.core.collection;
 
 import io.nano.core.util.Bits;
+import io.nano.core.util.Maths;
 
+/**
+ * Int-Int map based on IntIntMap4a from the following repo:
+ * https://github.com/mikvor/hashmapTest
+ */
 public class NanoIntIntMap implements IntIntMap {
 
     private static final int FREE_KEY = 0;
@@ -29,7 +34,7 @@ public class NanoIntIntMap implements IntIntMap {
     private final float fillFactor;
 
     /**
-     * We will resize a map once it reaches this size
+     * Resize map once it reaches this size
      */
     private int threshold;
 
@@ -53,7 +58,7 @@ public class NanoIntIntMap implements IntIntMap {
             throw new IllegalArgumentException("FillFactor must be in (0, 1)");
         if (size <= 0)
             throw new IllegalArgumentException("Size must be positive!");
-        if ((size & (size - 1)) == 0)
+        if (!Maths.isPowerOfTwo(size))
             throw new IllegalArgumentException("Size must be a power of two!");
         final int capacity = NanoArrays.arraySize(size, fillFactor);
         this.mask = capacity - 1;

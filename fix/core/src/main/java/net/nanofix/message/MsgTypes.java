@@ -1,5 +1,7 @@
 package net.nanofix.message;
 
+import io.nano.core.collection.NanoIntObjMap;
+
 /**
  * User: Mark
  * Date: 13/04/12
@@ -100,4 +102,9 @@ public final class MsgTypes {
     public static MsgType NetworkStatusResponse = new MsgType("BD");
     public static MsgType CollateralInquiryAck = new MsgType("BG");
 
+    public static IntObjMap allMsgTypes = new NanoIntObjMap<MsgType>(1024, 0.75f);
+
+    static {
+
+    }
 }

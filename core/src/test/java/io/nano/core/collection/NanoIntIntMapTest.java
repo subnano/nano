@@ -9,7 +9,9 @@ class NanoIntIntMapTest {
 
     private final static float[] FILL_FACTORS = { 0.25f, 0.5f, 0.75f, 0.9f, 0.99f };
 
-    protected IntIntMap makeMap( final int size, final float fillFactor );
+    protected IntIntMap makeMap( final int size, final float fillFactor ) {
+        return new NanoIntIntMap(size, fillFactor);
+    }
 
     public void testPut()
     {
