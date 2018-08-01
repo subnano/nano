@@ -6,12 +6,12 @@
     <name>Nano/Kx</name>
     <groupId>io.nano</groupId>
     <artifactId>nano-kx</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <parent>
         <groupId>io.nano</groupId>
         <artifactId>nano-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <build>
