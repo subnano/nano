@@ -30,4 +30,13 @@
         <module>fix</module>
         <module>core-benchmarks</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-nano-io-release</id>
+            <name>nano-io-release</name>
+            <url>https://api.bintray.com/maven/nano-io/release/${project.artifactId};publish=1</url>
+        </repository>
+    </distributionManagement>
+
 </project>
