@@ -6,12 +6,12 @@
     <name>Nano Time</name>
     <groupId>io.nano</groupId>
     <artifactId>nano-time</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <parent>
         <groupId>io.nano</groupId>
         <artifactId>nano-parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
     </parent>
 
     <properties>

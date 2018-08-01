@@ -6,12 +6,12 @@
     <name>Nano/Core</name>
     <groupId>io.nano</groupId>
     <artifactId>nano-core</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <parent>
         <groupId>io.nano</groupId>
         <artifactId>nano-parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
     </parent>
 
     <properties>
