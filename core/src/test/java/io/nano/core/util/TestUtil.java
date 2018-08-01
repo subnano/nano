@@ -1,6 +1,4 @@
-package com.b2c2.regina.fixclient;
-
-import org.junit.Assert;
+package io.nano.core.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -35,7 +33,7 @@ public final class TestUtil {
     private static void assertConstructorIsPrivate(Class<?> clazz) throws Exception {
         final Constructor<?> constructor = clazz.getDeclaredConstructor();
         if (constructor.isAccessible() || !Modifier.isPrivate(constructor.getModifiers())) {
-            Assert.fail("Constructor is not private");
+            throw new IllegalArgumentException("Constructor is not private");
         }
         constructor.setAccessible(true);
         constructor.newInstance();
@@ -46,7 +44,7 @@ public final class TestUtil {
         for (final Method method : clazz.getMethods()) {
             if (!Modifier.isStatic(method.getModifiers())
                     && method.getDeclaringClass().equals(clazz)) {
-                Assert.fail("Class contains a non-static method:" + method);
+                throw new IllegalArgumentException("Class contains a non-static method:" + method);
             }
         }
     }

@@ -19,7 +19,7 @@ public class MessageTypeReader implements FIXMessageVisitor {
     public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
         boolean handled = false;
         if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.BeginString)) {
-            messageHeader.beginString(MsgTypeLookup.lookup(msgTypeByte));
+            // TODO messageHeader.beginString(MsgTypeLookup.lookup(msgTypeByte));
             handled = true;
         }
         // Don't care about storing BodyLength
