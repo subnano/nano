@@ -47,27 +47,39 @@ public class DefaultKxConnection implements KxConnection {
     }
 
     @Override
-    public <T> SyncKxTableWriter<T> newTableWriter(KxSchema kxSchema, KxEncoder<T> encoder) {
-        return new SyncKxTableWriter<>(
+    public <T> KxTableWriter<T> newTableWriter(KxSchema kxSchema, KxEncoder<T> encoder, Mode mode) {
+        return new DefaultTableWriter<>(
                 this,
                 kxSchema.tableName(),
                 kxSchema.columnNames(),
                 kxSchema.data(),
-                encoder
+                encoder,
+                mode
         );
     }
 
     @Override
-    public void invoke(String table, String command, kx.c.Flip flip) throws IOException {
+    public void sync(String table, String command, kx.c.Flip flip) throws IOException {
         try {
             // TODO send asynchronously
             Object result = c.k(command, table, flip);
-            //LOGGER.debug("Successfully wrote record to kx server");
+            //LOGGER.debug("Sync method returned {}", result);
         } catch (IOException e) {
-            LOGGER.error("IO Error writing record to kx", e);
+            LOGGER.error("Sync IO Error writing record to kx", e);
             throw e;
         } catch (KException e) {
             LOGGER.error("Error writing record to kx", e);
+        }
+    }
+
+    @Override
+    public void async(String table, String command, kx.c.Flip flip) throws IOException {
+        try {
+            // TODO send asynchronously
+            c.ks(command, table, flip);
+        } catch (IOException e) {
+            LOGGER.error("IO Error writing record to kx", e);
+            throw e;
         }
     }
 
@@ -104,4 +116,5 @@ public class DefaultKxConnection implements KxConnection {
             return user;
         return user + ":" + password;
     }
+
 }

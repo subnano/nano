@@ -72,22 +72,23 @@ public class KxConnectionManager implements KxConnection {
     }
 
     @Override
-    public <T> KxTableWriter<T> newTableWriter(KxSchema kxSchema, KxEncoder<T> encoder) {
+    public <T> KxTableWriter<T> newTableWriter(KxSchema kxSchema, KxEncoder<T> encoder, Mode mode) {
         // TODO we could around this code dupe if we extended DefaultKxConnection
         // originally had a problem with that - need to investigate again further
-        return new SyncKxTableWriter<>(
+        return new DefaultTableWriter<>(
                 this,
                 kxSchema.tableName(),
                 kxSchema.columnNames(),
                 kxSchema.data(),
-                encoder
+                encoder,
+                mode
         );
     }
 
     @Override
-    public void invoke(String table, String command, Flip flip) throws IOException {
+    public void sync(String table, String command, Flip flip) throws IOException {
         try {
-            connection.invoke(table, command, flip);
+            connection.sync(table, command, flip);
         } catch (EOFException e) {
             // we see an EOFException when we lose the socket connection
             LOGGER.info("Lost connection to remote process - will re-establish connection", reconnectInterval);
@@ -101,4 +102,20 @@ public class KxConnectionManager implements KxConnection {
         }
     }
 
+    @Override
+    public void async(String table, String command, Flip flip) throws IOException {
+        try {
+            connection.async(table, command, flip);
+        } catch (EOFException e) {
+            // we see an EOFException when we lose the socket connection
+            LOGGER.info("Lost connection to remote process - will re-establish connection", reconnectInterval);
+
+            // currently blocks on the application thread writing data - ew!
+            // would need locking of some kind if re-connectivity was on another thread
+            connection.close();
+            connect();
+        } catch (Exception e) {
+            LOGGER.info("Error writing to kx process");
+        }
+    }
 }

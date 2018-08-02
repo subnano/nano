@@ -8,8 +8,8 @@
 
     <parent>
         <groupId>io.nano</groupId>
-        <artifactId>nano-parent</artifactId>
-        <version>1.0.2</version>
+        <artifactId>nano-project</artifactId>
+        <version>1.0.3</version>
     </parent>
 
     <dependencies>
