@@ -5,12 +5,12 @@
     <packaging>jar</packaging>
     <name>Nano/Kx</name>
     <artifactId>nano-kx</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <parent>
         <groupId>io.nano</groupId>
         <artifactId>nano-project</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
     </parent>
 
     <build>

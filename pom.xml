@@ -6,7 +6,7 @@
     <name>Nano/</name>
     <groupId>io.nano</groupId>
     <artifactId>nano-project</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <properties>
         <maven.build.timestamp.format>yyyyMMdd-HH:mm:ss</maven.build.timestamp.format>
