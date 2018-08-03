@@ -59,7 +59,7 @@ class KxConnectionTest {
         }
 
         private KxSchema buildKxSchema() {
-            return new KxSchemaBuilder()
+            return new DefaultKxSchema.Builder()
                     .forTable("sample")
                     .addColumn("name", ColumnType.String)
                     .addColumn("age", ColumnType.Int)

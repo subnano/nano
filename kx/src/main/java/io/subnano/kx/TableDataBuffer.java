@@ -22,59 +22,73 @@ public class TableDataBuffer {
         this.flip = new Flip(new c.Dict(columnNames, tableSchema));
     }
 
+    public static TableDataBuffer fromSchema(KxSchema schema) {
+        return new TableDataBuffer(schema.columnNames(), schema.data());
+    }
+
     /**
      * Rests column index (rename?)
      */
-    public void reset() {
+    public TableDataBuffer reset() {
         colIndex = 0;
+        return this;
     }
 
-    public void addBoolean(boolean value) {
+    public TableDataBuffer addBoolean(boolean value) {
         Object colData = tableData[colIndex++];
         ((boolean[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addByte(byte value) {
+    public TableDataBuffer addByte(byte value) {
         Object colData = tableData[colIndex++];
         ((byte[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addShort(short value) {
+    public TableDataBuffer addShort(short value) {
         Object colData = tableData[colIndex++];
         ((short[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addInt(int value) {
+    public TableDataBuffer addInt(int value) {
         Object colData = tableData[colIndex++];
         ((int[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addLong(long value) {
+    public TableDataBuffer addLong(long value) {
         Object colData = tableData[colIndex++];
         ((long[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addFloat(float value) {
+    public TableDataBuffer addFloat(float value) {
         Object colData = tableData[colIndex++];
         ((float[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addDouble(double value) {
+    public TableDataBuffer addDouble(double value) {
         Object colData = tableData[colIndex++];
         ((double[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addChar(char value) {
+    public TableDataBuffer addChar(char value) {
         Object colData = tableData[colIndex++];
         ((char[]) colData)[rowIndex] = value;
+        return this;
     }
 
-    public void addString(String value) {
+    public TableDataBuffer addString(String value) {
         Object colData = tableData[colIndex];
         if (!(colData instanceof String[]))
             throw new ClassCastException(colData.getClass() + " cannot be cast to String[] when updating column " + colIndex);
         ((String[]) colData)[rowIndex] = value;
         colIndex++;
+        return this;
     }
 
     public void addTimestamp(long timestamp) {
