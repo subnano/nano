@@ -1,4 +1,24 @@
-### Still using SimpleDataFormat
+## DateTime Encoding
+
+```
+DateTimeBench.dateFormatDecoder                                   avgt    9   909.515 ±       64.754   ns/op
+DateTimeBench.dateFormatEncoder                                   avgt    9   385.190 ±       41.961   ns/op
+DateTimeBench.nanoDecoder                                         avgt    9    69.382 ±        5.497   ns/op
+DateTimeBench.nanoEncoder                                         avgt    9   284.123 ±      602.125   ns/op
+DateTimeBench.dateFormatDecoder:·gc.alloc.rate                    avgt    9   515.730 ±       36.865  MB/sec
+DateTimeBench.dateFormatEncoder:·gc.alloc.rate                    avgt    9       ≈ 0                 MB/sec
+DateTimeBench.nanoDecoder:·gc.alloc.rate                          avgt    9     0.523 ±        0.007  MB/sec
+DateTimeBench.nanoEncoder:·gc.alloc.rate                          avgt    9     0.523 ±        0.008  MB/sec
+```
+Observations
+- SimpleDateFormat is awesome at encoding (just not thread safe)
+- nano decoder is blazing fast
+- nano encoder needs work on performance 
+- nano encoder & decoder still allocating something .. (??)
+
+## FIX Message Encoding
+
+#### Still using SimpleDataFormat ??
 ```
 ....[Thread state: RUNNABLE]........................................................................
  50.0%  60.2% java.net.SocketInputStream.socketRead0
