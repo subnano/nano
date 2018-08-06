@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.nanofix</groupId>
         <artifactId>nanofix</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.4-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>io.nano</groupId>
             <artifactId>nano-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${nano.version}</version>
         </dependency>
 
         <dependency>

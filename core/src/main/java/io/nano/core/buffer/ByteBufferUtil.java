@@ -1,5 +1,7 @@
 package io.nano.core.buffer;
 
+import io.nano.core.util.Maths;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -114,7 +116,7 @@ public final class ByteBufferUtil {
         int index = 0;
         for (int i = 0; i < len; i++) {
             index = offset + len - i - 1;
-            number += ((buffer.get(index) - '0') * Math.pow(10, i));
+            number += ((buffer.get(index) - '0') * Maths.pow10(i));
         }
         return number;
     }
@@ -125,7 +127,7 @@ public final class ByteBufferUtil {
 
     public static void putNumber(int value, int len, ByteBuffer buffer, int offset) {
         for (int i = 0; i < len; i++) {
-            int power = (int) Math.pow(10, len - i - 1);
+            int power = Maths.pow10(len - i - 1);
             byte digit = (byte) Math.floorDiv(value, power);
             buffer.put(offset + i, (byte) (digit + 0x30));
             value -= (digit * power);

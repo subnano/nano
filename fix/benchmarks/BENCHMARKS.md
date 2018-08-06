@@ -1,20 +1,35 @@
+## Maths Functions
+The benchmarks with the prefix `math` are the `java.lang.Math` implementations.
+
+```
+Benchmark             Mode  Cnt     Score    Error  Units
+MathsBench.log10      avgt    9    34.636 ±  2.849  ns/op
+MathsBench.pow10      avgt    9    22.241 ±  0.749  ns/op
+MathsBench.pow        avgt    9    53.908 ±  1.311  ns/op
+MathsBench.mathLog10  avgt    9   274.068 ±  5.422  ns/op
+MathsBench.mathPow10  avgt    9  1356.301 ± 31.671  ns/op
+MathsBench.mathPow    avgt    9  1589.436 ± 38.899  ns/op
+```
+**Observations**
+* The Nano implementations of `log10`, `pow` and `pow10` are tuned for performance and are much quicker. 
+
 ## DateTime Encoding
 
 ```
-DateTimeBench.dateFormatDecoder                                   avgt    9   909.515 ±       64.754   ns/op
-DateTimeBench.dateFormatEncoder                                   avgt    9   385.190 ±       41.961   ns/op
-DateTimeBench.nanoDecoder                                         avgt    9    69.382 ±        5.497   ns/op
-DateTimeBench.nanoEncoder                                         avgt    9   284.123 ±      602.125   ns/op
-DateTimeBench.dateFormatDecoder:·gc.alloc.rate                    avgt    9   515.730 ±       36.865  MB/sec
-DateTimeBench.dateFormatEncoder:·gc.alloc.rate                    avgt    9       ≈ 0                 MB/sec
-DateTimeBench.nanoDecoder:·gc.alloc.rate                          avgt    9     0.523 ±        0.007  MB/sec
-DateTimeBench.nanoEncoder:·gc.alloc.rate                          avgt    9     0.523 ±        0.008  MB/sec
+Benchmark                                                         Mode  Cnt     Score     Error   Units
+DateTimeBench.nanoDecoder                                         avgt    9    18.925 ±   0.878   ns/op
+DateTimeBench.nanoEncoder                                         avgt    9    58.365 ±   3.464   ns/op
+DateTimeBench.dateFormatDecoder                                   avgt    9   834.661 ±  23.500   ns/op
+DateTimeBench.dateFormatEncoder                                   avgt    9   357.461 ±  26.768   ns/op
+
+DateTimeBench.nanoDecoder:·gc.alloc.rate                          avgt    9     0.532 ±   0.017  MB/sec
+DateTimeBench.nanoEncoder:·gc.alloc.rate                          avgt    9     0.523 ±   0.008  MB/sec
+DateTimeBench.dateFormatDecoder:·gc.alloc.rate                    avgt    9   561.084 ±  15.574  MB/sec
+DateTimeBench.dateFormatEncoder:·gc.alloc.rate                    avgt    9  1339.937 ± 101.528  MB/sec
 ```
-Observations
-- SimpleDateFormat is awesome at encoding (just not thread safe)
-- nano decoder is blazing fast
-- nano encoder needs work on performance 
-- nano encoder & decoder still allocating something .. (??)
+**Observations**
+* nano date/time encoding is blazing fast
+* nano encoding still allocating something .. possibly the monitoring code itself (??)
 
 ## FIX Message Encoding
 

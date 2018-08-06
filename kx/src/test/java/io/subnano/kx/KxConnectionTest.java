@@ -5,16 +5,24 @@ import io.subnano.kx.KxConnection.Mode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
 class KxConnectionTest {
 
+    private static String SAMPLE_TABLE_NAME = "sample";
+
     private DefaultKxConnection connection;
+
+    @Mock
+    private KxListener kxListener;
 
     @BeforeEach
     void setUp() throws IOException {
-        connection = new DefaultKxConnection("localhost", 5001);
+        MockitoAnnotations.initMocks(this);
+        connection = new DefaultKxConnection("localhost", 5001, null, null, kxListener);
         connection.connect();
     }
 
@@ -26,6 +34,19 @@ class KxConnectionTest {
     @Test
     void writeSingleRow() throws Exception {
         KxTableWriter<KxSample> tableWriter = new KxSampleWriter(connection);
+        KxSample sample = new KxSample();
+        sample.name = "Arthur Dent";
+        sample.age = 42;
+        tableWriter.write(sample);
+    }
+
+
+    @Test
+    void queryTable() throws Exception {
+        KxTableWriter<KxSample> tableWriter = new KxSampleWriter(connection);
+        // Run sub function and store result
+        //Object[] response = (Object[]) qConnection.k(".u.sub[`trade;`]");
+        connection.subscribe(SAMPLE_TABLE_NAME);
         KxSample sample = new KxSample();
         sample.name = "Arthur Dent";
         sample.age = 42;
@@ -60,7 +81,7 @@ class KxConnectionTest {
 
         private KxSchema buildKxSchema() {
             return new DefaultKxSchema.Builder()
-                    .forTable("sample")
+                    .forTable(SAMPLE_TABLE_NAME)
                     .addColumn("name", ColumnType.String)
                     .addColumn("age", ColumnType.Int)
                     .build();

@@ -10,6 +10,7 @@ import java.io.IOException;
 /**
  * This class is responsible for reconnection to a Kx system when the socket connection is lost.
  * <p>
+ * TODO add connection retry logic
  * TODO add support for multiple Kx server processes for fault tolerance.
  * TODO create a builder to create a custom connection manager with required properties
  *
@@ -37,7 +38,7 @@ public class KxConnectionManager implements KxConnection {
     }
 
     @Override
-    public void connect() throws IOException {
+    public void connect() {
         int connectionAttempt = 0;
         do {
             tryConnect(++connectionAttempt);
@@ -52,13 +53,12 @@ public class KxConnectionManager implements KxConnection {
     }
 
     private void tryConnect(int connectionAttempt) {
-        try {
-            connection.connect();
-        } catch (IOException e) {
-            LOGGER.info("Error connecting to {}:{} - ", connection.host(), connection.port(), e.getMessage());
-            if (connectionAttempt == 1)
-                LOGGER.info("Will attempt to reconnect every {} ms", reconnectInterval);
-        }
+        connection.connect();
+//        catch (IOException e) {
+//            LOGGER.info("Error connecting to {}:{} - ", connection.host(), connection.port(), e.getMessage());
+//            if (connectionAttempt == 1)
+//                LOGGER.info("Will attempt to reconnect every {} ms", reconnectInterval);
+//        }
     }
 
     @Override
@@ -86,36 +86,41 @@ public class KxConnectionManager implements KxConnection {
     }
 
     @Override
-    public void sync(String table, String command, Flip flip) throws IOException {
-        try {
-            connection.sync(table, command, flip);
-        } catch (EOFException e) {
-            // we see an EOFException when we lose the socket connection
-            LOGGER.info("Lost connection to remote process - will re-establish connection", reconnectInterval);
-
-            // currently blocks on the application thread writing data - ew!
-            // would need locking of some kind if re-connectivity was on another thread
-            connection.close();
-            connect();
-        } catch (Exception e) {
-            LOGGER.info("Error writing to kx process");
-        }
+    public void sync(String table, String command, Flip flip) {
+        connection.sync(table, command, flip);
+//        } catch (EOFException e) {
+//            // we see an EOFException when we lose the socket connection
+//            LOGGER.info("Lost connection to remote process - will re-establish connection", reconnectInterval);
+//
+//            // currently blocks on the application thread writing data - ew!
+//            // would need locking of some kind if re-connectivity was on another thread
+//            connection.close();
+//            connect();
+//        } catch (Exception e) {
+//            LOGGER.info("Error writing to kx process");
+//        }
     }
 
     @Override
-    public void async(String table, String command, Flip flip) throws IOException {
-        try {
-            connection.async(table, command, flip);
-        } catch (EOFException e) {
-            // we see an EOFException when we lose the socket connection
-            LOGGER.info("Lost connection to remote process - will re-establish connection", reconnectInterval);
+    public void async(String table, String command, Flip flip) {
+        connection.async(table, command, flip);
+//        try {
+//            connection.async(table, command, flip);
+//        } catch (EOFException e) {
+//            // we see an EOFException when we lose the socket connection
+//            LOGGER.info("Lost connection to remote process - will re-establish connection", reconnectInterval);
+//
+//            // currently blocks on the application thread writing data - ew!
+//            // would need locking of some kind if re-connectivity was on another thread
+//            connection.close();
+//            connect();
+//        } catch (Exception e) {
+//            LOGGER.info("Error writing to kx process");
+//        }
+    }
 
-            // currently blocks on the application thread writing data - ew!
-            // would need locking of some kind if re-connectivity was on another thread
-            connection.close();
-            connect();
-        } catch (Exception e) {
-            LOGGER.info("Error writing to kx process");
-        }
+    @Override
+    public Object subscribe(String table) {
+        return connection.subscribe(table);
     }
 }

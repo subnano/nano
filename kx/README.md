@@ -1,7 +1,8 @@
 ### KDB Features TODO
 - reconnection logic
+- introduce and compare performance impact of using disruptor
 - failover logic
-- offline update logic with alerting
+- buffer writes when offline
 - intelligent batching
 
 ### KDB Notes

@@ -19,6 +19,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -27,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.function.DoubleConsumer;
+import java.util.function.LongConsumer;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -48,6 +51,8 @@ public class DateTimeBench {
 
     @State(Scope.Benchmark)
     public static class BenchmarkState {
+        long[] lastTime = new long[]{0};
+        LongConsumer consumer = x -> lastTime[0] = x;
         ByteBuffer buffer = ByteBuffer.allocate(256);
         long currentTimeMillis = System.currentTimeMillis();
         UtcDateTimeEncoder nanoEncoder = new UtcDateTimeEncoder();
@@ -70,9 +75,9 @@ public class DateTimeBench {
     }
 
     @Benchmark
-    public void nanoDecoder(BenchmarkState state, Blackhole hole) {
+    public void nanoDecoder(BenchmarkState state) {
         state.buffer.clear();
-        hole.consume(UtcDateTimeDecoder.decode(state.buffer, 0));
+        state.consumer.accept(UtcDateTimeDecoder.decode(state.buffer, 0));
     }
 
     @Benchmark
@@ -94,4 +99,15 @@ public class DateTimeBench {
         }
     }
 
+
+    static class SoakRunner {
+
+        public static void main(String[] args) {
+            BenchmarkState state = new BenchmarkState();
+            DateTimeBench bench = new DateTimeBench();
+            while (true) {
+                bench.nanoDecoder(state);
+            }
+        }
+    }
 }
