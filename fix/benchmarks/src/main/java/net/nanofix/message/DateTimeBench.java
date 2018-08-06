@@ -56,7 +56,7 @@ public class DateTimeBench {
         ByteBuffer buffer = ByteBuffer.allocate(256);
         long currentTimeMillis = System.currentTimeMillis();
         UtcDateTimeEncoder nanoEncoder = new UtcDateTimeEncoder();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.SSS'Z'");
         Date date = new Date();
         String utcDateString;
 
