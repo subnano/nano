@@ -16,19 +16,23 @@ MathsBench.mathPow    avgt    9  1589.436 ± 38.899  ns/op
 ## DateTime Encoding
 
 ```
-Benchmark                                                         Mode  Cnt     Score     Error   Units
-DateTimeBench.nanoDecoder                                         avgt    9    18.925 ±   0.878   ns/op
-DateTimeBench.nanoEncoder                                         avgt    9    58.365 ±   3.464   ns/op
-DateTimeBench.dateFormatDecoder                                   avgt    9   834.661 ±  23.500   ns/op
-DateTimeBench.dateFormatEncoder                                   avgt    9   357.461 ±  26.768   ns/op
+Benchmark                                                                    Mode  Cnt     Score     Error   Units
+DateTimeBench.nanoDecoder                                                    avgt    9    22.506 ±   5.244   ns/op
+DateTimeBench.java_util_Date_Decoder                                         avgt    9   893.815 ±  72.010   ns/op
+DateTimeBench.java_lang_DateFormat_Decoder                                   avgt    9  1127.442 ±  54.919   ns/op
 
-DateTimeBench.nanoDecoder:·gc.alloc.rate                          avgt    9     0.532 ±   0.017  MB/sec
-DateTimeBench.nanoEncoder:·gc.alloc.rate                          avgt    9     0.523 ±   0.008  MB/sec
-DateTimeBench.dateFormatDecoder:·gc.alloc.rate                    avgt    9   561.084 ±  15.574  MB/sec
-DateTimeBench.dateFormatEncoder:·gc.alloc.rate                    avgt    9  1339.937 ± 101.528  MB/sec
+DateTimeBench.nanoEncoder                                                    avgt    9    56.863 ±   0.831   ns/op
+DateTimeBench.java_lang_DateFormat_Encoder                                   avgt    9   521.578 ±  25.902   ns/op
+
+DateTimeBench.nanoDecoder:·gc.alloc.rate                                     avgt    9     0.524 ±   0.013  MB/sec
+DateTimeBench.nanoEncoder:·gc.alloc.rate                                     avgt    9     0.522 ±   0.007  MB/sec
+DateTimeBench.java_lang_DateFormat_Decoder:·gc.alloc.rate                    avgt    9   587.170 ±  28.914  MB/sec
+DateTimeBench.java_lang_DateFormat_Encoder:·gc.alloc.rate                    avgt    9   927.267 ±  46.688  MB/sec
+DateTimeBench.java_util_Date_Decoder:·gc.alloc.rate                          avgt    9  1277.225 ± 100.291  MB/sec
+
 ```
 **Observations**
-* nano date/time encoding is blazing fast
+* nano date/time encoding is blazing fast   
 * nano encoding still allocating something .. possibly the monitoring code itself (??)
 
 ## FIX Message Encoding

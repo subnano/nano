@@ -25,6 +25,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +58,9 @@ public class DateTimeBench {
         ByteBuffer buffer = ByteBuffer.allocate(256);
         long currentTimeMillis = System.currentTimeMillis();
         UtcDateTimeEncoder nanoEncoder = new UtcDateTimeEncoder();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.SSS'Z'");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+        //String source = "2018-08-06T10:49:02.971Z";
+
         Date date = new Date();
         String utcDateString;
 
@@ -81,7 +85,7 @@ public class DateTimeBench {
     }
 
     @Benchmark
-    public void dateFormatEncoder(BenchmarkState state) {
+    public void java_lang_DateFormat_Encoder(BenchmarkState state) {
         state.buffer.clear();
         state.date.setTime(state.currentTimeMillis);
         String utcDate = state.dateFormat.format(state.date);
@@ -89,8 +93,7 @@ public class DateTimeBench {
     }
 
     @Benchmark
-    public void dateFormatDecoder(BenchmarkState state, Blackhole hole) {
-        String utcDate = null;
+    public void java_lang_DateFormat_Decoder(BenchmarkState state, Blackhole hole) {
         try {
             Date parsedDate = state.dateFormat.parse(state.utcDateString);
             hole.consume(parsedDate.getTime());
@@ -99,6 +102,11 @@ public class DateTimeBench {
         }
     }
 
+    @Benchmark
+    public void java_util_Date_Decoder(BenchmarkState state, Blackhole hole) {
+        Date parsedDate = Date.from(Instant.parse(state.utcDateString));
+        hole.consume(parsedDate.getTime());
+    }
 
     static class SoakRunner {
 
