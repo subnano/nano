@@ -5,9 +5,7 @@ package io.subnano.kx;
  */
 public interface KxListener {
 
-    void onConnect();
-
-    void onClose();
+    void onStateUpdated(ConnectState state);
 
     void onError(Throwable cause);
 

@@ -5,6 +5,6 @@ package io.subnano.kx;
  */
 public interface KxEncoder<T> {
 
-    void encoder(T anObject, TableDataBuffer buffer);
+    void encode(T anObject, TableDataBuffer buffer);
 
 }

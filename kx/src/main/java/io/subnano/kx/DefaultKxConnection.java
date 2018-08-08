@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 
 public class DefaultKxConnection implements KxConnection {
 
@@ -16,25 +17,19 @@ public class DefaultKxConnection implements KxConnection {
 
     private final String host;
     private final int port;
-    private final String user;
-    private final String password;
     private final KxListener listener;
 
-    private final String userPassword;
 
     private kx.c c;
 
     public DefaultKxConnection(String host, int port) {
-        this(host, port, null, null, new NullKxListener());
+        this(host, port, new NullKxListener());
     }
 
-    public DefaultKxConnection(String host, int port, String user, String password, KxListener listener) {
+    public DefaultKxConnection(String host, int port, KxListener listener) {
         this.host = host;
         this.port = port;
-        this.user = user;
-        this.password = password;
         this.listener = listener;
-        this.userPassword = userPassword();
     }
 
     @Override
@@ -44,29 +39,27 @@ public class DefaultKxConnection implements KxConnection {
             this.c = new c(host, port);
             this.c.tz = UTC_TIME_ZONE;
             LOGGER.info("Connected to {}:{}", host, port);
-            listener.onConnect();
+            listener.onStateUpdated(ConnectState.Connected);
         } catch (Exception e) {
             listener.onError(e);
         }
     }
 
     @Override
-    public <T> KxTableWriter<T> newTableWriter(KxSchema kxSchema, KxEncoder<T> encoder, Mode mode) {
+    public <T> KxTableWriter<T> newTableWriter(KxWriterSource<T> kxWriterSource) {
         return new DefaultTableWriter<>(
                 this,
-                kxSchema.tableName(),
-                kxSchema.columnNames(),
-                kxSchema.data(),
-                encoder,
-                mode
+                kxWriterSource.schema(),
+                kxWriterSource.encoder(),
+                kxWriterSource.mode()
         );
     }
 
     @Override
     public void sync(String table, String command, kx.c.Flip flip) {
         try {
+            LOGGER.trace("sync: table:{} command:{}", table, command);
             Object result = c.k(command, table, flip);
-            //LOGGER.debug("Sync method returned {}", result);
             // TODO need a more sensible return object
             listener.onMessage(result);
         } catch (Exception e) {
@@ -78,8 +71,11 @@ public class DefaultKxConnection implements KxConnection {
     @Override
     public void async(String table, String command, kx.c.Flip flip) {
         try {
+            LOGGER.trace("async: table:{} command:{} flip:{}", table, command, flip.y);
             c.ks(command, table, flip);
         } catch (IOException e) {
+            // commonly see a SocketException when kx process dies
+            // TODO buffer record for offline persistence
             LOGGER.error("Error writing record to kx", e);
             listener.onError(e);
         }
@@ -95,7 +91,7 @@ public class DefaultKxConnection implements KxConnection {
         if (c != null) {
             try {
                 c.close();
-                listener.onClose();
+                listener.onStateUpdated(ConnectState.Closed);
             } catch (IOException e) {
                 LOGGER.warn("Error closing socket connection: {}", e.getMessage());
                 listener.onError(e);
@@ -117,14 +113,6 @@ public class DefaultKxConnection implements KxConnection {
 
     int port() {
         return port;
-    }
-
-    private String userPassword() {
-        if (user == null || user.length() == 0)
-            return null;
-        if (password == null || password.length() == 0)
-            return user;
-        return user + ":" + password;
     }
 
 }

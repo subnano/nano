@@ -27,13 +27,11 @@ public interface KxConnection {
     /**
      * Creates a new instance of KxTableWriter for the given type.
      *
-     * @param kxSchema the given KxSchema of the table
-     * @param encoder  the encoder used to covert data from given type to the native Kx data
-     * @param mode     the mode used to send message to kx process (can be Sync / Async)
-     * @param <T>      type Java type representing the Kx table
-     * @return a suitable KxTableWriter
+     * @param kxWriterSource the given source of the KxWriter details
+     * @param <T>            type Java type representing the Kx table
+     * @return a suitable KxTableWriter for the given Java type
      */
-    <T> KxTableWriter<T> newTableWriter(KxSchema kxSchema, KxEncoder<T> encoder, Mode mode);
+    <T> KxTableWriter<T> newTableWriter(KxWriterSource<T> kxWriterSource);
 
     /**
      * Invokes the command synchronously on the specified table with the corresponding Kx Flip data set

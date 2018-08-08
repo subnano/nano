@@ -6,12 +6,7 @@ package io.subnano.kx;
 public class NullKxListener implements KxListener {
 
     @Override
-    public void onConnect() {
-        // NO-OP
-    }
-
-    @Override
-    public void onClose() {
+    public void onStateUpdated(ConnectState state) {
         // NO-OP
     }
 
