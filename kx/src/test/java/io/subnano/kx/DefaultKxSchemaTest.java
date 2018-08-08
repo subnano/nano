@@ -20,9 +20,10 @@ class DefaultKxSchemaTest {
                 .addColumn("B", ColumnType.Short)
                 .addColumn("C", ColumnType.Int)
                 .addColumn("D", ColumnType.Long)
-                .addColumn("E", ColumnType.Float)
-                .addColumn("F", ColumnType.Double)
-                .addColumn("G", ColumnType.Byte)
+                .addColumn("E", ColumnType.Double)
+                .addColumn("F", ColumnType.Byte)
+                .addColumn("G", ColumnType.Char)
+                .addColumn("H", ColumnType.Boolean)
                 .build();
     }
 

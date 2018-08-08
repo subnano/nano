@@ -6,9 +6,9 @@ public enum ColumnType {
     Short,
     Int,
     Long,
-    Float,
     Double,
     Char,
     String,
+    DateTime,
     Timestamp
 }

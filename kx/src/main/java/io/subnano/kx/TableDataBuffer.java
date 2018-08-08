@@ -1,8 +1,6 @@
 package io.subnano.kx;
 
-import kx.c;
-import kx.c.Flip;
-
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -12,14 +10,15 @@ public class TableDataBuffer {
 
     // We may want to support writing multiple rows
     private final int rowIndex = 0;
+    private final String[] columnNames;
+    private final Object[] tableData;
+
     // pointer to column to be updated
     private int colIndex = 0;
-    private final Object[] tableData;
-    private final Flip flip;
 
-    TableDataBuffer(String[] columnNames, Object[] tableSchema) {
-        this.tableData = tableSchema;
-        this.flip = new Flip(new c.Dict(columnNames, tableSchema));
+    TableDataBuffer(String[] columnNames, Object[] tableData) {
+        this.columnNames = columnNames;
+        this.tableData = tableData;
     }
 
     public static TableDataBuffer fromSchema(KxSchema schema) {
@@ -64,12 +63,6 @@ public class TableDataBuffer {
         return this;
     }
 
-    public TableDataBuffer addFloat(float value) {
-        Object colData = tableData[colIndex++];
-        ((float[]) colData)[rowIndex] = value;
-        return this;
-    }
-
     public TableDataBuffer addDouble(double value) {
         Object colData = tableData[colIndex++];
         ((double[]) colData)[rowIndex] = value;
@@ -85,27 +78,45 @@ public class TableDataBuffer {
     public TableDataBuffer addString(String value) {
         Object colData = tableData[colIndex];
         if (!(colData instanceof String[]))
-            throw new ClassCastException(colData.getClass() + " cannot be cast to String[] when updating column " + colIndex);
+            throw new ClassCastException(colData.getClass() + " cannot be cast to String[] when updating column " + columnNames[colIndex]);
         ((String[]) colData)[rowIndex] = value;
         colIndex++;
         return this;
     }
 
-    public void addTimestamp(long timestamp) {
+    public void addDateTime(long value) {
         Object colData = tableData[colIndex];
         if (!(colData instanceof Date[]))
-            throw new ClassCastException(colData.getClass() + " cannot be cast to Date[] when updating column " + colIndex);
+            throw new ClassCastException(colData.getClass() + " cannot be cast to Date[] when updating column " + columnNames[colIndex]);
         Date date = ((Date[]) colData)[rowIndex];
         if (date == null) {
             date = new Date();
             ((Date[]) colData)[rowIndex] = date;
         }
-        date.setTime(timestamp);
+        date.setTime(value);
         colIndex++;
     }
 
-    Flip flip() {
-        return flip;
+    public void addTimestamp(long value) {
+        Object colData = tableData[colIndex];
+        if (!(colData instanceof Timestamp[]))
+            throw new ClassCastException(colData.getClass() + " cannot be cast to Timestamp[] when updating column " + columnNames[colIndex]);
+        Timestamp timestamp = ((Timestamp[]) colData)[rowIndex];
+        if (timestamp == null) {
+            timestamp = new Timestamp(value);
+            ((Timestamp[]) colData)[rowIndex] = timestamp;
+        } else {
+            timestamp.setTime(value);
+        }
+        colIndex++;
+    }
+
+    public String[] columnNames() {
+        return columnNames;
+    }
+
+    public Object[] tableData() {
+        return tableData;
     }
 }
 

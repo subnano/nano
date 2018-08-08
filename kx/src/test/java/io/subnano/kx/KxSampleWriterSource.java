@@ -3,7 +3,7 @@ package io.subnano.kx;
 /**
  * @author Mark Wardell
  */
-class KxSampleWriterSource implements KxWriterSource<KxSample> {
+    class KxSampleWriterSource implements KxWriterSource<KxSample> {
 
     static String SAMPLE_TABLE_NAME = "sample";
 

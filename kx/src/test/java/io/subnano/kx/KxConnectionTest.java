@@ -31,7 +31,7 @@ class KxConnectionTest {
     @Test
     void writeSingleRow() {
         KxTableWriter<KxSample> tableWriter = connection.newTableWriter(new KxSampleWriterSource());
-        KxSample sample = new KxSample("Arthur Dent", 42, -1);
+        KxSample sample = new KxSample("Arthur Dent", 42, System.currentTimeMillis());
         tableWriter.write(sample);
     }
 

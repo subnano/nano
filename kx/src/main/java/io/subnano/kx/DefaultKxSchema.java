@@ -1,5 +1,6 @@
 package io.subnano.kx;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,13 +11,16 @@ import java.util.List;
 public class DefaultKxSchema implements KxSchema {
 
     private final String tableName;
+    private final String command;
     private final String[] columnNames;
     private final Object[] data;
 
     DefaultKxSchema(String tableName,
+                    String command,
                     String[] columnNames,
                     Object[] data) {
         this.tableName = tableName;
+        this.command = command;
         this.columnNames = columnNames;
         this.data = data;
     }
@@ -24,6 +28,11 @@ public class DefaultKxSchema implements KxSchema {
     @Override
     public String tableName() {
         return tableName;
+    }
+
+    @Override
+    public String command() {
+        return command;
     }
 
     @Override
@@ -36,12 +45,15 @@ public class DefaultKxSchema implements KxSchema {
         return data;
     }
 
-    static class Builder {
+    public static class Builder {
+
+        private static final String DEFAULT_COMMAND = "insert";
 
         // Only supports single row for now
         private final int rowCount = 1;
 
         private String tableName;
+        private String command = DEFAULT_COMMAND;
         private final List<String> columnNames = new ArrayList<>();
         private final List<ColumnType> columnTypes = new ArrayList<>();
 
@@ -54,6 +66,11 @@ public class DefaultKxSchema implements KxSchema {
             return this;
         }
 
+        public Builder andCommand(String command) {
+            this.command = command;
+            return this;
+        }
+
         public Builder addColumn(String name, ColumnType columnType) {
             columnNames.add(name);
             columnTypes.add(columnType);
@@ -63,6 +80,7 @@ public class DefaultKxSchema implements KxSchema {
         public KxSchema build() {
             return new DefaultKxSchema(
                     tableName,
+                    command,
                     columnNames.toArray(new String[0]),
                     newTableData()
             );
@@ -72,7 +90,7 @@ public class DefaultKxSchema implements KxSchema {
             Object[] data = new Object[columnTypes.size()];
             for (int i = 0; i < columnTypes.size(); i++) {
                 ColumnType type = columnTypes.get(i);
-                switch(type) {
+                switch (type) {
                     case Boolean:
                         data[i] = new boolean[rowCount];
                         break;
@@ -88,9 +106,6 @@ public class DefaultKxSchema implements KxSchema {
                     case Long:
                         data[i] = new long[rowCount];
                         break;
-                    case Float:
-                        data[i] = new float[rowCount];
-                        break;
                     case Double:
                         data[i] = new double[rowCount];
                         break;
@@ -100,9 +115,11 @@ public class DefaultKxSchema implements KxSchema {
                     case String:
                         data[i] = new String[rowCount];
                         break;
-                    case Timestamp:
-                        // TODO there must be a better way than Date ??
+                    case DateTime:
                         data[i] = new Date[rowCount];
+                        break;
+                    case Timestamp:
+                        data[i] = new Timestamp[rowCount];
                         break;
                     default:
                         throw new IllegalArgumentException("Unsupported column type: " + type);

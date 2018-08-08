@@ -36,20 +36,20 @@ public interface KxConnection {
     /**
      * Invokes the command synchronously on the specified table with the corresponding Kx Flip data set
      *
-     * @param table   the table to perform the operation on
-     * @param command the command to execute
-     * @param flip    the Kx Flip data used for the operation
+     * @param table     the table to perform the operation on
+     * @param command   the command to execute
+     * @param data      the data used for the operation
      */
-    void sync(String table, String command, Flip flip);
+    void sync(String table, String command, Object data);
 
     /**
      * Invokes the command asynchronously on the specified table with the corresponding Kx Flip data set
      *
      * @param table   the table to perform the operation on
      * @param command the command to execute
-     * @param flip    the Kx Flip data used for the operation
+     * @param data    the data used for the operation
      */
-    void async(String table, String command, kx.c.Flip flip);
+    void async(String table, String command, Object data);
 
     Object subscribe(String table);
 

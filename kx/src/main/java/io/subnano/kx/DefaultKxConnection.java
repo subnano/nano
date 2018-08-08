@@ -56,27 +56,28 @@ public class DefaultKxConnection implements KxConnection {
     }
 
     @Override
-    public void sync(String table, String command, kx.c.Flip flip) {
+    public void sync(String table, String command, Object data) {
         try {
-            LOGGER.trace("sync: table:{} command:{}", table, command);
-            Object result = c.k(command, table, flip);
+            LOGGER.trace("sync: table:{} command:{} date:{}", table, command, data);
+            Object response = c.k(command, table, data);
             // TODO need a more sensible return object
-            listener.onMessage(result);
+            LOGGER.trace("Kx response: {}", response);
+            listener.onMessage(response);
         } catch (Exception e) {
-            LOGGER.error("Error writing record to kx", e);
+            LOGGER.error("Error writing record to kx: {}", e);
             listener.onError(e);
         }
     }
 
     @Override
-    public void async(String table, String command, kx.c.Flip flip) {
+    public void async(String table, String command, Object data) {
         try {
-            LOGGER.trace("async: table:{} command:{} flip:{}", table, command, flip.y);
-            c.ks(command, table, flip);
+            LOGGER.trace("async: table:{} command:{} data:{}", table, command, data);
+            c.ks(command, table, data);
         } catch (IOException e) {
             // commonly see a SocketException when kx process dies
             // TODO buffer record for offline persistence
-            LOGGER.error("Error writing record to kx", e);
+            LOGGER.error("Error writing record to kx: {}", e);
             listener.onError(e);
         }
     }

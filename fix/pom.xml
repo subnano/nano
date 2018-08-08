@@ -15,7 +15,7 @@
     <parent>
         <groupId>io.nano</groupId>
         <artifactId>nano-project</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.4</version>
     </parent>
 
     <modules>

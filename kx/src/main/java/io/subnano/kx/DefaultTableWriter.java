@@ -7,10 +7,9 @@ package io.subnano.kx;
  */
 public class DefaultTableWriter<T> implements KxTableWriter<T> {
 
-    private static final String UPDATE_COMMAND = "insert";
-
     private final KxConnection kxConnection;
     private final String tableName;
+    private final String command;
     private final KxEncoder<T> encoder;
     private final KxConnection.Mode mode;
     private final TableDataBuffer tableDataBuffer;
@@ -21,6 +20,7 @@ public class DefaultTableWriter<T> implements KxTableWriter<T> {
                        final KxConnection.Mode mode) {
         this.kxConnection = connection;
         this.tableName = kxSchema.tableName();
+        this.command = kxSchema.command();
         this.encoder = encoder;
         this.mode = mode;
         this.tableDataBuffer = new TableDataBuffer(
@@ -35,9 +35,9 @@ public class DefaultTableWriter<T> implements KxTableWriter<T> {
         // should store the method reference in the ctor to avoid a condition on every invocation
         // this is possibly optimized away anyway
         if (KxConnection.Mode.Sync == mode)
-            kxConnection.sync(tableName, UPDATE_COMMAND, tableDataBuffer.flip());
+            kxConnection.sync(tableName, command, tableDataBuffer.tableData());
         else
-            kxConnection.async(tableName, UPDATE_COMMAND, tableDataBuffer.flip());
+            kxConnection.async(tableName, command, tableDataBuffer.tableData());
     }
 
 }

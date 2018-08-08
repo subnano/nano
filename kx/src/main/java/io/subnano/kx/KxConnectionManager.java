@@ -79,13 +79,13 @@ public class KxConnectionManager implements KxConnection, KxListener {
     }
 
     @Override
-    public void sync(String table, String command, Flip flip) {
-        connection.sync(table, command, flip);
+    public void sync(String table, String command, Object data) {
+        connection.sync(table, command, data);
     }
 
     @Override
-    public void async(String table, String command, Flip flip) {
-        connection.async(table, command, flip);
+    public void async(String table, String command, Object data) {
+        connection.async(table, command, data);
     }
 
     @Override
@@ -117,10 +117,14 @@ public class KxConnectionManager implements KxConnection, KxListener {
         }
         else if (isConnectState(ConnectState.Connected)) {
             kxListener.onError(cause);
-
-            setConnectState(ConnectState.Connecting);
-            connectionAttempt = 0;
-            tryConnect(++connectionAttempt);
+            // A KException can be caused by an invalid type on an update
+            // An EOFException is when we lose connection to remote socket
+            // not guaranteed for isConnection to reflect reality correctly - seen socket lie
+            if (!connection.isConnected()) {
+                setConnectState(ConnectState.Connecting);
+                connectionAttempt = 0;
+                tryConnect(++connectionAttempt);
+            }
         }
     }
 
