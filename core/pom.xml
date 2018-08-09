@@ -5,12 +5,12 @@
     <packaging>jar</packaging>
     <name>Nano/Core</name>
     <artifactId>nano-core</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
 
     <parent>
         <groupId>net.subnano</groupId>
         <artifactId>nano-project</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.5</version>
     </parent>
 
     <properties>
@@ -30,7 +30,6 @@
         <dependency>
             <groupId>net.subnano</groupId>
             <artifactId>nano-time</artifactId>
-            <version>${nano.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

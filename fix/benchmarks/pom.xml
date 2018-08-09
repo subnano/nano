@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.nanofix</groupId>
         <artifactId>nanofix</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.5</version>
     </parent>
 
     <properties>
@@ -20,7 +20,6 @@
         <dependency>
             <groupId>net.nanofix</groupId>
             <artifactId>nanofix-core</artifactId>
-            <version>${nano.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
