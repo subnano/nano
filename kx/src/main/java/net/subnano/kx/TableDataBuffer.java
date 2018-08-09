@@ -1,4 +1,4 @@
-package io.subnano.kx;
+package net.subnano.kx;
 
 import java.sql.Timestamp;
 import java.util.Date;

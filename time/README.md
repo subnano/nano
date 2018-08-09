@@ -21,7 +21,7 @@ Once built, you will need to add the maven dependency to your project.
 
 ```
 <dependency>
-    <groupId>io.nano</groupId>
+    <groupId>net.subnano</groupId>
     <artifactId>nano-time</artifactId>
     <version>1.0.1</version>
 </dependency>

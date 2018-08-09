@@ -1,6 +1,4 @@
-package io.subnano.kx;
-
-import kx.c.Flip;
+package net.subnano.kx;
 
 /**
  * @author Mark Wardell

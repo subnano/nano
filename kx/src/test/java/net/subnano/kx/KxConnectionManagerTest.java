@@ -1,4 +1,4 @@
-package io.subnano.kx;
+package net.subnano.kx;
 
 
 import org.junit.jupiter.api.BeforeEach;

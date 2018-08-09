@@ -1,13 +1,11 @@
-package io.subnano.kx;
+package net.subnano.kx;
 
 import kx.c;
-import kx.c.KException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.TimeZone;
-import java.util.function.Supplier;
 
 public class DefaultKxConnection implements KxConnection {
 

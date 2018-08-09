@@ -1,4 +1,4 @@
-package io.subnano.kx;
+package net.subnano.kx;
 
 
 import org.junit.jupiter.api.AfterEach;
@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static io.subnano.kx.KxSampleWriterSource.SAMPLE_TABLE_NAME;
 
 class KxConnectionTest {
 
@@ -41,7 +39,7 @@ class KxConnectionTest {
         KxTableWriter<KxSample> tableWriter = connection.newTableWriter(new KxSampleWriterSource());
         // Run sub function and store result
         //Object[] response = (Object[]) qConnection.k(".u.sub[`trade;`]");
-        connection.subscribe(SAMPLE_TABLE_NAME);
+        connection.subscribe(KxSampleWriterSource.SAMPLE_TABLE_NAME);
         KxSample sample = new KxSample();
         sample.name = "Arthur Dent";
         sample.age = 42;

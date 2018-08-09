@@ -1,4 +1,4 @@
-package io.subnano.kx;
+package net.subnano.kx;
 
 /**
  * Single responsibility and that is to insert records into kx table.

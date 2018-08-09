@@ -13,9 +13,9 @@
     <artifactId>nanofix</artifactId>
 
     <parent>
-        <groupId>io.nano</groupId>
+        <groupId>net.subnano</groupId>
         <artifactId>nano-project</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5-SNAPSHOT</version>
     </parent>
 
     <modules>
