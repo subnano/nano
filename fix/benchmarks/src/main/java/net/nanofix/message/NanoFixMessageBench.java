@@ -2,7 +2,7 @@ package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.time.TimeUtil;
-import net.nanofix.util.ByteArrayUtil;
+import io.nano.core.util.ByteArrayUtil;
 import net.nanofix.util.ByteString;
 import net.nanofix.util.FIXBytes;
 import org.openjdk.jmh.annotations.Benchmark;

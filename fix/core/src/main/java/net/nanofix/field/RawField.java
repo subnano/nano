@@ -1,6 +1,6 @@
 package net.nanofix.field;
 
-import net.nanofix.util.ByteArrayUtil;
+import io.nano.core.util.ByteArrayUtil;
 
 /**
  * User: Mark Wardell

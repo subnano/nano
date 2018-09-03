@@ -1,6 +1,7 @@
 package net.nanofix.util;
 
 import io.nano.core.clock.SystemClock;
+import io.nano.core.util.ByteArrayUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

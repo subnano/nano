@@ -1,5 +1,7 @@
 package net.nanofix.util;
 
+import io.nano.core.util.ByteArrayUtil;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 

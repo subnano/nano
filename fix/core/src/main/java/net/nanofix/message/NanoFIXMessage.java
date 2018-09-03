@@ -2,7 +2,7 @@ package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
 import net.nanofix.message.util.ChecksumCalculator;
-import net.nanofix.util.ByteArrayUtil;
+import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.ByteBuffer;
 

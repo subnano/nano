@@ -1,4 +1,4 @@
-package net.nanofix.util;
+package io.nano.core.util;
 
 import java.nio.charset.StandardCharsets;
 
@@ -168,7 +168,7 @@ public class ByteArrayUtil {
         return bytes;
     }
 
-    static byte[] intToBytesAsString(int value) {
+    public static byte[] intToBytesAsString(int value) {
         return Integer.toString(value).getBytes();
     }
 

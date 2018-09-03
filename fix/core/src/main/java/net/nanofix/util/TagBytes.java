@@ -1,5 +1,6 @@
 package net.nanofix.util;
 
+import io.nano.core.util.ByteArrayUtil;
 import net.nanofix.message.Tags;
 
 public final class TagBytes {

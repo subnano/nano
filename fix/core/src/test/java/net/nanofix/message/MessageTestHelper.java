@@ -1,7 +1,7 @@
 package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
-import net.nanofix.util.ByteArrayUtil;
+import io.nano.core.util.ByteArrayUtil;
 import net.nanofix.util.FIXBytes;
 
 import java.nio.ByteBuffer;

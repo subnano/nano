@@ -1,9 +1,8 @@
 package net.nanofix.message.util;
 
-import net.nanofix.util.ByteArrayUtil;
+import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 public final class ChecksumCalculator {
 

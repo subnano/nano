@@ -1,5 +1,7 @@
 package net.nanofix.util;
 
+import io.nano.core.util.ByteArrayUtil;
+
 public final class FIXBytes {
 
     public static final byte SOH = (byte) 0x01;
