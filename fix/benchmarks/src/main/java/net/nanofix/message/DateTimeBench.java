@@ -42,7 +42,7 @@ public class DateTimeBench {
         System.setProperty("jmh.ignoreLock", "true");
         Options options = new OptionsBuilder()
                 .include(DateTimeBench.class.getSimpleName())
-                .addProfiler(StackProfiler.class)
+                //.addProfiler(StackProfiler.class)
                 .addProfiler(GCProfiler.class)
                 .build();
         new Runner(options).run();
@@ -56,7 +56,6 @@ public class DateTimeBench {
         long currentTimeMillis = System.currentTimeMillis();
         UtcDateTimeEncoder nanoEncoder = new UtcDateTimeEncoder();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        //String source = "2018-08-06T10:49:02.971Z";
 
         Date date = new Date();
         String utcDateString;

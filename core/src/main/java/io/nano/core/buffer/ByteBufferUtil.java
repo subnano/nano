@@ -118,8 +118,20 @@ public final class ByteBufferUtil {
         buffer.put(bytes, 0, bytes.length);
     }
 
+    /**
+     * Wraps a String {@link String} into a {@link ByteBuffer}
+     *
+     * <p>Should't really use {@link String} for high performance code but sometime it can't be avoided.</p>
+     *
+     * @param text The given text to wrap into a {@link ByteBuffer}
+     * @return a {@link ByteBuffer} wrapped around the given string
+     */
     public static ByteBuffer wrap(final String text) {
-        return ByteBuffer.wrap(text.getBytes(StandardCharsets.US_ASCII));
+        int len = text == null ? 0 : text.length();
+        byte[] bytes = new byte[len];
+        for (int i=0; i<len; i++)
+            bytes[i] = (byte) text.charAt(i);
+        return ByteBuffer.wrap(bytes);
     }
 
     public static String hexDump(final ByteBuffer buffer) {
