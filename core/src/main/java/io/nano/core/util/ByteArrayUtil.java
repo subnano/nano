@@ -3,7 +3,8 @@ package io.nano.core.util;
 import java.nio.charset.StandardCharsets;
 
 /**
- * User: Mark Wardell
+ * @author Mark Wardell
+ *
  * Date: 18/10/11
  * Time: 08:04
  */

@@ -47,9 +47,9 @@ public class MathsBench {
     }
 
     @Benchmark
-    public void log10(Blackhole hole) {
+    public void numberDigits(Blackhole hole) {
         for (int i = 0; i <= 9; i++)
-            hole.consume(Maths.log10(Maths.pow10(i) + i));
+            hole.consume(Maths.numberDigits(Maths.pow10(i) + i));
     }
 
     @Benchmark

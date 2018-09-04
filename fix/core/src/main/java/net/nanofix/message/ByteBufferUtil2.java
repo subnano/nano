@@ -20,30 +20,6 @@ public final class ByteBufferUtil2 {
         return NOT_FOUND_INDEX;
     }
 
-    /**
-     * Takes the bytes from the array of given ByteBuffers and combines them
-     * into a single byte array.
-     *
-     * @param buffers the collection of ByteBuffers to combine
-     * @return a new byte array
-     */
-    public static byte[] asByteArray(ByteBuffer[] buffers) {
-        int bufferLen = 0;
-        for (ByteBuffer buffer : buffers) {
-            buffer.flip();  // flip to reading mode
-            bufferLen += buffer.remaining();
-        }
-        byte[] bytes = new byte[bufferLen];
-        int offset = 0;
-        for (ByteBuffer buffer : buffers) {
-            int srcLen = buffer.remaining();
-            buffer.get(bytes, offset, srcLen);
-            offset += srcLen;
-            buffer.clear();
-        }
-        return bytes;
-    }
-
     public static byte[] asByteArray(ByteBuffer buffer, int index, int len) {
         byte[] bytes = new byte[len];
         //buffer.get(bytes);

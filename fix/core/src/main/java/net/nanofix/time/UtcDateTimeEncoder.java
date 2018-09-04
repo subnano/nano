@@ -1,6 +1,6 @@
 package net.nanofix.time;
 
-import io.nano.core.buffer.ByteBufferUtil;
+import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.time.TimeUtil;
 
 import java.nio.ByteBuffer;
@@ -61,9 +61,9 @@ public class UtcDateTimeEncoder {
         final int day = marchDay0 - (marchMonth0 * 306 + 5) / 10 + 1;
         final int year = (int) (yearEstimate + marchMonth0 / 10);
 
-        ByteBufferUtil.putNumber(year, 4, buffer, offset);
-        ByteBufferUtil.putNumber(month, 2, buffer, offset + 4);
-        ByteBufferUtil.putNumber(day, 2, buffer, offset + 6);
+        AsciiBufferUtil.putInt(year, 4, buffer, offset);
+        AsciiBufferUtil.putInt(month, 2, buffer, offset + 4);
+        AsciiBufferUtil.putInt(day, 2, buffer, offset + 6);
         buffer.put(offset + 8, HYPHEN);
     }
 
@@ -77,12 +77,12 @@ public class UtcDateTimeEncoder {
         int second = (int) TimeUnit.MILLISECONDS.toSeconds(millis);
         millis -= (TimeUnit.SECONDS.toMillis(second));
 
-        ByteBufferUtil.putNumber(hour, 2, buffer, offset);
+        AsciiBufferUtil.putInt(hour, 2, buffer, offset);
         buffer.put(offset + 2, COLON);
-        ByteBufferUtil.putNumber(minute, 2, buffer, offset + 3);
+        AsciiBufferUtil.putInt(minute, 2, buffer, offset + 3);
         buffer.put(offset + 5, COLON);
-        ByteBufferUtil.putNumber(second, 2, buffer, offset + 6);
+        AsciiBufferUtil.putInt(second, 2, buffer, offset + 6);
         buffer.put(offset + 8, PERIOD);
-        ByteBufferUtil.putNumber((int) millis, 3, buffer, offset + 9);
+        AsciiBufferUtil.putInt((int) millis, 3, buffer, offset + 9);
     }
 }

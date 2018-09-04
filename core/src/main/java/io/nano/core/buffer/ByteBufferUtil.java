@@ -6,6 +6,9 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Mark Wardell
+ */
 public final class ByteBufferUtil {
 
     static final byte[] CHECKSUM_BYTE_SUFFIX = new byte[]{'0', '1', '0', '='};
@@ -123,15 +126,6 @@ public final class ByteBufferUtil {
 
     public static void putBytes(ByteBuffer buffer, byte[] bytes) {
         buffer.put(bytes, 0, bytes.length);
-    }
-
-    public static void putNumber(int value, int len, ByteBuffer buffer, int offset) {
-        for (int i = 0; i < len; i++) {
-            int power = Maths.pow10(len - i - 1);
-            byte digit = (byte) Math.floorDiv(value, power);
-            buffer.put(offset + i, (byte) (digit + 0x30));
-            value -= (digit * power);
-        }
     }
 
     public static ByteBuffer wrap(final String text) {
