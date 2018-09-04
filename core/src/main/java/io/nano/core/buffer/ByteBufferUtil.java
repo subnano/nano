@@ -114,16 +114,6 @@ public final class ByteBufferUtil {
         return aByte == 'Y';
     }
 
-    public static int toInt(ByteBuffer buffer, int offset, int len) {
-        int number = 0;
-        int index = 0;
-        for (int i = 0; i < len; i++) {
-            index = offset + len - i - 1;
-            number += ((buffer.get(index) - '0') * Maths.pow10(i));
-        }
-        return number;
-    }
-
     public static void putBytes(ByteBuffer buffer, byte[] bytes) {
         buffer.put(bytes, 0, bytes.length);
     }

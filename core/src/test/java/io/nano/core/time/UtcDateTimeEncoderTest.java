@@ -1,4 +1,4 @@
-package net.nanofix.time;
+package io.nano.core.time;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

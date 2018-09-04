@@ -1,7 +1,8 @@
 package net.nanofix.message;
 
+import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
-import net.nanofix.time.UtcDateTimeDecoder;
+import io.nano.core.time.UtcDateTimeDecoder;
 import net.nanofix.util.ByteString;
 import net.nanofix.util.TagBytes;
 
@@ -26,7 +27,7 @@ public class MessageHeaderReader extends MessageTypeReader implements FIXMessage
         // parent not interested - let's have a go
         int valueIndex = tagIndex + tagLen + 1;
         if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgSeqNum)) {
-            int msgSeqNum = ByteBufferUtil.toInt(buffer, valueIndex, valueLen);
+            int msgSeqNum = AsciiBufferUtil.getInt(buffer, valueIndex, valueLen);
             messageHeader.msgSeqNum(msgSeqNum);
             handled = true;
         } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.SenderCompID)) {

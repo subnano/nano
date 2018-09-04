@@ -1,4 +1,4 @@
-package net.nanofix.time;
+package io.nano.core.time;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,38 +10,30 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-class UtcDateTimeDecoderTest {
+class UtcTimeDecoderTest {
 
     private ByteBuffer buffer;
     private DateFormat formatter;
 
     @BeforeEach
     void setUp() {
-        buffer = ByteBuffer.allocate(32);
-        formatter = new SimpleDateFormat("yyyyMMdd-HH:mm:ss.SSS");
+        buffer = ByteBuffer.allocate(16);
+        formatter = new SimpleDateFormat("HH:mm:ss.SSS");
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Test
-    void decodeEpoch() throws Exception {
-        assertDecode("19700101-00:00:00.000");
-    }
-
-    @Test
-    void decodeMillenium() throws Exception {
-        assertDecode("20000101-00:00:00.001");
-    }
-
-    @Test
-    void decodeLeapYear() throws Exception {
-        assertDecode("20200229-14:56:12.987");
+    void decode() throws Exception {
+        assertDecode("00:00:00.000");
+        assertDecode("09:59:59.999");
+        assertDecode("01:02:03.004");
     }
 
     private void assertDecode(String expected) throws Exception {
         long expectedMillis = formatter.parse(expected).getTime();
         buffer.clear();
         buffer.put(expected.getBytes(StandardCharsets.US_ASCII), 0, expected.length());
-        long epochMillis = UtcDateTimeDecoder.decode(buffer, 0);
+        long epochMillis = UtcTimeDecoder.decode(buffer, 0);
         Assertions.assertThat(epochMillis).isEqualTo(expectedMillis);
     }
 

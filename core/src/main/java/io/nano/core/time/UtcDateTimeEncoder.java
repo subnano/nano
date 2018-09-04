@@ -1,4 +1,4 @@
-package net.nanofix.time;
+package io.nano.core.time;
 
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.time.TimeUtil;

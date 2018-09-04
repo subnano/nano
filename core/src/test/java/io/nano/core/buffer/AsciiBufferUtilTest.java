@@ -1,6 +1,5 @@
 package io.nano.core.buffer;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -14,8 +13,22 @@ class AsciiBufferUtilTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(32);
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void putStringAbsolute() {
+        String value = "Hello world!";
+        int len = AsciiBufferUtil.putString(value, buffer, 0);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, len))
+                .isEqualTo(value);
+        assertThat(buffer.position()).isZero();
+    }
+
+    @Test
+    void putStringRelative() {
+        String value = "Hello world!";
+        int len = AsciiBufferUtil.putString(value, buffer);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, len))
+                .isEqualTo(value);
+        assertThat(buffer.position()).isEqualTo(12);
     }
 
     @Test
@@ -51,6 +64,13 @@ class AsciiBufferUtilTest {
         assertLongBuffer(987654321);
         assertLongBuffer(4536039866140L);
         assertLongBuffer(Long.MAX_VALUE);
+    }
+
+    @Test
+    void getInt() {
+        AsciiBufferUtil.putString("001742", buffer);
+        assertThat(AsciiBufferUtil.getInt(buffer, 0, 4)).isEqualTo(17);
+        assertThat(AsciiBufferUtil.getInt(buffer, 4, 2)).isEqualTo(42);
     }
 
     private void assertIntBuffer(int value) {

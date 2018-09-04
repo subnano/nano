@@ -1,6 +1,6 @@
 package net.nanofix.message;
 
-import net.nanofix.time.UtcDateTimeEncoder;
+import io.nano.core.time.UtcDateTimeEncoder;
 import io.nano.core.util.ByteArrayUtil;
 import net.nanofix.util.ByteString;
 import net.nanofix.util.FIXBytes;

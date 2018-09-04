@@ -9,8 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ByteBufferUtilTest {
 
-    private ByteBuffer buffer = ByteBuffer.allocate(16);
-
     @Test
     void hexDump() {
         //String random = "This is what you want to see in 25/12/2512";

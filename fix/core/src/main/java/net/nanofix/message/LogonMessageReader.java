@@ -1,5 +1,6 @@
 package net.nanofix.message;
 
+import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
 import net.nanofix.util.TagBytes;
 
@@ -32,7 +33,7 @@ public class LogonMessageReader extends MessageHeaderReader implements FIXMessag
             encryptMethod = ByteBufferUtil.toBoolean(buffer, valueIndex, valueLen);
             handled = true;
         } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.HeartBtInt)) {
-            heartBeatInterval = ByteBufferUtil.toInt(buffer, valueIndex, valueLen);
+            heartBeatInterval = AsciiBufferUtil.getInt(buffer, valueIndex, valueLen);
             handled = true;
         } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.ResetSeqNumFlag)) {
             resetSeqNumFlag = ByteBufferUtil.toBoolean(buffer, valueIndex, valueLen);
