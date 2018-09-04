@@ -21,7 +21,7 @@ public final class AsciiBufferUtil {
     }
 
     /**
-     * Relative <i>put</i> method to copy characters from a {@link String }into a {@link ByteBuffer}
+     * Relative <i>put</i> method to copy characters from a {@link String} into a {@link ByteBuffer}
      *
      * <p>Writes the Ascii bytes from the given string into this buffer at the current
      * buffer position, and then increments the position.</p>
@@ -37,7 +37,7 @@ public final class AsciiBufferUtil {
     }
 
     /**
-     * Absolute <i>put</i> method to copy characters from a {@link String }into a {@link ByteBuffer}
+     * Absolute <i>put</i> method to copy characters from a {@link String} into a {@link ByteBuffer}
      *
      * <p>Writes the Ascii bytes from the given string into this buffer at the given offset.</p>
      *
@@ -54,11 +54,33 @@ public final class AsciiBufferUtil {
         return len;
     }
 
+    /**
+     * Relative <i>put</i> method to copy characters from an {@code int} into a {@link ByteBuffer}
+     *
+     * <p>Writes the Ascii bytes from the given {@code int} into this buffer at the current
+     * buffer position, and then increments the position.</p>
+     *
+     * @param value The {@code int} to be written.
+     * @param buffer The target {@link ByteBuffer} to write into
+     * @return The number of bytes written
+     */
     public static int putInt(int value, ByteBuffer buffer) {
         int numDigits = Maths.numberDigits(value);
-        return putInt(value, numDigits, buffer, buffer.position());
+        putInt(value, numDigits, buffer, buffer.position());
+        buffer.position(buffer.position() + numDigits);
+        return numDigits;
     }
 
+    /**
+     * Absolute <i>put</i> method to copy characters from an {@code int} into a {@link ByteBuffer}
+     *
+     * <p>Writes the Ascii bytes from the given {@code int} into this buffer at the given offset.</p>
+     *
+     * @param value The {@code int} to be written.
+     * @param buffer The target {@link ByteBuffer} to write the bytes into
+     * @param offset The offset at which the bytes will be written
+     * @return The number of bytes written
+     */
     public static int putInt(int value, ByteBuffer buffer, int offset) {
         int numDigits = Maths.numberDigits(value);
         return putInt(value, numDigits, buffer, offset);
@@ -75,9 +97,21 @@ public final class AsciiBufferUtil {
         return len;
     }
 
+    /**
+     * Absolute <i>put</i> method to copy characters from a {@link long} into a {@link ByteBuffer}
+     *
+     * <p>Writes the Ascii bytes from the given {@link long} into this buffer at the current
+     * buffer position, and then increments the position.</p>
+     *
+     * @param value The {@link long} to be written.
+     * @param buffer The target {@link ByteBuffer} to write into
+     * @return The number of bytes written
+     */
     public static int putLong(long value, ByteBuffer buffer) {
         int numDigits = Maths.numberDigits(value);
-        return putLong(value, numDigits, buffer, buffer.position());
+        putLong(value, numDigits, buffer, buffer.position());
+        buffer.position(buffer.position() + numDigits);
+        return numDigits;
     }
 
     public static int putLong(long value, ByteBuffer buffer, int offset) {

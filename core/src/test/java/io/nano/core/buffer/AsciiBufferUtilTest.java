@@ -17,8 +17,7 @@ class AsciiBufferUtilTest {
     void putStringAbsolute() {
         String value = "Hello world!";
         int len = AsciiBufferUtil.putString(value, buffer, 0);
-        assertThat(AsciiBufferUtil.getString(buffer, 0, len))
-                .isEqualTo(value);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, len)).isEqualTo(value);
         assertThat(buffer.position()).isZero();
     }
 
@@ -26,9 +25,22 @@ class AsciiBufferUtilTest {
     void putStringRelative() {
         String value = "Hello world!";
         int len = AsciiBufferUtil.putString(value, buffer);
-        assertThat(AsciiBufferUtil.getString(buffer, 0, len))
-                .isEqualTo(value);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, len)).isEqualTo(value);
         assertThat(buffer.position()).isEqualTo(12);
+    }
+
+    @Test
+    void putIntAbsolute() {
+        AsciiBufferUtil.putInt(1234, buffer, 0);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, 4)) .isEqualTo("1234");
+        assertThat(buffer.position()).isZero();
+    }
+
+    @Test
+    void putIntRelative() {
+        AsciiBufferUtil.putInt(1234, buffer);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, 4)) .isEqualTo("1234");
+        assertThat(buffer.position()).isEqualTo(4);
     }
 
     @Test
@@ -64,6 +76,20 @@ class AsciiBufferUtilTest {
         assertLongBuffer(987654321);
         assertLongBuffer(4536039866140L);
         assertLongBuffer(Long.MAX_VALUE);
+    }
+
+    @Test
+    void putLongAbsolute() {
+        AsciiBufferUtil.putLong(123456L, buffer, 0);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, 6)) .isEqualTo("123456");
+        assertThat(buffer.position()).isZero();
+    }
+
+    @Test
+    void putLongRelative() {
+        AsciiBufferUtil.putLong(123456L, buffer);
+        assertThat(AsciiBufferUtil.getString(buffer, 0, 6)) .isEqualTo("123456");
+        assertThat(buffer.position()).isEqualTo(6);
     }
 
     @Test
