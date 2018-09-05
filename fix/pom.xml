@@ -91,31 +91,4 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>local</id>
-            <properties>
-                <filter.name>local</filter.name>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <filter.name>dev</filter.name>
-            </properties>
-        </profile>
-        <profile>
-            <id>uat</id>
-            <properties>
-                <filter.name>uat</filter.name>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <filter.name>prod</filter.name>
-            </properties>
-        </profile>
-    </profiles>
-
 </project>
