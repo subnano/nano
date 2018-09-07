@@ -1,6 +1,6 @@
 package net.nanofix.message;
 
-import net.nanofix.util.ByteString;
+import io.nano.core.lang.ByteString;
 
 public final class BeginStrings {
 

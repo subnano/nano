@@ -1,15 +1,18 @@
-package net.nanofix.util;
+package io.nano.core.lang;
 
-import io.nano.core.lang.ByteString;
+
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Mark Wardell
+ */
 class ByteStringTest {
 
     @Test
     void equalityOfNullStrings() {
-        assertThat(ByteString.of((String) null)).isEqualTo(ByteString.of((String) null));
+        assertThat(ByteString.of((String)null)).isEqualTo(ByteString.of((String)null));
     }
 
     @Test

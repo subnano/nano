@@ -1,16 +1,27 @@
-package net.nanofix.util;
+package io.nano.core.lang;
 
+import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * {@link ByteString} is designed to be a static wrapper around a byte array.
+ *
+ * It is not meant to be a reusable buffer space, hence there is no clear/reset functionality.
+ *
+ * @author Mark Wardell
+ */
 public class ByteString {
 
     private final byte[] bytes;
+    private final int length;
 
-    public ByteString(byte[] bytes) {
+    // the constructor is used for derived classes only
+    protected ByteString(byte[] bytes) {
         this.bytes = bytes;
+        this.length = bytes == null ? 0 : bytes.length;
     }
 
     public static ByteString of(String string) {
@@ -26,14 +37,22 @@ public class ByteString {
     }
 
     public int length() {
-        return bytes == null ? 0 : bytes.length;
+        return length;
+    }
+
+    public boolean isEmpty() {
+        return length == 0;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ByteString that = (ByteString) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ByteString that = (ByteString)o;
         return Arrays.equals(bytes, that.bytes);
     }
 
@@ -48,6 +67,6 @@ public class ByteString {
      */
     @Override
     public String toString() {
-        return "ByteString(" + new String(bytes, StandardCharsets.US_ASCII) + ')';
+        return ByteArrayUtil.toString(bytes);
     }
 }

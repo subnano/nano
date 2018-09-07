@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 /**
  * @author Mark Wardell
  */
-public interface TokenVisitor {
+public interface JsonVisitor {
 
     void startObject(ByteBuffer buffer, int offset);
 
@@ -22,4 +22,9 @@ public interface TokenVisitor {
     void onString(ByteBuffer buffer, int offset, int len);
 
     void onNumber(ByteBuffer buffer, int offset, int len);
+
+    void onError(ByteBuffer buffer, int offset, String cause);
+
+    void onBoolean(ByteBuffer buffer, int offset, boolean value);
+
 }

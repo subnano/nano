@@ -2,7 +2,7 @@ package net.nanofix.message;
 
 import io.nano.core.time.UtcDateTimeEncoder;
 import io.nano.core.util.ByteArrayUtil;
-import net.nanofix.util.ByteString;
+import io.nano.core.lang.ByteString;
 import net.nanofix.util.FIXBytes;
 
 import java.nio.ByteBuffer;

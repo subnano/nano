@@ -16,7 +16,7 @@ class AsciiBufferUtilTest {
     @Test
     void putStringAbsolute() {
         String value = "Hello world!";
-        int len = AsciiBufferUtil.putString(value, buffer, 0);
+        int len = AsciiBufferUtil.putCharSequence(value, buffer, 0);
         assertThat(AsciiBufferUtil.getString(buffer, 0, len)).isEqualTo(value);
         assertThat(buffer.position()).isZero();
     }
@@ -24,7 +24,7 @@ class AsciiBufferUtilTest {
     @Test
     void putStringRelative() {
         String value = "Hello world!";
-        int len = AsciiBufferUtil.putString(value, buffer);
+        int len = AsciiBufferUtil.putCharSequence(value, buffer);
         assertThat(AsciiBufferUtil.getString(buffer, 0, len)).isEqualTo(value);
         assertThat(buffer.position()).isEqualTo(12);
     }
@@ -94,7 +94,7 @@ class AsciiBufferUtilTest {
 
     @Test
     void getInt() {
-        AsciiBufferUtil.putString("001742", buffer);
+        AsciiBufferUtil.putCharSequence("001742", buffer);
         assertThat(AsciiBufferUtil.getInt(buffer, 0, 4)).isEqualTo(17);
         assertThat(AsciiBufferUtil.getInt(buffer, 4, 2)).isEqualTo(42);
     }

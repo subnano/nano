@@ -1,11 +1,15 @@
 package net.subnano.codec.json;
 
+import io.nano.core.buffer.AsciiBufferUtil;
+
 import java.nio.ByteBuffer;
 
 /**
+ * An implementation of {@link JsonVisitor} that writes the data to the console.
+ *
  * @author Mark Wardell
  */
-public class ConsoleTokenVisitor implements TokenVisitor {
+public class ConsoleJsonVisitor implements JsonVisitor {
 
     @Override
     public void startObject(ByteBuffer buffer, int offset) {
@@ -39,11 +43,24 @@ public class ConsoleTokenVisitor implements TokenVisitor {
 
     @Override
     public void onString(ByteBuffer buffer, int offset, int len) {
-        System.out.println("onString(" + offset + ")");
+        String text = AsciiBufferUtil.getString(buffer, offset, len);
+        System.out.println("onString(" + offset + "," + len +") \"" + text + "\"");
     }
 
     @Override
     public void onNumber(ByteBuffer buffer, int offset, int len) {
-        System.out.println("onNumber(" + offset + ")");
+        String text = AsciiBufferUtil.getString(buffer, offset, len);
+        System.out.println("onNumber(" + offset + "," + len +") \"" + text + "\"");
+    }
+
+    @Override
+    public void onError(ByteBuffer buffer, int offset, String cause) {
+        char text = (char) buffer.get(offset);
+        System.out.println("onError: '" + cause +"' @ " + offset + " => \"" + text + "\"");
+    }
+
+    @Override
+    public void onBoolean(ByteBuffer buffer, int offset, boolean value) {
+        System.out.println("onBoolean(" + offset + "," + value +")");
     }
 }

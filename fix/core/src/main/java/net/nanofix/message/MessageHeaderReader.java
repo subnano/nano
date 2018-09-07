@@ -3,7 +3,7 @@ package net.nanofix.message;
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.time.UtcDateTimeDecoder;
-import net.nanofix.util.ByteString;
+import io.nano.core.lang.ByteString;
 import net.nanofix.util.TagBytes;
 
 import java.nio.ByteBuffer;

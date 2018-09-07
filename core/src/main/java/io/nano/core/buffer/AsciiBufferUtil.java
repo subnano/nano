@@ -21,32 +21,32 @@ public final class AsciiBufferUtil {
     }
 
     /**
-     * Relative <i>put</i> method to copy characters from a {@link String} into a {@link ByteBuffer}
+     * Relative <i>put</i> method to copy characters from a {@link CharSequence} into a {@link ByteBuffer}
      *
-     * <p>Writes the Ascii bytes from the given string into this buffer at the current
+     * <p>Writes the Ascii bytes from the given sequence into this buffer at the current
      * buffer position, and then increments the position.</p>
      *
-     * @param value The string to be written.
+     * @param value The CharSequence to be written.
      * @param buffer The target {@link ByteBuffer} to write into
      * @return The number of bytes written
      */
-    public static int putString(String value, ByteBuffer buffer) {
-        int len = putString(value, buffer, buffer.position());
+    public static int putCharSequence(CharSequence value, ByteBuffer buffer) {
+        int len = putCharSequence(value, buffer, buffer.position());
         buffer.position(buffer.position() + len);
         return len;
     }
 
     /**
-     * Absolute <i>put</i> method to copy characters from a {@link String} into a {@link ByteBuffer}
+     * Absolute <i>put</i> method to copy characters from a {@link CharSequence} into a {@link ByteBuffer}
      *
-     * <p>Writes the Ascii bytes from the given string into this buffer at the given offset.</p>
+     * <p>Writes the Ascii bytes from the given sequence into this buffer at the given offset.</p>
      *
-     * @param value The string to be written.
+     * @param value The CharSequence to be written.
      * @param buffer The target {@link ByteBuffer} to write the bytes into
      * @param offset The offset at which the bytes will be written
      * @return The number of bytes written
      */
-    public static int putString(String value, ByteBuffer buffer, int offset) {
+    public static int putCharSequence(CharSequence value, ByteBuffer buffer, int offset) {
         int len = value == null ? 0 : value.length();
         for (int i = 0; i < len; i++) {
             buffer.put(offset + i, (byte) value.charAt(i));
@@ -144,12 +144,30 @@ public final class AsciiBufferUtil {
     }
 
     public static int getInt(ByteBuffer buffer, int offset, int len) {
+        if (len <= 0) {
+            throw new IllegalArgumentException("Positive length expected");
+        }
         int number = 0;
-        int index = 0;
+        int index;
         for (int i = 0; i < len; i++) {
             index = offset + len - i - 1;
             number += ((buffer.get(index) - '0') * Maths.pow10(i));
         }
         return number;
     }
+
+    public static long getLong(ByteBuffer buffer, int offset, int len) {
+        if (len <= 0) {
+            throw new IllegalArgumentException("Positive length expected");
+        }
+        boolean positive = true;
+        long number = 0L;
+        long index;
+        for (long i = 0; i < len; i++) {
+            index = offset + len - i - 1;
+            number += ((buffer.get((int) index) - '0') * Maths.pow10(i));
+        }
+        return positive ? number : 0-number;
+    }
+
 }

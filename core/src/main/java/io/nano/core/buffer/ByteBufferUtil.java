@@ -1,17 +1,16 @@
 package io.nano.core.buffer;
 
-import io.nano.core.util.Maths;
+import io.nano.core.lang.ByteString;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author Mark Wardell
  */
 public final class ByteBufferUtil {
 
-    static final byte[] CHECKSUM_BYTE_SUFFIX = new byte[]{'0', '1', '0', '='};
+    static final byte[] CHECKSUM_BYTE_SUFFIX = new byte[] {'0', '1', '0', '='};
     static final int NOT_FOUND_INDEX = -1;
     static final String HEX = "0123456789ABCDEF";
 
@@ -22,7 +21,9 @@ public final class ByteBufferUtil {
     public static int indexOf(ByteBuffer buffer, int startIndex, byte value) {
         int toIndex = buffer.position();
         for (int index = startIndex; index < toIndex; index++) {
-            if (buffer.get(index) == value) return index;
+            if (buffer.get(index) == value) {
+                return index;
+            }
         }
         return NOT_FOUND_INDEX;
     }
@@ -54,11 +55,21 @@ public final class ByteBufferUtil {
     public static byte[] asByteArray(ByteBuffer buffer, int index, int len) {
         byte[] bytes = new byte[len];
         //buffer.get(bytes);
-        if (len > buffer.remaining())
+        if (len > buffer.remaining()) {
             throw new BufferUnderflowException();
-        for (int i = 0; i < len; i++)
+        }
+        for (int i = 0; i < len; i++) {
             bytes[i] = buffer.get(index + i);
+        }
         return bytes;
+    }
+
+    /**
+     * Returns a new ByteString from the given ByteBuffer at offset and of len.
+     */
+    public static ByteString asByteString(ByteBuffer buffer, int index, int len) {
+        byte[] bytes = asByteArray(buffer, index, len);
+        return ByteString.of(bytes);
     }
 
     /**
@@ -82,11 +93,25 @@ public final class ByteBufferUtil {
      * are equal to the bytes in the given byte array.
      */
     public static boolean hasBytes(ByteBuffer buffer, int offset, byte[] bytes) {
-        for (int pos = 0; pos < bytes.length; pos++) {
-            if (buffer.get(offset + pos) != bytes[pos])
+        for (int i = 0; i < bytes.length; i++) {
+            if (buffer.get(offset + i) != bytes[i]) {
                 return false;
+            }
         }
         return true;
+    }
+
+    /**
+     * Returns true if the bytes in the given {@link ByteBuffer} and offset match the contents of the {@link ByteString}
+     * @return True if they match, otherwise false.
+     */
+    public static boolean equals(ByteBuffer buffer, int offset, int len, ByteString byteString) {
+        boolean equal = false;
+        // don't even start unless the lengths are the same
+        if (byteString.length() == len) {
+            return hasBytes(buffer, offset, byteString.bytes());
+        }
+        return equal;
     }
 
     public static int readableBytes(ByteBuffer buffer) {
@@ -129,8 +154,9 @@ public final class ByteBufferUtil {
     public static ByteBuffer wrap(final String text) {
         int len = text == null ? 0 : text.length();
         byte[] bytes = new byte[len];
-        for (int i=0; i<len; i++)
-            bytes[i] = (byte) text.charAt(i);
+        for (int i = 0; i < len; i++) {
+            bytes[i] = (byte)text.charAt(i);
+        }
         return ByteBuffer.wrap(bytes);
     }
 
@@ -143,20 +169,22 @@ public final class ByteBufferUtil {
         StringBuilder lineBuilder = new StringBuilder();
         StringBuilder charBuilder = new StringBuilder(charsPerRow);
         int rows = Math.floorDiv(length, charsPerRow);
-        for (int row=0; row<=rows; row++) {
+        for (int row = 0; row <= rows; row++) {
             charBuilder.setLength(0);
             int lineStart = row * charsPerRow;
             int linedEnd = Math.min(lineStart + charsPerRow, length);
-            for (int i=lineStart; i<linedEnd; i++) {
+            for (int i = lineStart; i < linedEnd; i++) {
                 byte b = buffer.get(i);
                 lineBuilder.append(toHex(b));
-                if (i<linedEnd)
+                if (i < linedEnd) {
                     lineBuilder.append(" ");
-                charBuilder.append(b == 0 ? "." : new Character((char) b));
+                }
+                charBuilder.append(b == 0 ? "." : new Character((char)b));
             }
             lineBuilder.append("  ").append(charBuilder.toString());
-            if (row < rows)
+            if (row < rows) {
                 lineBuilder.append("\n");
+            }
         }
         return lineBuilder.toString();
     }
@@ -167,4 +195,5 @@ public final class ByteBufferUtil {
         sb.append(HEX.charAt(b & 0x0F));
         return sb.toString();
     }
+
 }

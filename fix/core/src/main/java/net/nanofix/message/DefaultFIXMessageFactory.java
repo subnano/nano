@@ -1,7 +1,7 @@
 package net.nanofix.message;
 
 import net.nanofix.settings.SessionSettings;
-import net.nanofix.util.ByteString;
+import io.nano.core.lang.ByteString;
 
 /**
  * Created by IntelliJ IDEA.

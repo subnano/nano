@@ -1,5 +1,7 @@
 package net.nanofix.util;
 
+import io.nano.core.lang.ByteString;
+
 /**
  * User; Mark Wardell
  * Date; 11/10/11

@@ -1,7 +1,7 @@
 package net.nanofix.message;
 
 import io.nano.core.time.UtcDateTimeDecoder;
-import net.nanofix.util.ByteString;
+import io.nano.core.lang.ByteString;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;

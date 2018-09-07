@@ -2,7 +2,7 @@ package net.nanofix.message;
 
 import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.util.ByteArrayUtil;
-import net.nanofix.util.ByteString;
+import io.nano.core.lang.ByteString;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
