@@ -31,6 +31,8 @@ import static net.subnano.codec.json.sample.SampleData.SAMPLE_PRICE;
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
+//@BenchmarkMode(Mode.Throughput)
+//@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 @Warmup(iterations = 5)
 @Measurement(iterations = 3)
