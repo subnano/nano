@@ -1,12 +1,9 @@
-package net.subnano.codec.json;
+package net.subnano.codec.json.sample;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
-import net.subnano.codec.json.model.ImmutablePrice;
-import net.subnano.codec.json.model.ImmutablePrice.ImmutableLevel;
-import net.subnano.codec.json.model.Level;
-import net.subnano.codec.json.model.Price;
+import net.subnano.codec.json.sample.ImmutablePrice.ImmutableLevel;
 import org.decimal4j.api.DecimalArithmetic;
 import org.decimal4j.immutable.Decimal4f;
 

@@ -1,6 +1,5 @@
 package net.subnano.codec.json;
 
-import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.ByteBuffer;
@@ -19,6 +18,7 @@ import java.nio.ByteBuffer;
  * {@link JsonVisitor} as the document is traversed.</p>
  *
  * TODO - ideally ByteBuffer should be a typed <T> source and buffer implementations should be subclasses
+ * TODO - it currently works directly with the underlying byt[] for performance - this wont work for direct buffers
  *
  * @author Mark Wardell
  */
@@ -42,42 +42,45 @@ public class JsonByteParser {
 
     private ByteBuffer buffer;
     private int bufferIndex;
+    private byte[] bytes;
+    private int limit;
 
     public void parse(ByteBuffer buffer, JsonVisitor visitor) {
         this.buffer = buffer;
+        this.bytes = buffer.array();
+        this.limit = buffer.limit();
         this.bufferIndex = 0;
-        while (hasNextByte()) {
+        while (bufferIndex < limit) {
             parseNext(visitor);
         }
     }
 
     private void parseNext(JsonVisitor visitor) {
-        skipWhiteSpaces();
-        byte nextByte = getByte();
+        byte nextByte = bytes[bufferIndex];
         switch (nextByte) {
             case OPEN_BRACE:
                 visitor.startObject(buffer, bufferIndex);
-                nextByte();
+                bufferIndex++;
                 break;
             case CLOSE_BRACE:
                 visitor.endObject(buffer, bufferIndex);
-                nextByte();
+                bufferIndex++;
                 break;
             case OPEN_ARRAY:
                 visitor.startArray(buffer, bufferIndex);
-                nextByte();
+                bufferIndex++;
                 break;
             case CLOSE_ARRAY:
                 visitor.endArray(buffer, bufferIndex);
-                nextByte();
+                bufferIndex++;
                 break;
             case COMMA:
                 visitor.comma(buffer, bufferIndex);
-                nextByte();
+                bufferIndex++;
                 break;
             case COLON:
                 visitor.colon(buffer, bufferIndex);
-                nextByte();
+                bufferIndex++;
                 break;
             case QUOTE:
                 parseString(visitor);
@@ -103,79 +106,34 @@ public class JsonByteParser {
             case 'n':
                 parseNull(visitor);
                 break;
-            default    :
+            case ' ' :
+            case '\n':
+            case '\r':
+            case '\t':
+                bufferIndex++;
+                break;
+            default:
                 visitor.onError(buffer, bufferIndex, ERROR_INVALID_CHARACTER);
-                nextByte();
-        }
-    }
-
-    /**
-     * Advance the buffer index by 1 and return the next byte in the buffer
-     */
-    private byte nextByte() {
-        bufferIndex++;
-        return getByte();
-    }
-
-    /**
-     * Advance the buffer index by the specified number of bytes
-     */
-    private void skip(int bytes) {
-        bufferIndex += bytes;
-    }
-
-    /**
-     * Returns true if there are more available bytes in the buffer.
-     * @return true When more bytes are available, otherwise false.
-     */
-    private boolean hasNextByte() {
-        return bufferIndex < buffer.limit();
-    }
-
-    /**
-     * Returns the next available byte in the buffer without altering the buffer index
-     *
-     * @return The next byte in the buffer or -1 if end of buffer reached
-     */
-    private byte getByte() {
-        return hasNextByte() ? buffer.get(bufferIndex) : EOF;
-    }
-
-    private void skipWhiteSpaces() {
-        boolean skipping = true;
-        byte nextByte = getByte();
-        while (skipping && hasNextByte()) {
-            switch (nextByte) {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
-                    nextByte = nextByte();
-                    break;
-
-                default: {
-                    skipping = false;
-                }
-            }
+                bufferIndex++;
         }
     }
 
     private void parseString(JsonVisitor visitor) {
         // skip the opening quote
-        byte nextByte = nextByte();
+        byte nextByte = bytes[++bufferIndex];
         int offset = bufferIndex;
         int len = 0;
-        while (nextByte != '"' && hasNextByte()) {
+        while (nextByte != '"' && bufferIndex < limit) {
             len++;
-            nextByte = nextByte();
+            nextByte = bytes[++bufferIndex];
         }
         if (nextByte == '"') {
             // advance past the closing quote
-            nextByte();
+            bufferIndex++;
             visitor.onString(buffer, offset, len);
-        }
-        else
+        } else {
             visitor.onError(buffer, bufferIndex, ERROR_UNEXPECTED_END);
+        }
     }
 
     private void parseNumber(JsonVisitor visitor) {
@@ -183,8 +141,8 @@ public class JsonByteParser {
         // index at start of first digit
         int offset = bufferIndex;
         int len = 1;
-        byte nextByte = nextByte();
-        while (!numberComplete && hasNextByte()) {
+        byte nextByte = bytes[++bufferIndex];
+        while (!numberComplete && bufferIndex < limit) {
             // TODO handle other cases such as negative, NaN and e notation
             switch (nextByte) {
                 case '0':
@@ -199,7 +157,7 @@ public class JsonByteParser {
                 case '9':
                 case '.':
                     len++;
-                    nextByte = nextByte();
+                    nextByte = bytes[++bufferIndex];
                     break;
 
                 default:
@@ -211,11 +169,10 @@ public class JsonByteParser {
 
     private void parseTrue(JsonVisitor visitor) {
         int offset = bufferIndex;
-        if (ByteBufferUtil.hasBytes(buffer, offset, TRUE_BYTES)) {
+        if (ByteArrayUtil.equals(bytes, offset, TRUE_BYTES)) {
             visitor.onBoolean(buffer, offset, true);
-            skip(TRUE_BYTES.length);
-        }
-        else {
+            bufferIndex += TRUE_BYTES.length;
+        } else {
             visitor.onError(buffer, offset, ERROR_UNQUOTED_TEXT);
             skipToNextDelimiter();
         }
@@ -223,11 +180,10 @@ public class JsonByteParser {
 
     private void parseFalse(JsonVisitor visitor) {
         int offset = bufferIndex;
-        if (ByteBufferUtil.hasBytes(buffer, offset, FALSE_BYTES)) {
+        if (ByteArrayUtil.equals(bytes, offset, FALSE_BYTES)) {
             visitor.onBoolean(buffer, offset, false);
-            skip(FALSE_BYTES.length);
-        }
-        else {
+            bufferIndex += FALSE_BYTES.length;
+        } else {
             visitor.onError(buffer, offset, ERROR_UNQUOTED_TEXT);
             skipToNextDelimiter();
         }
@@ -238,13 +194,13 @@ public class JsonByteParser {
     }
 
     private void skipToNextDelimiter() {
-        byte nextByte = nextByte();
-        while (hasNextByte()
+        byte nextByte = bytes[++bufferIndex];
+        while (bufferIndex < limit
                 && nextByte != COMMA
                 && nextByte != COLON
                 && nextByte != QUOTE
                 && nextByte != CLOSE_BRACE) {
-            nextByte = nextByte();
+            nextByte = bytes[++bufferIndex];
         }
     }
 

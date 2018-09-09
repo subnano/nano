@@ -1,4 +1,4 @@
-package net.subnano.codec.json.model;
+package net.subnano.codec.json.sample;
 
 /**
  * @author Mark Wardell

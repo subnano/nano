@@ -214,4 +214,13 @@ public class ByteArrayUtil {
     public static String toString(byte[] bytes) {
         return new String(bytes, StandardCharsets.US_ASCII);
     }
+
+    public static boolean equals(byte[] bytes, int offset, byte[] expected) {
+        for (int i = 0; i < expected.length; i++) {
+            if (bytes[offset + i] != expected[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

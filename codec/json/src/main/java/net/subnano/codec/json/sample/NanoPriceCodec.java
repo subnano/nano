@@ -1,9 +1,11 @@
-package net.subnano.codec.json;
+package net.subnano.codec.json.sample;
 
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
+import io.nano.core.collection.ByteStringMap;
 import io.nano.core.lang.ByteString;
-import net.subnano.codec.json.model.MutablePrice;
+import net.subnano.codec.json.JsonByteParser;
+import net.subnano.codec.json.JsonVisitor;
 import org.decimal4j.api.DecimalArithmetic;
 import org.decimal4j.immutable.Decimal4f;
 
@@ -18,9 +20,12 @@ public class NanoPriceCodec {
 
     private final JsonByteParser parser = new JsonByteParser();
     private final JsonPriceVisitor visitor = new JsonPriceVisitor();
+    private final BufferCharSequence bufferCharSequence = new BufferCharSequence();
+    private final ByteStringMap byteStringMap = new ByteStringMap(16);
 
     public void decode(ByteBuffer buffer, MutablePrice price) {
         visitor.withPrice(price);
+        bufferCharSequence.of(buffer);
         price.clear();
         parser.parse(buffer, visitor);
     }
@@ -50,26 +55,24 @@ public class NanoPriceCodec {
                     // ignore the confirmation of 'event' == 'price'
                     // This needs to be determined to obtain correct JSON codec in advance
                     name = null;
-                }
-                else if (PriceBytes.INSTRUMENT.equals(name)) {
+                } else if (PriceBytes.INSTRUMENT.equals(name)) {
                     // TODO do NOT allocate - lookup from a cache
-                    //instrumentCache.getOrCreate();
-                    price.instrument = ByteBufferUtil.asByteString(buffer, offset, len);
+                    price.instrument = byteStringMap.getOrCreate(buffer, offset, len);
                     name = null;
-                }
-                else if (PriceBytes.QUANTITY.equals(name)) {
-                    long qty = ARITHMETIC.parse(AsciiBufferUtil.getString(buffer, offset, len));
+                } else if (PriceBytes.QUANTITY.equals(name)) {
+                    long qty = ARITHMETIC.parse(bufferCharSequence, offset, offset + len);
                     price.setQuantity(depth, side, qty);
                     name = null;
-                }
-                else if (PriceBytes.PRICE.equals(name)) {
-                    long px = ARITHMETIC.parse(AsciiBufferUtil.getString(buffer, offset, len));
+                } else if (PriceBytes.PRICE.equals(name)) {
+                    long px = ARITHMETIC.parse(bufferCharSequence, offset, offset + len);
                     price.setPrice(depth++, side, px);
                     name = null;
-                }
-                else {
-                    throw new IllegalArgumentException("Unexpected string @ " + offset + " '"
-                            + AsciiBufferUtil.getString(buffer, offset, len) + "'");
+                } else {
+                    throw new IllegalArgumentException("Unexpected string @ "
+                            + offset
+                            + " '"
+                            + AsciiBufferUtil.getString(buffer, offset, len)
+                            + "'");
                 }
             }
         }
@@ -78,12 +81,10 @@ public class NanoPriceCodec {
         public void onNumber(ByteBuffer buffer, int offset, int len) {
             if (name == null) {
                 throw new IllegalArgumentException("Encountered a number when attribute not set");
-            }
-            else if (PriceBytes.TIMESTAMP.equals(name)) {
+            } else if (PriceBytes.TIMESTAMP.equals(name)) {
                 price.timestamp = AsciiBufferUtil.getLong(buffer, offset, len);
                 name = null;
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Unexpected number");
             }
         }
@@ -101,8 +102,7 @@ public class NanoPriceCodec {
             if (PriceBytes.SUCCESS.equals(name)) {
                 price.success = value;
                 name = null;
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Unexpected boolean");
             }
         }
@@ -123,8 +123,7 @@ public class NanoPriceCodec {
             if (PriceBytes.BUY.equals(name)) {
                 side = price.bids;
                 name = null;
-            }
-            else if (PriceBytes.SELL.equals(name)) {
+            } else if (PriceBytes.SELL.equals(name)) {
                 side = price.asks;
                 name = null;
             }
@@ -183,6 +182,30 @@ public class NanoPriceCodec {
         static ByteString SELL = ByteString.of("sell");
         static ByteString QUANTITY = ByteString.of("quantity");
         static ByteString PRICE = ByteString.of("price");   // can also be an attribute value
+    }
+
+    private class BufferCharSequence implements CharSequence {
+
+        private ByteBuffer buffer;
+
+        void of(ByteBuffer buffer) {
+            this.buffer = buffer;
+        }
+
+        @Override
+        public int length() {
+            return buffer.remaining();
+        }
+
+        @Override
+        public char charAt(int index) {
+            return (char)buffer.get(index);
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            throw new UnsupportedOperationException("not implemented");
+        }
     }
 
     /*

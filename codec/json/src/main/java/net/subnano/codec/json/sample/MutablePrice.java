@@ -1,4 +1,4 @@
-package net.subnano.codec.json.model;
+package net.subnano.codec.json.sample;
 
 import io.nano.core.lang.ByteString;
 
@@ -15,20 +15,20 @@ public class MutablePrice implements Price {
     public MutableLevel[] bids = new MutableLevel[2];
     public MutableLevel[] asks = new MutableLevel[2];
 
+    public MutablePrice() {
+        for (int i=0; i<bids.length; i++) {
+            bids[i] = new MutableLevel();
+            asks[i] = new MutableLevel();
+        }
+    }
 
     public void clear() {
         instrument = null;
         timestamp = 0;
         success = false;
         for (int i=0; i<bids.length; i++) {
-            if (bids[i] == null)
-                bids[i] = new MutableLevel();
-                        bids[i].quantity = Long.MIN_VALUE;
             bids[i].quantity = Long.MIN_VALUE;
             bids[i].price = Long.MIN_VALUE;
-
-            if (asks[i] == null)
-                asks[i] = new MutableLevel();
             asks[i].quantity = Long.MIN_VALUE;
             asks[i].price = Long.MIN_VALUE;
         }

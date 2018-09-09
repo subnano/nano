@@ -1,8 +1,11 @@
 package net.subnano.codec.json;
 
 import io.nano.core.buffer.AsciiBufferUtil;
-import net.subnano.codec.json.model.MutablePrice;
-import net.subnano.codec.json.model.Price;
+import net.subnano.codec.json.sample.SampleData;
+import net.subnano.codec.json.sample.JacksonPriceCodec;
+import net.subnano.codec.json.sample.MutablePrice;
+import net.subnano.codec.json.sample.NanoPriceCodec;
+import net.subnano.codec.json.sample.Price;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,24 +18,18 @@ import java.nio.ByteBuffer;
  */
 public class PriceParserTest {
 
-    static final String PRICE = "{\"event\": \"price\", \"success\": true, \"instrument\": \"ETHJPY.SPOT\", " +
-            "\"buy\": [{\"quantity\": \"3.4274\", \"price\": \"25212\"}, " +
-            "{\"quantity\": \"17.1371\", \"price\": \"25212\"}], " +
-            "\"sell\": [{\"quantity\": \"3.4274\", \"price\": \"25169\"}, " +
-            "{\"quantity\": \"17.1371\", \"price\": \"25167\"}], \"timestamp\": 1536217539975}";
-
     ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     @BeforeEach
     void setUp() {
-        AsciiBufferUtil.putCharSequence(PRICE, buffer);
+        AsciiBufferUtil.putCharSequence(SampleData.SAMPLE_PRICE, buffer);
         buffer.flip();  // ready to be read
         buffer.mark();  // remember position
     }
 
     @Test
     void ensureBothParsersProduceSameResult() throws IOException {
-        System.out.println(PRICE);
+        System.out.println(SampleData.SAMPLE_PRICE);
         JacksonPriceCodec jacksonCodec = new JacksonPriceCodec();
         Price priceByJackson = jacksonCodec.decode(buffer);
         System.out.println("Decoded: " + priceByJackson);
