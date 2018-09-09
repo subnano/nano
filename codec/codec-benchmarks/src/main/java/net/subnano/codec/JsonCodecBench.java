@@ -88,6 +88,9 @@ public class JsonCodecBench {
         state.nanoCodec.decode(state.buffer, state.mutablePrice);
     }
 
+    /**
+     * SoakRunner used to invoke a method continuously so can be profiled externally
+     */
     static class SoakRunner {
 
         public static void main(String[] args) {
