@@ -1,4 +1,6 @@
-package net.subnano.codec.json;
+package net.subnano.codec;
+
+import net.subnano.codec.json.JsonVisitor;
 
 import java.nio.ByteBuffer;
 

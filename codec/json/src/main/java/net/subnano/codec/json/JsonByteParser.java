@@ -20,6 +20,12 @@ import java.nio.ByteBuffer;
  * TODO - ideally ByteBuffer should be a typed <T> source and buffer implementations should be subclasses
  * TODO - it currently works directly with the underlying byt[] for performance - this wont work for direct buffers
  *
+ * <b>Possible Optimizations</b>
+ *
+ * - convert bufferIndex from a member (uses load/store) to an argument which would use registers
+ * - true/false to test bytes locally and avoid method call
+ * - do we really need callbacks for colon & comma?
+ *
  * @author Mark Wardell
  */
 public class JsonByteParser {
@@ -85,6 +91,7 @@ public class JsonByteParser {
             case QUOTE:
                 parseString(visitor);
                 break;
+            case '-':
             case '0':
             case '1':
             case '2':
@@ -122,15 +129,13 @@ public class JsonByteParser {
         // skip the opening quote
         byte nextByte = bytes[++bufferIndex];
         int offset = bufferIndex;
-        int len = 0;
         while (nextByte != '"' && bufferIndex < limit) {
-            len++;
             nextByte = bytes[++bufferIndex];
         }
         if (nextByte == '"') {
             // advance past the closing quote
             bufferIndex++;
-            visitor.onString(buffer, offset, len);
+            visitor.onString(buffer, offset, bufferIndex - offset - 1);
         } else {
             visitor.onError(buffer, bufferIndex, ERROR_UNEXPECTED_END);
         }
@@ -140,10 +145,9 @@ public class JsonByteParser {
         boolean numberComplete = false;
         // index at start of first digit
         int offset = bufferIndex;
-        int len = 1;
         byte nextByte = bytes[++bufferIndex];
         while (!numberComplete && bufferIndex < limit) {
-            // TODO handle other cases such as negative, NaN and e notation
+            // TODO handle other cases such as NaN and e notation
             switch (nextByte) {
                 case '0':
                 case '1':
@@ -156,7 +160,6 @@ public class JsonByteParser {
                 case '8':
                 case '9':
                 case '.':
-                    len++;
                     nextByte = bytes[++bufferIndex];
                     break;
 
@@ -164,7 +167,7 @@ public class JsonByteParser {
                     numberComplete = true;
             }
         }
-        visitor.onNumber(buffer, offset, len);
+        visitor.onNumber(buffer, offset, bufferIndex-offset);
     }
 
     private void parseTrue(JsonVisitor visitor) {

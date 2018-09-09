@@ -1,8 +1,7 @@
-package net.subnano.codec.json.sample;
+package net.subnano.codec;
 
 import net.subnano.codec.json.JsonByteParser;
 import net.subnano.codec.json.JsonVisitor;
-import net.subnano.codec.json.NullJsonVisitor;
 
 import java.nio.ByteBuffer;
 

@@ -13,7 +13,8 @@ import static net.subnano.codec.json.JsonByteParser.ERROR_UNQUOTED_TEXT;
 import static org.mockito.Mockito.verify;
 
 /**
- * TODO - add some tests with invalid characters to exercise the parser
+ * TODO - add tests with invalid characters to exercise the parser
+ * TODO - add tests with for negative numbers
  *
  * @author Mark Wardell
  */
