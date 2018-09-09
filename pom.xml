@@ -6,7 +6,7 @@
     <name>Nano/</name>
     <groupId>net.subnano</groupId>
     <artifactId>nano</artifactId>
-    <version>1.0.11-SNAPSHOT</version>
+    <version>1.0.11</version>
 
     <properties>
         <maven.build.timestamp.format>yyyyMMdd-HH:mm:ss</maven.build.timestamp.format>
@@ -99,12 +99,12 @@
             <dependency>
                 <groupId>net.subnano</groupId>
                 <artifactId>nano-time</artifactId>
-                <version>1.0.11-SNAPSHOT</version>
+                <version>1.0.11</version>
             </dependency>
             <dependency>
                 <groupId>net.subnano</groupId>
                 <artifactId>nano-core</artifactId>
-                <version>1.0.11-SNAPSHOT</version>
+                <version>1.0.11</version>
             </dependency>
 
             <dependency>
