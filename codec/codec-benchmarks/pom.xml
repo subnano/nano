@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>net.subnano.codec</groupId>
-            <artifactId>json</artifactId>
+            <artifactId>json-codec</artifactId>
             <version>1.0.13-SNAPSHOT</version>
         </dependency>
         <dependency>

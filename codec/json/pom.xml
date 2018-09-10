@@ -6,7 +6,7 @@
     <name>Nano/Codec/Json</name>
 
     <groupId>net.subnano.codec</groupId>
-    <artifactId>json</artifactId>
+    <artifactId>json-codec</artifactId>
 
     <parent>
         <groupId>net.subnano</groupId>
