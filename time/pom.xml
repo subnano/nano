@@ -5,12 +5,12 @@
     <packaging>jar</packaging>
     <name>Nano Time</name>
     <artifactId>nano-time</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.13-SNAPSHOT</version>
 
     <parent>
         <groupId>net.subnano</groupId>
         <artifactId>nano</artifactId>
-        <version>1.0.12</version>
+        <version>1.0.13-SNAPSHOT</version>
     </parent>
 
     <properties>
