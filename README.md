@@ -2,3 +2,10 @@
 
 # nano
 Nano is a collection of tools for low latency zero allocation applications.
+
+There are numerous benchmarks throughout the project comparing the different techniques used.
+
+[core-benchmarks] (core-benchmarks/README.md)
+[codec-benchmarks] (codec/codec-benchmarks/README.md)
+
+
