@@ -2,6 +2,7 @@
 
 A collection of micro benchmarks measuring all sorts of code that has been optimized for particular use cases.
 
+## return Code v Exception
 ```
 Benchmark                      Mode  Cnt    Score    Error  Units
 ThrownBench.methodThatReturns  avgt    9    2.889 ±  1.932  ns/op

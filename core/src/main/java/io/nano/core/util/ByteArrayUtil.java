@@ -1,6 +1,10 @@
 package io.nano.core.util;
 
+import io.nano.core.lang.ByteString;
+
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @author Mark Wardell
@@ -222,5 +226,19 @@ public class ByteArrayUtil {
             }
         }
         return true;
+    }
+
+    public static int hash(byte[] bytes, int offset, int len) {
+        int hash = 0;
+        int end = offset + len;
+        for (int i = offset; i < end; i++) {
+            hash += 31 * bytes[i];
+        }
+        return hash;
+    }
+
+    public static int hash(byte[] bytes) {
+        // TODO null check
+        return hash(bytes, 0, bytes.length);
     }
 }

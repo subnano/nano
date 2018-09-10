@@ -1,9 +1,11 @@
 package io.nano.core.buffer;
 
 import io.nano.core.lang.ByteString;
+import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 /**
  * @author Mark Wardell
@@ -196,4 +198,10 @@ public final class ByteBufferUtil {
         return sb.toString();
     }
 
+    public static int hash(ByteBuffer buffer, int offset, int len) {
+        if (buffer.hasArray()) {
+            return ByteArrayUtil.hash(buffer.array(), offset, len);
+        }
+        throw new UnsupportedOperationException("not implemented for DirectBuffers");
+    }
 }

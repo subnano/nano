@@ -4,6 +4,7 @@ import io.nano.core.buffer.AsciiBufferUtil;
 import net.subnano.codec.json.sample.JacksonPriceCodec;
 import net.subnano.codec.json.sample.MutablePrice;
 import net.subnano.codec.json.sample.NanoPriceCodec;
+import net.subnano.codec.json.sample.NanoPriceCodec2;
 import net.subnano.codec.json.sample.Price;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -51,6 +52,7 @@ public class JsonCodecBench {
     public static class BenchmarkState {
         JacksonPriceCodec jacksonCodec = new JacksonPriceCodec();
         NanoPriceCodec nanoCodec = new NanoPriceCodec();
+        NanoPriceCodec2 nanoCodec2 = new NanoPriceCodec2();
         NullBufferCodec nullCodec = new NullBufferCodec();
         StrlenBufferCodec strlenCodec = new StrlenBufferCodec();
         ByteBuffer buffer = getBuffer();
@@ -90,16 +92,23 @@ public class JsonCodecBench {
         state.nanoCodec.decode(state.buffer, state.mutablePrice);
     }
 
+    @Benchmark
+    public void nanoCodec2(BenchmarkState state) {
+        state.buffer.reset();
+        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
+    }
+
     /**
      * SoakRunner used to invoke a method continuously so can be profiled externally
      */
     static class SoakRunner {
 
         public static void main(String[] args) {
+            System.out.println("Running ...");
             BenchmarkState state = new BenchmarkState();
             JsonCodecBench bench = new JsonCodecBench();
             while (true) {
-                bench.nullJsonParser(state);
+                bench.nanoCodec(state);
             }
         }
     }
