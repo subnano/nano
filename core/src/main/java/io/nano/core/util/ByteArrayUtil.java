@@ -1,10 +1,6 @@
 package io.nano.core.util;
 
-import io.nano.core.lang.ByteString;
-
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * @author Mark Wardell
@@ -21,23 +17,23 @@ public class ByteArrayUtil {
 
     private static final boolean INTEGER_CACHE_DISABLED = Boolean.getBoolean("io.nano.integer.cache.disabled");
 
-    private static final byte ZERO = (byte) '0';
+    private static final byte ZERO = (byte)'0';
 
     static {
         // populate the 1 byte array
-        for (int i=0;i<10;i++) {
+        for (int i = 0; i < 10; i++) {
             BYTE_ARRAY_1[i] = ByteArrayUtil.as1ByteArray(i);
         }
         // populate the 2 bytes array
-        for (int i=0;i<100;i++) {
+        for (int i = 0; i < 100; i++) {
             BYTE_ARRAY_2[i] = ByteArrayUtil.as2ByteArray(i);
         }
         // populate the 3 bytes array
-        for (int i=0;i<1000;i++) {
+        for (int i = 0; i < 1000; i++) {
             BYTE_ARRAY_3[i] = ByteArrayUtil.as3ByteArray(i);
         }
         // populate the 2 bytes array
-        for (int i=0;i<10000;i++) {
+        for (int i = 0; i < 10000; i++) {
             BYTE_ARRAY_4[i] = ByteArrayUtil.as4ByteArray(i);
         }
     }
@@ -56,21 +52,18 @@ public class ByteArrayUtil {
         }
         boolean positive = true;
         int number = 0;
-        for (int i=offset; i<offset+length; i++) {
-            if (i==offset && bytes[i] == '+') {
+        for (int i = offset; i < offset + length; i++) {
+            if (i == offset && bytes[i] == '+') {
                 positive = true;
-            }
-            else if (i==offset && bytes[i] == '-') {
+            } else if (i == offset && bytes[i] == '-') {
                 positive = false;
-            }
-            else if (!isDigit(bytes[i])) {
+            } else if (!isDigit(bytes[i])) {
                 throw new NumberFormatException("Integer number expected (" + new String(bytes, offset, length) + ")");
-            }
-            else {
+            } else {
                 number = (number * 10) + bytes[i] - '0';
             }
         }
-        return positive ? number : 0-number;
+        return positive ? number : 0 - number;
     }
 
     public static long toLong(byte[] bytes) throws NumberFormatException {
@@ -83,21 +76,18 @@ public class ByteArrayUtil {
         }
         boolean positive = true;
         long number = 0L;
-        for (int i=offset; i<offset+length; i++) {
-            if (i==offset && bytes[i] == '+') {
+        for (int i = offset; i < offset + length; i++) {
+            if (i == offset && bytes[i] == '+') {
                 positive = true;
-            }
-            else if (i==offset && bytes[i] == '-') {
+            } else if (i == offset && bytes[i] == '-') {
                 positive = false;
-            }
-            else if (!isDigit(bytes[i])) {
+            } else if (!isDigit(bytes[i])) {
                 throw new NumberFormatException("Long number expected (" + new String(bytes, offset, length) + ")");
-            }
-            else {
+            } else {
                 number = (number * 10) + bytes[i] - '0';
             }
         }
-        return positive ? number : 0-number;
+        return positive ? number : 0 - number;
     }
 
     /**
@@ -108,8 +98,8 @@ public class ByteArrayUtil {
         int len = string == null ? 0 : string.length();
         byte[] bytes = new byte[len];
         if (len > 0) {
-            for (int i=0; i<len; i++) {
-                bytes[i] = (byte) string.charAt(i);
+            for (int i = 0; i < len; i++) {
+                bytes[i] = (byte)string.charAt(i);
             }
         }
         return bytes;
@@ -130,8 +120,7 @@ public class ByteArrayUtil {
         }
         if (value <= 9999) {
             return INTEGER_CACHE_DISABLED ? as4ByteArray(value) : BYTE_ARRAY_4[value];
-        }
-        else {
+        } else {
             return intToBytesAsString(value);
         }
     }
@@ -151,24 +140,24 @@ public class ByteArrayUtil {
 
     public static byte[] as2ByteArray(int value) {
         byte[] bytes = new byte[2];
-        bytes[0] = (byte)((value % 100 - value % 10) / 10   + 48);
+        bytes[0] = (byte)((value % 100 - value % 10) / 10 + 48);
         bytes[1] = (byte)(value % 10 + 48);
         return bytes;
     }
 
     public static byte[] as3ByteArray(int value) {
         byte[] bytes = new byte[3];
-        bytes[0] = (byte)((value % 1000 - value % 100) / 100   + 48);
-        bytes[1] = (byte)((value % 100 - value % 10) / 10   + 48);
+        bytes[0] = (byte)((value % 1000 - value % 100) / 100 + 48);
+        bytes[1] = (byte)((value % 100 - value % 10) / 10 + 48);
         bytes[2] = (byte)(value % 10 + 48);
         return bytes;
     }
 
     public static byte[] as4ByteArray(int value) {
         byte[] bytes = new byte[4];
-        bytes[0] = (byte)((value % 10000 - value % 1000) / 1000   + 48);
-        bytes[1] = (byte)((value % 1000 - value % 100) / 100   + 48);
-        bytes[2] = (byte)((value % 100 - value % 10) / 10   + 48);
+        bytes[0] = (byte)((value % 10000 - value % 1000) / 1000 + 48);
+        bytes[1] = (byte)((value % 1000 - value % 100) / 100 + 48);
+        bytes[2] = (byte)((value % 100 - value % 10) / 10 + 48);
         bytes[3] = (byte)(value % 10 + 48);
         return bytes;
     }
@@ -186,8 +175,10 @@ public class ByteArrayUtil {
      */
     public static String replace(byte[] bytes, byte find, byte replace) {
         if (bytes != null) {
-            for (int i=0; i<bytes.length; i++) {
-                if (bytes[i] == find) bytes[i] = replace;
+            for (int i = 0; i < bytes.length; i++) {
+                if (bytes[i] == find) {
+                    bytes[i] = replace;
+                }
             }
         }
         return null;
@@ -235,6 +226,14 @@ public class ByteArrayUtil {
             hash += 31 * bytes[i];
         }
         return hash;
+    }
+
+    public static int hash2(byte[] bytes, int offset, int len) {
+        int hash = 0;
+        int end = offset + len;
+        for (int i = offset; i < end; i++) {
+            hash += (bytes[i] ^ (bytes[i] << 1));
+        } return hash;
     }
 
     public static int hash(byte[] bytes) {

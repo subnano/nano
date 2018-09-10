@@ -204,4 +204,11 @@ public final class ByteBufferUtil {
         }
         throw new UnsupportedOperationException("not implemented for DirectBuffers");
     }
+
+    public static int hash2(ByteBuffer buffer, int offset, int len) {
+        if (buffer.hasArray()) {
+            return ByteArrayUtil.hash2(buffer.array(), offset, len);
+        }
+        throw new UnsupportedOperationException("not implemented for DirectBuffers");
+    }
 }

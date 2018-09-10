@@ -18,7 +18,7 @@ each byte of the same buffer.
 Benchmark                      Mode  Cnt     Score    Error  Units
 JsonCodecBench.strlenCodec     avgt    9    14.706 ±  0.063  ns/op
 JsonCodecBench.nullJsonParser  avgt    9   532.803 ±  6.046  ns/op
-JsonCodecBench.nanoCodec       avgt    9  1193.657 ± 11.883  ns/op
+JsonCodecBench.nanoCodec       avgt    9  1062.172 ± 14.617  ns/op
 JsonCodecBench.jacksonCodec    avgt    9  1584.691 ± 28.345  ns/op
 ```
 

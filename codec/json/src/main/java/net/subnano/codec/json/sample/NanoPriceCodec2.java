@@ -2,12 +2,10 @@ package net.subnano.codec.json.sample;
 
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
-import io.nano.core.collection.ByteStringMap;
-import io.nano.core.collection.IntIntMap;
-import io.nano.core.collection.IntObjectMap;
-import io.nano.core.collection.NanoIntObjMap;
+import io.nano.core.collection.ByteStringArray;
 import io.nano.core.lang.ByteString;
 import io.nano.core.util.ByteArrayUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.subnano.codec.json.JsonByteParser;
 import net.subnano.codec.json.JsonVisitor;
 import org.decimal4j.api.DecimalArithmetic;
@@ -25,18 +23,20 @@ public class NanoPriceCodec2 {
     private final JsonByteParser parser = new JsonByteParser();
     private final JsonPriceVisitor visitor = new JsonPriceVisitor();
     private final BufferCharSequence bufferCharSequence = new BufferCharSequence();
-    private final ByteStringMap byteStringMap = new ByteStringMap(16);
+    private final ByteStringArray byteStringArray = new ByteStringArray(16);
 
     public void decode(ByteBuffer buffer, MutablePrice price) {
         visitor.withPrice(price);
-        bufferCharSequence.of(buffer);
+        bufferCharSequence.of(buffer.array());
         price.clear();
         parser.parse(buffer, visitor);
     }
 
     private class JsonPriceVisitor implements JsonVisitor {
 
-        private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
+        // I forgot that IntObjectMap is broken - need to switch to fastutil for the test
+        //private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
+        private final Int2ObjectArrayMap<ByteString> nameMap = new Int2ObjectArrayMap<>();
         private MutablePrice price;
         private ByteString name;
         private MutablePrice.MutableLevel[] side;
@@ -54,7 +54,7 @@ public class NanoPriceCodec2 {
         }
 
         private void addAttribute(ByteString byteString) {
-            nameMap.put(ByteArrayUtil.hash(byteString.bytes()), byteString);
+            nameMap.put(ByteArrayUtil.hash2(byteString.bytes(), 0, byteString.length()), byteString);
         }
 
         public void withPrice(MutablePrice price) {
@@ -77,7 +77,7 @@ public class NanoPriceCodec2 {
                     name = null;
                 } else if (PriceBytes.INSTRUMENT.equals(name)) {
                     // TODO do NOT allocate - lookup from a cache
-                    price.instrument = byteStringMap.getOrCreate(buffer, offset, len);
+                    price.instrument = byteStringArray.getOrCreate(buffer, offset, len);
                     name = null;
                 } else if (PriceBytes.QUANTITY.equals(name)) {
                     long qty = ARITHMETIC.parse(bufferCharSequence, offset, offset + len);
@@ -165,7 +165,7 @@ public class NanoPriceCodec2 {
         }
 
         private ByteString getAttributeName(ByteBuffer buffer, int offset, int len) {
-            int key = ByteBufferUtil.hash(buffer, offset, len);
+            int key = ByteBufferUtil.hash2(buffer, offset, len);
             ByteString attributeName = nameMap.get(key);
             if (attributeName == null)
                 throw new IllegalArgumentException("Unsupported attribute or JSON schema invalid");
@@ -186,20 +186,20 @@ public class NanoPriceCodec2 {
 
     private class BufferCharSequence implements CharSequence {
 
-        private ByteBuffer buffer;
+        private byte[] bytes;
 
-        void of(ByteBuffer buffer) {
-            this.buffer = buffer;
+        void of(byte[] bytes) {
+            this.bytes = bytes;
         }
 
         @Override
         public int length() {
-            return buffer.remaining();
+            return bytes.length;
         }
 
         @Override
         public char charAt(int index) {
-            return (char)buffer.get(index);
+            return (char)bytes[index];
         }
 
         @Override

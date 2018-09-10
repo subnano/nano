@@ -2,8 +2,10 @@ package net.subnano.codec.json.sample;
 
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
-import io.nano.core.collection.ByteStringMap;
+import io.nano.core.collection.ByteStringArray;
 import io.nano.core.lang.ByteString;
+import io.nano.core.util.ByteArrayUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.subnano.codec.json.JsonByteParser;
 import net.subnano.codec.json.JsonVisitor;
 import org.decimal4j.api.DecimalArithmetic;
@@ -21,7 +23,7 @@ public class NanoPriceCodec {
     private final JsonByteParser parser = new JsonByteParser();
     private final JsonPriceVisitor visitor = new JsonPriceVisitor();
     private final BufferCharSequence bufferCharSequence = new BufferCharSequence();
-    private final ByteStringMap byteStringMap = new ByteStringMap(16);
+    private final ByteStringArray byteStringArray = new ByteStringArray(16);
 
     public void decode(ByteBuffer buffer, MutablePrice price) {
         visitor.withPrice(price);
@@ -32,10 +34,28 @@ public class NanoPriceCodec {
 
     private class JsonPriceVisitor implements JsonVisitor {
 
+        // I forgot that IntObjectMap is broken - need to switch to fastutil for the test
+        //private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
+        private final Int2ObjectArrayMap<ByteString> nameMap = new Int2ObjectArrayMap<>();
         private MutablePrice price;
         private ByteString name;
         private MutablePrice.MutableLevel[] side;
         private int depth = 0;
+
+        public JsonPriceVisitor() {
+            addAttribute(PriceBytes.EVENT);
+            addAttribute(PriceBytes.TIMESTAMP);
+            addAttribute(PriceBytes.SUCCESS);
+            addAttribute(PriceBytes.INSTRUMENT);
+            addAttribute(PriceBytes.BUY);
+            addAttribute(PriceBytes.SELL);
+            addAttribute(PriceBytes.QUANTITY);
+            addAttribute(PriceBytes.PRICE);
+        }
+
+        private void addAttribute(ByteString byteString) {
+            nameMap.put(ByteArrayUtil.hash(byteString.bytes()), byteString);
+        }
 
         public void withPrice(MutablePrice price) {
             this.price = price;
@@ -57,7 +77,7 @@ public class NanoPriceCodec {
                     name = null;
                 } else if (PriceBytes.INSTRUMENT.equals(name)) {
                     // TODO do NOT allocate - lookup from a cache
-                    price.instrument = byteStringMap.getOrCreate(buffer, offset, len);
+                    price.instrument = byteStringArray.getOrCreate(buffer, offset, len);
                     name = null;
                 } else if (PriceBytes.QUANTITY.equals(name)) {
                     long qty = ARITHMETIC.parse(bufferCharSequence, offset, offset + len);
@@ -145,31 +165,11 @@ public class NanoPriceCodec {
         }
 
         private ByteString getAttributeName(ByteBuffer buffer, int offset, int len) {
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.EVENT)) {
-                return PriceBytes.EVENT;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.TIMESTAMP)) {
-                return PriceBytes.TIMESTAMP;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.SUCCESS)) {
-                return PriceBytes.SUCCESS;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.INSTRUMENT)) {
-                return PriceBytes.INSTRUMENT;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.BUY)) {
-                return PriceBytes.BUY;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.SELL)) {
-                return PriceBytes.SELL;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.QUANTITY)) {
-                return PriceBytes.QUANTITY;
-            }
-            if (ByteBufferUtil.equals(buffer, offset, len, PriceBytes.PRICE)) {
-                return PriceBytes.PRICE;
-            }
-            throw new IllegalArgumentException("Unsupported attribute or JSON schema invalid");
+            int key = ByteBufferUtil.hash(buffer, offset, len);
+            ByteString attributeName = nameMap.get(key);
+            if (attributeName == null)
+                throw new IllegalArgumentException("Unsupported attribute or JSON schema invalid");
+            return attributeName;
         }
     }
 
