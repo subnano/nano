@@ -5,12 +5,12 @@
     <packaging>jar</packaging>
     <name>Nano/Core</name>
     <artifactId>nano-core</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>1.0.12</version>
 
     <parent>
         <groupId>net.subnano</groupId>
         <artifactId>nano</artifactId>
-        <version>1.0.12-SNAPSHOT</version>
+        <version>1.0.12</version>
     </parent>
 
     <properties>
