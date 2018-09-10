@@ -35,11 +35,13 @@ mvn -q versions:set -DnewVersion=$RELEASE_VER -DgenerateBackupPoms=false
 git add -A
 git commit -m "Bump version to $RELEASE_VER"
 git push
+echo
 
 # this does the pushing to remote too
 echo "Tagging $RELEASE_VER .."
 git tag $RELEASE_VER
 git push origin $RELEASE_VER
+echo
 
 # Now bump to next development version
 echo "Bump version to next development version $DEV_VER .."

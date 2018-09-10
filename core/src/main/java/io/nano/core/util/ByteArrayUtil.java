@@ -1,5 +1,7 @@
 package io.nano.core.util;
 
+import sun.misc.Unsafe;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -18,6 +20,11 @@ public class ByteArrayUtil {
     private static final boolean INTEGER_CACHE_DISABLED = Boolean.getBoolean("io.nano.integer.cache.disabled");
 
     private static final byte ZERO = (byte)'0';
+
+    public static final int BYTE_ARRAY_SCALE = Unsafe.ARRAY_BYTE_INDEX_SCALE;
+    //public static final int BYTE_ARRAY_OFFSET = UnsafeHolder.UNSAFE.arrayBaseOffset(byte[].class);
+    public static final int BYTE_ARRAY_OFFSET = Unsafe.ARRAY_BYTE_BASE_OFFSET;
+    private static final int M2 = 0x7A646E4D;
 
     static {
         // populate the 1 byte array
@@ -219,21 +226,31 @@ public class ByteArrayUtil {
         return true;
     }
 
+    public static int getInt(byte[] bytes, int offset) {
+        return UnsafeHolder.UNSAFE.getInt(bytes, (long)(BYTE_ARRAY_OFFSET + offset));
+    }
+
     public static int hash(byte[] bytes, int offset, int len) {
-        int hash = 0;
+        if (bytes == null) {
+            return 0;
+        }
+        int result = 1;
         int end = offset + len;
         for (int i = offset; i < end; i++) {
-            hash += 31 * bytes[i];
+            result = 31 * result + bytes[i];
         }
-        return hash;
+        return result;
     }
 
     public static int hash2(byte[] bytes, int offset, int len) {
-        int hash = 0;
+        long h = getInt(bytes, offset);
         int end = offset + len;
-        for (int i = offset; i < end; i++) {
-            hash += (bytes[i] ^ (bytes[i] << 1));
-        } return hash;
+        for (int i = offset + 4; i < end; i += 4) {
+            int anInt = getInt(bytes, offset);
+            h = h * M2 + anInt;
+        }
+        h *= M2;
+        return (int)h ^ (int)(h >>> 25);
     }
 
     public static int hash(byte[] bytes) {

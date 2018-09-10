@@ -1,6 +1,7 @@
 package io.nano.core.lang;
 
 import io.nano.core.buffer.AsciiBufferUtil;
+import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -17,11 +18,13 @@ public class ByteString {
 
     private final byte[] bytes;
     private final int length;
+    private final int hashCode;
 
     // the constructor is used for derived classes only
     protected ByteString(byte[] bytes) {
         this.bytes = bytes;
         this.length = bytes == null ? 0 : bytes.length;
+        this.hashCode = ByteArrayUtil.hash(bytes, 0, length);
     }
 
     public static ByteString of(String string) {
@@ -44,6 +47,26 @@ public class ByteString {
         return length == 0;
     }
 
+    public byte byteAt(int pos) {
+        return bytes[pos];
+    }
+
+    // A faster equals for most use cases
+    public boolean equals(ByteString that) {
+        if (this == that) {
+            return true;
+        }
+        if (that == null) {
+            return false;
+        }
+        if (that.length != length)
+            return false;
+        for (int i=0; i<length; i++)
+            if (bytes[i] != that.bytes[i])
+                return false;
+        return true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -55,6 +78,11 @@ public class ByteString {
         ByteString that = (ByteString)o;
         return Arrays.equals(bytes, that.bytes);
     }
+
+//    @Override
+//    public int hashCode() {
+//        return hashCode;
+//    }
 
     @Override
     public int hashCode() {

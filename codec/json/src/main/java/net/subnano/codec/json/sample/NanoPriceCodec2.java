@@ -38,7 +38,7 @@ public class NanoPriceCodec2 {
         //private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
         private final Int2ObjectArrayMap<ByteString> nameMap = new Int2ObjectArrayMap<>();
         private MutablePrice price;
-        private ByteString name;
+        private int attribute = 0;
         private MutablePrice.MutableLevel[] side;
         private int depth = 0;
 
@@ -54,7 +54,9 @@ public class NanoPriceCodec2 {
         }
 
         private void addAttribute(ByteString byteString) {
-            nameMap.put(ByteArrayUtil.hash2(byteString.bytes(), 0, byteString.length()), byteString);
+            int key = ByteArrayUtil.hash(byteString.bytes(), 0, byteString.length());
+            //System.out.println(byteString.toString() + " hash = " + key);
+            nameMap.put(key, byteString);
         }
 
         public void withPrice(MutablePrice price) {
@@ -63,47 +65,47 @@ public class NanoPriceCodec2 {
 
         @Override
         public void onString(ByteBuffer buffer, int offset, int len) {
-
-            // if name is null then we record the attribute
-            if (name == null) {
-                name = getAttributeName(buffer, offset, len);
-            }
-
-            // if name is set then we have an attribute value
-            else {
-                if (PriceBytes.EVENT.equals(name)) {
-                    // ignore the confirmation of 'event' == 'price'
-                    // This needs to be determined to obtain correct JSON codec in advance
-                    name = null;
-                } else if (PriceBytes.INSTRUMENT.equals(name)) {
-                    // TODO do NOT allocate - lookup from a cache
+            switch (attribute) {
+                // if name is null then we record the attribute
+                // else if name is set then we have an attribute value
+                case 0:
+                    attribute = getAttributeHash(buffer, offset, len);
+                    break;
+                // Ignore the confirmation of 'event' == 'price'
+                // This needs to be determined to obtain correct JSON codec in advance
+                case 571700625: // event
+                    attribute = 0;
+                    break;
+                case 977569014: // instrument
                     price.instrument = byteStringArray.getOrCreate(buffer, offset, len);
-                    name = null;
-                } else if (PriceBytes.QUANTITY.equals(name)) {
+                    attribute = 0;
+                    break;
+                case 740639257: // quantity
                     long qty = ARITHMETIC.parse(bufferCharSequence, offset, offset + len);
                     price.setQuantity(depth, side, qty);
-                    name = null;
-                } else if (PriceBytes.PRICE.equals(name)) {
+                    attribute = 0;
+                    break;
+                case 660786995: // price
                     long px = ARITHMETIC.parse(bufferCharSequence, offset, offset + len);
                     price.setPrice(depth++, side, px);
-                    name = null;
-                } else {
+                    attribute = 0;
+                    break;
+                default:
                     throw new IllegalArgumentException("Unexpected string @ "
                             + offset
                             + " '"
                             + AsciiBufferUtil.getString(buffer, offset, len)
                             + "'");
-                }
             }
         }
 
         @Override
         public void onNumber(ByteBuffer buffer, int offset, int len) {
-            if (name == null) {
+            if (attribute == 0) {
                 throw new IllegalArgumentException("Encountered a number when attribute not set");
-            } else if (PriceBytes.TIMESTAMP.equals(name)) {
+            } else if (PriceBytes.TIMESTAMP.hashCode() == attribute) {
                 price.timestamp = AsciiBufferUtil.getLong(buffer, offset, len);
-                name = null;
+                attribute = 0;
             } else {
                 throw new IllegalArgumentException("Unexpected number");
             }
@@ -116,12 +118,12 @@ public class NanoPriceCodec2 {
 
         @Override
         public void onBoolean(ByteBuffer buffer, int offset, boolean value) {
-            if (name == null) {
+            if (attribute == 0) {
                 throw new IllegalArgumentException("Encountered a number when attribute not set");
             }
-            if (PriceBytes.SUCCESS.equals(name)) {
+            if (PriceBytes.SUCCESS.hashCode() == attribute) {
                 price.success = value;
-                name = null;
+                attribute = 0;
             } else {
                 throw new IllegalArgumentException("Unexpected boolean");
             }
@@ -140,12 +142,12 @@ public class NanoPriceCodec2 {
         @Override
         public void startArray(ByteBuffer buffer, int offset) {
             depth = 0;
-            if (PriceBytes.BUY.equals(name)) {
+            if (PriceBytes.BUY.hashCode() == attribute) {
                 side = price.bids;
-                name = null;
-            } else if (PriceBytes.SELL.equals(name)) {
+                attribute = 0;
+            } else if (PriceBytes.SELL.hashCode() == attribute) {
                 side = price.asks;
-                name = null;
+                attribute = 0;
             }
         }
 
@@ -164,12 +166,22 @@ public class NanoPriceCodec2 {
 
         }
 
-        private ByteString getAttributeName(ByteBuffer buffer, int offset, int len) {
-            int key = ByteBufferUtil.hash2(buffer, offset, len);
-            ByteString attributeName = nameMap.get(key);
-            if (attributeName == null)
-                throw new IllegalArgumentException("Unsupported attribute or JSON schema invalid");
-            return attributeName;
+        private int getAttributeHash(ByteBuffer buffer, int offset, int len) {
+            int hash = ByteBufferUtil.hash(buffer, offset, len);
+            switch (hash) {
+                case 571700625:
+                case -233242563:
+                case 465923568:
+                case 977569014:
+                case -28794613:
+                case 1946508888:
+                case 740639257:
+                case 660786995:
+                break;
+                default:
+                    throw new IllegalArgumentException("Unsupported attribute or JSON schema invalid");
+            }
+            return hash;
         }
     }
 

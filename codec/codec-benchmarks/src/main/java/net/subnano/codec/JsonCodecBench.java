@@ -36,7 +36,7 @@ import static net.subnano.codec.json.sample.SampleData.SAMPLE_PRICE;
 //@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 @Warmup(iterations = 5)
-@Measurement(iterations = 3)
+@Measurement(iterations = 5)
 @Fork(3)
 public class JsonCodecBench {
 

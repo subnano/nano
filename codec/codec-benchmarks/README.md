@@ -16,10 +16,11 @@ each byte of the same buffer.
 **Average invocation time in nanoseconds.**
 ```
 Benchmark                      Mode  Cnt     Score    Error  Units
-JsonCodecBench.strlenCodec     avgt    9    14.706 ±  0.063  ns/op
-JsonCodecBench.nullJsonParser  avgt    9   532.803 ±  6.046  ns/op
-JsonCodecBench.nanoCodec       avgt    9  1062.172 ± 14.617  ns/op
-JsonCodecBench.jacksonCodec    avgt    9  1584.691 ± 28.345  ns/op
+JsonCodecBench.strlenCodec     avgt   15    14.872 ±  0.104  ns/op
+JsonCodecBench.nullJsonParser  avgt   15   540.779 ±  4.209  ns/op
+JsonCodecBench.nanoCodec       avgt   15   954.920 ±  9.500  ns/op
+JsonCodecBench.jacksonCodec    avgt   15  1632.236 ± 31.786  ns/op
+
 ```
 
 **Object allocation rate (MB/sec).**
