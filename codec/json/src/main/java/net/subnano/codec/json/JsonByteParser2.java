@@ -5,7 +5,7 @@ import io.nano.core.util.ByteArrayUtil;
 import java.nio.ByteBuffer;
 
 /**
- * {@link JsonByteParser} is an extremely fast JSON parser that parses a stream of bytes and not characters.
+ * {@link JsonByteParser2} is an extremely fast JSON parser that parses a stream of bytes and not characters.
  *
  * <p>This is by design and is not a limitation of the parser. As a result this parser should not be considered
  * as a replacement for the commonly available parsers.</p>
@@ -16,28 +16,19 @@ import java.nio.ByteBuffer;
  * <p>No attempt is made to validate the source JSON. This parser merely iterates over the bytes within the buffer
  * and notifies the {@link JsonVisitor} as each byte is encountered. Schema validation can be added to the
  * {@link JsonVisitor} as the document is traversed.</p>
- * <br>
  *
- * <h3>Optimizations</h3>
- * - Converted buffer index from a member (uses load/store) to an argument which uses registers (9-10%)
- * <br>
+ * TODO - ideally ByteBuffer should be a typed <T> source and buffer implementations should be subclasses
+ * TODO - it currently works directly with the underlying byte[] for performance - this wont work for direct buffers
  *
- * <h3>Credit</h3>
- * <p>Many design considerations and optimizations based on the following article:
- * https://chadaustin.me/2017/05/writing-a-really-really-fast-json-parser/
- * </p>
- * <br>
+ * <b>Optimizations</b>
+ * - converted buffer index from a member (uses load/store) to an argument which uses registers (9%)
+ * - TODO true/false to test bytes locally and avoid method call
+ * - TODO do we really need callbacks for colon & comma?
  *
- * <h3>TODO</h3>
- * <ul>
- * <li>TODO - ideally ByteBuffer should be a typed <T> source and buffer implementations should be subclasses</li>
- * <li>TODO - it currently works directly with the underlying byte[] for performance - this wont work for direct buffers</li>
- * <li>TODO - true/false to test bytes locally and avoid method call</li>
- * <li>TODO - do we really need callbacks for colon & comma?</li>
- * </ul>
  * @author Mark Wardell
  */
-public class JsonByteParser {
+@SuppressWarnings("ALL")
+public class JsonByteParser2 {
 
     static final String ERROR_INVALID_CHARACTER = "Invalid character in JSON source";
     static final String ERROR_UNEXPECTED_END = "Unexpected end of JSON source reached";
@@ -46,6 +37,7 @@ public class JsonByteParser {
     static final byte[] TRUE_BYTES = ByteArrayUtil.asByteArray("true");
     static final byte[] FALSE_BYTES = ByteArrayUtil.asByteArray("false");
 
+    static final byte EOF = (byte)0;
     static final char COMMA = ',';
     static final char COLON = ':';
     static final char QUOTE = '"';
@@ -61,7 +53,8 @@ public class JsonByteParser {
     public void parse(ByteBuffer buffer, JsonVisitor visitor) {
         this.buffer = buffer;
         this.bytes = buffer.array();
-        this.limit = buffer.limit();
+        this.limit = buffer.limit() + 1;
+        this.bytes[this.limit] = EOF;
         int index = 0;
         while (index < limit) {
             index = parseNext(index, visitor);
@@ -124,6 +117,7 @@ public class JsonByteParser {
             case '\n':
             case '\r':
             case '\t':
+            case EOF:
                 index++;
                 break;
             default:
@@ -137,7 +131,7 @@ public class JsonByteParser {
         // skip the opening quote
         byte nextByte = bytes[++index];
         int offset = index;
-        while (nextByte != '"' && index < limit) {
+        while (nextByte != '"' && nextByte != EOF) {
             nextByte = bytes[++index];
         }
         if (nextByte == '"') {
@@ -155,21 +149,21 @@ public class JsonByteParser {
         // index at start of first digit
         int offset = index;
         byte nextByte = bytes[++index];
-        while (!numberComplete && index < limit) {
-            // TODO handle other cases such as NaN and e notation
+        while (!numberComplete && nextByte != EOF) {
             if ((nextByte >= '0' && nextByte <= '9') || nextByte == '.') {
                 nextByte = bytes[++index];
             } else {
                 numberComplete = true;
             }
         }
+        // TODO premature EOF check
         visitor.onNumber(buffer, offset, index - offset);
         return index;
     }
 
     private int parseTrue(int index, JsonVisitor visitor) {
         int offset = index;
-        if (ByteArrayUtil.equals(bytes, offset, TRUE_BYTES)) {
+        if (ByteArrayUtil.getInt(bytes, offset) == ByteArrayUtil.getInt(TRUE_BYTES, 0)) {
             visitor.onBoolean(buffer, offset, true);
             index += TRUE_BYTES.length;
         } else {
@@ -181,7 +175,7 @@ public class JsonByteParser {
 
     private int parseFalse(int index, JsonVisitor visitor) {
         int offset = index;
-        if (ByteArrayUtil.equals(bytes, offset, FALSE_BYTES)) {
+        if (ByteArrayUtil.getInt(bytes, offset + 1) == ByteArrayUtil.getInt(FALSE_BYTES, 1)) {
             visitor.onBoolean(buffer, offset, false);
             index += FALSE_BYTES.length;
         } else {
@@ -197,7 +191,7 @@ public class JsonByteParser {
 
     private int skipToNextDelimiter(int index) {
         byte nextByte = bytes[++index];
-        while (index < limit
+        while (nextByte != EOF
                 && nextByte != COMMA
                 && nextByte != COLON
                 && nextByte != QUOTE

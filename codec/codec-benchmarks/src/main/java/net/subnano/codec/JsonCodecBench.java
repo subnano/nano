@@ -35,8 +35,8 @@ import static net.subnano.codec.json.sample.SampleData.SAMPLE_PRICE;
 //@BenchmarkMode(Mode.Throughput)
 //@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-@Warmup(iterations = 5)
-@Measurement(iterations = 5)
+@Warmup(iterations = 3)
+@Measurement(iterations = 3)
 @Fork(3)
 public class JsonCodecBench {
 
@@ -54,6 +54,7 @@ public class JsonCodecBench {
         NanoPriceCodec nanoCodec = new NanoPriceCodec();
         NanoPriceCodec2 nanoCodec2 = new NanoPriceCodec2();
         NullBufferCodec nullCodec = new NullBufferCodec();
+        NullBufferCodec2 nullCodec2 = new NullBufferCodec2();
         StrlenBufferCodec strlenCodec = new StrlenBufferCodec();
         ByteBuffer buffer = getBuffer();
         MutablePrice mutablePrice = new MutablePrice();
@@ -67,7 +68,7 @@ public class JsonCodecBench {
         }
     }
 
-    @Benchmark
+    //@Benchmark
     public void jacksonCodec(BenchmarkState state, Blackhole hole) throws IOException {
         state.buffer.reset();
         Price price = state.jacksonCodec.decode(state.buffer);
@@ -81,22 +82,28 @@ public class JsonCodecBench {
     }
 
     @Benchmark
+    public void nullJsonParser2(BenchmarkState state) {
+        state.buffer.reset();
+        state.nullCodec2.decode(state.buffer);
+    }
+
+    //@Benchmark
     public void strlenCodec(BenchmarkState state, Blackhole hole) {
         state.buffer.reset();
         hole.consume(state.strlenCodec.decode(state.buffer));
     }
 
-    @Benchmark
+    //@Benchmark
     public void nanoCodec(BenchmarkState state) {
         state.buffer.reset();
         state.nanoCodec.decode(state.buffer, state.mutablePrice);
     }
 
-    @Benchmark
-    public void nanoCodec2(BenchmarkState state) {
-        state.buffer.reset();
-        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
-    }
+//    @Benchmark
+//    public void nanoCodec2(BenchmarkState state) {
+//        state.buffer.reset();
+//        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
+//    }
 
     /**
      * SoakRunner used to invoke a method continuously so can be profiled externally
@@ -108,7 +115,7 @@ public class JsonCodecBench {
             BenchmarkState state = new BenchmarkState();
             JsonCodecBench bench = new JsonCodecBench();
             while (true) {
-                bench.nanoCodec(state);
+                bench.nullJsonParser2(state);
             }
         }
     }
