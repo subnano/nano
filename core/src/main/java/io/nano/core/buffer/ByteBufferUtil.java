@@ -12,8 +12,7 @@ import java.util.Objects;
  */
 public final class ByteBufferUtil {
 
-    static final byte[] CHECKSUM_BYTE_SUFFIX = new byte[] {'0', '1', '0', '='};
-    static final int NOT_FOUND_INDEX = -1;
+    public static final int NOT_FOUND_INDEX = -1;
     static final String HEX = "0123456789ABCDEF";
 
     private ByteBufferUtil() {
@@ -72,14 +71,6 @@ public final class ByteBufferUtil {
     public static ByteString asByteString(ByteBuffer buffer, int index, int len) {
         byte[] bytes = asByteArray(buffer, index, len);
         return ByteString.of(bytes);
-    }
-
-    /**
-     * ByteBuffer contents for a FIX message should end with 010=nnn| (8 bytes)
-     */
-    public static boolean hasChecksum(ByteBuffer buffer) {
-        int offset = buffer.remaining() - 8;
-        return ByteBufferUtil.hasBytes(buffer, offset, CHECKSUM_BYTE_SUFFIX);
     }
 
     /**

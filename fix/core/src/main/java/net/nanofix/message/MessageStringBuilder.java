@@ -1,5 +1,6 @@
 package net.nanofix.message;
 
+import io.nano.core.buffer.ByteBufferUtil;
 import net.nanofix.util.FIXBytes;
 
 import java.nio.ByteBuffer;
@@ -15,16 +16,14 @@ public class MessageStringBuilder implements FIXMessageVisitor {
 
     public MessageStringBuilder() {
         this.sb = new StringBuilder();
-        this.delimiter = (char) FIXBytes.PIPE;
+        this.delimiter = (char)FIXBytes.PIPE;
     }
 
     @Override
     public boolean onTag(ByteBuffer buffer, int tagIndex, int tagLen, int valueLen) {
         int valueIndex = tagIndex + tagLen + 1;
-        sb.append(new String(ByteBufferUtil2.asByteArray(buffer, tagIndex, tagLen)))
-                .append('=')
-                .append(new String(ByteBufferUtil2.asByteArray(buffer, valueIndex, valueLen)))
-                .append(delimiter);
+        sb.append(new String(ByteBufferUtil.asByteArray(buffer, tagIndex, tagLen))).append('=').append(new String(
+                ByteBufferUtil.asByteArray(buffer, valueIndex, valueLen))).append(delimiter);
         return true;
     }
 

@@ -1,12 +1,14 @@
 package net.nanofix.message;
 
+import io.nano.core.buffer.AsciiBufferUtil;
+import io.nano.core.buffer.ByteBufferUtil;
 import net.nanofix.message.util.ChecksumCalculator;
 import net.nanofix.util.FIXBytes;
 import net.nanofix.util.TagBytes;
 
 import java.nio.ByteBuffer;
 
-import static net.nanofix.message.ByteBufferUtil2.NOT_FOUND_INDEX;
+import static io.nano.core.buffer.ByteBufferUtil.NOT_FOUND_INDEX;
 import static net.nanofix.util.FIXBytes.EQUALS;
 import static net.nanofix.util.FIXBytes.SOH;
 
@@ -56,7 +58,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
         int tagIndex = initialOffset;
         int tagCount = 0;
         while (tagIndex < buffer.position()) {
-            int equalIndex = ByteBufferUtil2.indexOf(buffer, tagIndex, EQUALS);
+            int equalIndex = ByteBufferUtil.indexOf(buffer, tagIndex, EQUALS);
             if (equalIndex == NOT_FOUND_INDEX) {
                 visitor.onError(tagIndex, EQUAL_NOT_FOUND_ERROR_MESSAGE);
                 break;
@@ -64,7 +66,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
             int tagLen = equalIndex - tagIndex;
             int valueIndex = equalIndex + 1;
 
-            int startOfHeaderIndex = ByteBufferUtil2.indexOf(buffer, valueIndex, SOH);
+            int startOfHeaderIndex = ByteBufferUtil.indexOf(buffer, valueIndex, SOH);
             if (startOfHeaderIndex == NOT_FOUND_INDEX) {
                 visitor.onError(valueIndex, SOH_NOT_FOUND_ERROR_MESSAGE);
                 break;
@@ -73,14 +75,14 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
             // check first tag is the FIX BeginString
             if (tagCount == 0) {
-                if (!ByteBufferUtil2.hasBytes(buffer, tagIndex, FIXBytes.BEGIN_STRING_PREFIX)) {
+                if (!ByteBufferUtil.hasBytes(buffer, tagIndex, FIXBytes.BEGIN_STRING_PREFIX)) {
                     visitor.onError(tagIndex, BEGIN_STRING_ERROR_MESSAGE);
                     break;
                 }
             }
             // check MsgBody
             else if (tagCount == 1) {
-                if (!ByteBufferUtil2.hasByte(buffer, tagIndex, FIXBytes.BODY_LEN_TAG)) {
+                if (!ByteBufferUtil.hasByte(buffer, tagIndex, FIXBytes.BODY_LEN_TAG)) {
                     visitor.onError(tagIndex, BODY_LEN_SECOND_FIELD_ERROR_MESSAGE);
                     break;
                 }
@@ -88,7 +90,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
                     visitor.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
                     break;
                 }
-                bodyLen = ByteBufferUtil2.toInt(buffer, valueIndex, valueLen);
+                bodyLen = AsciiBufferUtil.getInt(buffer, valueIndex, valueLen);
 
                 if (bodyLen < MIN_BODY_LEN || bodyLen > MAX_BODY_LEN) {
                     visitor.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
@@ -103,21 +105,21 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
             // check MsgType is the third field
             else if (tagCount == 2) {
-                if (!ByteBufferUtil2.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
+                if (!ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
                     visitor.onError(tagIndex, MSG_TYPE_THIRD_FIELD_ERROR_MESSAGE);
                     break;
                 }
             }
 
             // last consistency check for checksum field
-            if (ByteBufferUtil2.hasBytes(buffer, tagIndex, FIXBytes.CHECKSUM_PREFIX)) {
+            if (ByteBufferUtil.hasBytes(buffer, tagIndex, FIXBytes.CHECKSUM_PREFIX)) {
                 int actualBodyLength = tagIndex - bodyStartIndex;
                 if (bodyLen != actualBodyLength) {
                     visitor.onError(tagIndex, BODY_LEN_INCORRECT_ERROR_MESSAGE);
                     break;
                 }
                 // check that checksum value is correct
-                int checksum = ByteBufferUtil2.toInt(buffer, valueIndex, valueLen);
+                int checksum = AsciiBufferUtil.getInt(buffer, valueIndex, valueLen);
                 int calculatedChecksum = ChecksumCalculator.calculateChecksum(
                         buffer, initialOffset, tagIndex - initialOffset);
 
