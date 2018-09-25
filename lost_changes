@@ -1,0 +1,1357 @@
+Index: codec/codec-benchmarks/src/main/java/net/subnano/codec/JsonCodecBench.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- codec/codec-benchmarks/src/main/java/net/subnano/codec/JsonCodecBench.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ codec/codec-benchmarks/src/main/java/net/subnano/codec/JsonCodecBench.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -16,6 +16,7 @@
+ import org.openjdk.jmh.annotations.State;
+ import org.openjdk.jmh.annotations.Warmup;
+ import org.openjdk.jmh.infra.Blackhole;
++import org.openjdk.jmh.profile.GCProfiler;
+ import org.openjdk.jmh.runner.Runner;
+ import org.openjdk.jmh.runner.RunnerException;
+ import org.openjdk.jmh.runner.options.Options;
+@@ -35,15 +36,15 @@
+ //@BenchmarkMode(Mode.Throughput)
+ //@OutputTimeUnit(TimeUnit.MILLISECONDS)
+ @State(Scope.Benchmark)
+-@Warmup(iterations = 3)
+-@Measurement(iterations = 3)
++@Warmup(iterations = 2)
++@Measurement(iterations = 2)
+ @Fork(3)
+ public class JsonCodecBench {
+ 
+     public static void main(String[] args) throws RunnerException {
+         System.setProperty("jmh.ignoreLock", "true");
+         Options options = new OptionsBuilder().include(JsonCodecBench.class.getSimpleName())
+-                //.addProfiler(GCProfiler.class)
++                .addProfiler(GCProfiler.class)
+                 .build();
+         new Runner(options).run();
+     }
+@@ -68,7 +69,7 @@
+         }
+     }
+ 
+-    //@Benchmark
++    @Benchmark
+     public void jacksonCodec(BenchmarkState state, Blackhole hole) throws IOException {
+         state.buffer.reset();
+         Price price = state.jacksonCodec.decode(state.buffer);
+@@ -87,23 +88,23 @@
+         state.nullCodec2.decode(state.buffer);
+     }
+ 
+-    //@Benchmark
++    @Benchmark
+     public void strlenCodec(BenchmarkState state, Blackhole hole) {
+         state.buffer.reset();
+         hole.consume(state.strlenCodec.decode(state.buffer));
+     }
+ 
+-    //@Benchmark
++    @Benchmark
+     public void nanoCodec(BenchmarkState state) {
+         state.buffer.reset();
+         state.nanoCodec.decode(state.buffer, state.mutablePrice);
+     }
+ 
+-//    @Benchmark
+-//    public void nanoCodec2(BenchmarkState state) {
+-//        state.buffer.reset();
+-//        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
+-//    }
++    @Benchmark
++    public void nanoCodec2(BenchmarkState state) {
++        state.buffer.reset();
++        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
++    }
+ 
+     /**
+      * SoakRunner used to invoke a method continuously so can be profiled externally
+Index: codec/json/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- codec/json/pom.xml	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ codec/json/pom.xml	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -35,11 +35,6 @@
+             <version>2.9.6</version>
+         </dependency>
+         <dependency>
+-            <groupId>it.unimi.dsi</groupId>
+-            <artifactId>fastutil</artifactId>
+-            <version>8.2.1</version>
+-        </dependency>
+-        <dependency>
+             <groupId>org.junit.jupiter</groupId>
+             <artifactId>junit-jupiter-api</artifactId>
+             <scope>test</scope>
+Index: codec/json/src/main/java/net/subnano/codec/json/sample/NanoPriceCodec.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- codec/json/src/main/java/net/subnano/codec/json/sample/NanoPriceCodec.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ codec/json/src/main/java/net/subnano/codec/json/sample/NanoPriceCodec.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -3,9 +3,10 @@
+ import io.nano.core.buffer.AsciiBufferUtil;
+ import io.nano.core.buffer.ByteBufferUtil;
+ import io.nano.core.collection.ByteStringArray;
++import io.nano.core.collection.IntObjectMap;
++import io.nano.core.collection.NanoIntObjectMap;
+ import io.nano.core.lang.ByteString;
+ import io.nano.core.util.ByteArrayUtil;
+-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+ import net.subnano.codec.json.JsonByteParser;
+ import net.subnano.codec.json.JsonVisitor;
+ import org.decimal4j.api.DecimalArithmetic;
+@@ -34,9 +35,7 @@
+ 
+     private class JsonPriceVisitor implements JsonVisitor {
+ 
+-        // I forgot that IntObjectMap is broken - need to switch to fastutil for the test
+-        //private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
+-        private final Int2ObjectArrayMap<ByteString> nameMap = new Int2ObjectArrayMap<>();
++        private final IntObjectMap<ByteString> nameMap = new NanoIntObjectMap<>(16, 0.75f);
+         private MutablePrice price;
+         private ByteString name;
+         private MutablePrice.MutableLevel[] side;
+Index: codec/json/src/main/java/net/subnano/codec/json/sample/NanoPriceCodec2.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- codec/json/src/main/java/net/subnano/codec/json/sample/NanoPriceCodec2.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ codec/json/src/main/java/net/subnano/codec/json/sample/NanoPriceCodec2.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -3,9 +3,10 @@
+ import io.nano.core.buffer.AsciiBufferUtil;
+ import io.nano.core.buffer.ByteBufferUtil;
+ import io.nano.core.collection.ByteStringArray;
++import io.nano.core.collection.IntObjectMap;
++import io.nano.core.collection.NanoIntObjectMap;
+ import io.nano.core.lang.ByteString;
+ import io.nano.core.util.ByteArrayUtil;
+-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+ import net.subnano.codec.json.JsonByteParser;
+ import net.subnano.codec.json.JsonVisitor;
+ import org.decimal4j.api.DecimalArithmetic;
+@@ -34,9 +35,7 @@
+ 
+     private class JsonPriceVisitor implements JsonVisitor {
+ 
+-        // I forgot that IntObjectMap is broken - need to switch to fastutil for the test
+-        //private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
+-        private final Int2ObjectArrayMap<ByteString> nameMap = new Int2ObjectArrayMap<>();
++        private final IntObjectMap<ByteString> nameMap = new NanoIntObjectMap<>(16, 0.75f);
+         private MutablePrice price;
+         private int attribute = 0;
+         private MutablePrice.MutableLevel[] side;
+Index: core-benchmarks/src/main/java/io/nano/core/BufferBench.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core-benchmarks/src/main/java/io/nano/core/BufferBench.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core-benchmarks/src/main/java/io/nano/core/BufferBench.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -1,8 +1,6 @@
+ package io.nano.core;
+ 
+ import io.nano.core.buffer.ByteBufferUtil;
+-import io.nano.core.util.Maths;
+-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+ import org.openjdk.jmh.annotations.Benchmark;
+ import org.openjdk.jmh.annotations.BenchmarkMode;
+ import org.openjdk.jmh.annotations.Fork;
+Index: core-benchmarks/src/main/java/io/nano/core/MapsBench.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core-benchmarks/src/main/java/io/nano/core/MapsBench.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core-benchmarks/src/main/java/io/nano/core/MapsBench.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -1,8 +1,11 @@
+ package io.nano.core;
+ 
++import io.nano.core.collection.IntIntMap;
++import io.nano.core.collection.IntObjectMap;
+ import io.nano.core.collection.NanoIntIntMap;
+-import io.nano.core.util.Maths;
++import io.nano.core.collection.NanoIntObjectMap;
+ import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
++import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+ import org.openjdk.jmh.annotations.Benchmark;
+ import org.openjdk.jmh.annotations.BenchmarkMode;
+@@ -14,12 +17,12 @@
+ import org.openjdk.jmh.annotations.State;
+ import org.openjdk.jmh.annotations.Warmup;
+ import org.openjdk.jmh.infra.Blackhole;
++import org.openjdk.jmh.profile.GCProfiler;
+ import org.openjdk.jmh.runner.Runner;
+ import org.openjdk.jmh.runner.RunnerException;
+ import org.openjdk.jmh.runner.options.Options;
+ import org.openjdk.jmh.runner.options.OptionsBuilder;
+ 
+-import java.nio.ByteBuffer;
+ import java.util.concurrent.TimeUnit;
+ 
+ @BenchmarkMode(Mode.AverageTime)
+@@ -30,50 +33,84 @@
+ @Fork(3)
+ public class MapsBench {
+ 
++    public static final int SIZE_TO_FILL = 512;
+     public static final int CAPACITY = 1024;
++    public static final float FILL_FACTOR = 0.75f;
+ 
+     public static void main(String[] args) throws RunnerException {
+         System.setProperty("jmh.ignoreLock", "true");
+-        Options options = new OptionsBuilder()
+-                .include(MapsBench.class.getSimpleName())
+-                .build();
++        Options options =
++                new OptionsBuilder().include(MapsBench.class.getSimpleName()).addProfiler(GCProfiler.class).build();
+         new Runner(options).run();
+     }
+ 
+     @State(Scope.Benchmark)
+     public static class BenchmarkState {
+-        Int2ObjectOpenHashMap fastUtilObjMap = new Int2ObjectOpenHashMap();
+-        NanoIntIntMap nanoIntIntMap = newNanoIntIntMap(CAPACITY, 0.75f);
+-        Int2IntArrayMap fastUtilMap = newInt2IntArrayMap();
++        IntIntMap nanoIntMap = newNanoIntIntMap(SIZE_TO_FILL, CAPACITY, FILL_FACTOR);
++        Int2IntArrayMap fastUtilIntMap = newInt2IntArrayMap(SIZE_TO_FILL, CAPACITY);
++        Int2ObjectMap fastUtilObjectMap = newInt2ObjectOpenHashMap(SIZE_TO_FILL, CAPACITY, FILL_FACTOR);
++        IntObjectMap<String> nanoObjectMap = newNanoIntObjectMap(SIZE_TO_FILL, CAPACITY, FILL_FACTOR);
+ 
+-        private Int2IntArrayMap newInt2IntArrayMap() {
+-            Int2IntArrayMap map = new Int2IntArrayMap(CAPACITY);
+-            for (int i=0; i<=256; i++)
++        int index = 0;
++
++        private Int2IntArrayMap newInt2IntArrayMap(int sizeToFill, int capacity) {
++            Int2IntArrayMap map = new Int2IntArrayMap(capacity);
++            for (int i = 0; i <= sizeToFill; i++) {
+                 map.put(i, i);
++            }
++            return map;
++        }
++        private Int2ObjectMap newInt2ObjectOpenHashMap(int sizeToFill, int capacity, float fillFactor) {
++            Int2ObjectMap map = new Int2ObjectOpenHashMap(capacity, fillFactor);
++            for (int i = 0; i <= sizeToFill; i++) {
++                map.put(i, String.valueOf(i));
++            }
+             return map;
+         }
+ 
+-        private NanoIntIntMap newNanoIntIntMap(int size, float fillFactor) {
+-            NanoIntIntMap map = new NanoIntIntMap(size, fillFactor);
+-            for (int i=0; i<=256; i++)
++        private IntIntMap newNanoIntIntMap(int sizeToFill, int capacity, float fillFactor) {
++            NanoIntIntMap map = new NanoIntIntMap(capacity, fillFactor);
++            for (int i = 0; i <= sizeToFill; i++) {
+                 map.put(i, i);
++            }
++            return map;
++        }
++
++        private IntObjectMap<String> newNanoIntObjectMap(int sizeToFill, int capacity, float fillFactor) {
++            IntObjectMap<String> map = new NanoIntObjectMap<>(capacity, fillFactor);
++            for (int i = 0; i <= sizeToFill; i++) {
++                map.put(i, String.valueOf(i));
++            }
+             return map;
+         }
+     }
+ 
+-
+     @Benchmark
+-    public void IntIntMap_nano_Get(BenchmarkState state,Blackhole hole) {
+-        NanoIntIntMap map = state.nanoIntIntMap;
+-        for (int i = 0; i <= map.size(); i++)
+-            hole.consume(map.get(i));
++    public void IntIntMap_nano_Get(BenchmarkState state, Blackhole hole) {
++        IntIntMap map = state.nanoIntMap;
++        hole.consume(map.get(state.index));
++        state.index = state.index < SIZE_TO_FILL - 1 ? state.index++ : 0;
++    }
++
++    @Benchmark
++    public void IntObjectMap_nano_Get(BenchmarkState state, Blackhole hole) {
++        IntObjectMap<String> map = state.nanoObjectMap;
++        hole.consume(map.get(state.index));
++        state.index = state.index < SIZE_TO_FILL - 1 ? state.index++ : 0;
++    }
++
++    @Benchmark
++    public void IntObjectMap_fastutil_Get(BenchmarkState state, Blackhole hole) {
++        Int2ObjectMap map = state.fastUtilObjectMap;
++        hole.consume(map.get(state.index));
++        state.index = state.index < SIZE_TO_FILL - 1 ? state.index++ : 0;
+     }
+ 
+     @Benchmark
+-    public void IntIntMap_fastutil_Get(BenchmarkState state,Blackhole hole) {
+-        Int2IntArrayMap map = state.fastUtilMap;
+-        for (int i = 0; i <= map.size(); i++)
+-            hole.consume(map.get(i));
++    public void IntIntMap_fastutil_Get(BenchmarkState state, Blackhole hole) {
++        Int2IntArrayMap map = state.fastUtilIntMap;
++        hole.consume(map.get(state.index));
++        state.index = state.index < SIZE_TO_FILL - 1 ? state.index++ : 0;
+     }
+ 
+ }
+Index: core/src/main/java/io/nano/core/collection/IntIntMap.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/java/io/nano/core/collection/IntIntMap.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core/src/main/java/io/nano/core/collection/IntIntMap.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -2,12 +2,41 @@
+ 
+ public interface IntIntMap {
+ 
++    /**
++     * Indicates whether or not the map contains a value for the given key.
++     */
++    boolean containsKey(final int key);
++
++    /**
++     * Retrieves the entry referenced by the given key from the map.
++     *
++     * @param key the key of the map entry.
++     * @return the value for this key or {@code -1} if there is no mapping.
++     */
+     int get(final int key);
+ 
++    /**
++     * Puts the given value into the map.
++     *
++     * @param key the key of the map entry.
++     * @param value the value of the entry.
++     * @return the previous value for this key or {@code -1} if there was no previous mapping.
++     */
+     int put(final int key, final int value);
+ 
++    /**
++     * Removed the entry referenced by the given key from the map.
++     *
++     * @param key the key of the map entry.
++     * @return the previous value for this key or {@code -1} if there was no previous mapping.
++     */
+     int remove(final int key);
+ 
++    /**
++     * Returns the current size of the map.
++     *
++     * @return the size of the map.
++     */
+     int size();
+ 
+ }
+Index: core/src/main/java/io/nano/core/collection/IntObjectMap.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/java/io/nano/core/collection/IntObjectMap.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core/src/main/java/io/nano/core/collection/IntObjectMap.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -2,6 +2,8 @@
+ 
+ public interface IntObjectMap<V> {
+ 
++    boolean containsKey(final int key);
++
+     V get(final int key);
+ 
+     V put(final int key, final V value);
+Index: core/src/main/java/io/nano/core/collection/NanoIntIntMap.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/java/io/nano/core/collection/NanoIntIntMap.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core/src/main/java/io/nano/core/collection/NanoIntIntMap.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -11,7 +11,7 @@
+ 
+     private static final int FREE_KEY = 0;
+ 
+-    public static final int NO_VALUE = 0;
++    private static final int KEY_MISSING = -1;
+ 
+     /**
+      * Keys and values
+@@ -20,13 +20,14 @@
+ 
+     /**
+      * Do we have 'free' key in the map?
++     * We need to use zero to indicate an empty slot while still support using a key equal to zero
+      */
+-    private boolean hasFreeKey;
++    private boolean isFreeKeySet;
+ 
+     /**
+      * Value of 'free' key
+      */
+-    private int freeValue;
++    private int freeValue = KEY_MISSING;
+ 
+     /**
+      * Fill factor, must be between (0 and 1)
+@@ -54,122 +55,117 @@
+     private int mask2;
+ 
+     public NanoIntIntMap(final int size, final float fillFactor) {
+-        if (fillFactor <= 0 || fillFactor >= 1)
++        if (fillFactor <= 0 || fillFactor >= 1) {
+             throw new IllegalArgumentException("FillFactor must be in (0, 1)");
+-        if (size <= 0)
++        }
++        if (size <= 0) {
+             throw new IllegalArgumentException("Size must be positive!");
+-        if (!Maths.isPowerOfTwo(size))
++        }
++        // Using power-of-two array capacity avoids expensive % operations
++        if (!Maths.isPowerOfTwo(size)) {
+             throw new IllegalArgumentException("Size must be a power of two!");
++        }
+         final int capacity = NanoArrays.arraySize(size, fillFactor);
+         this.mask = capacity - 1;
+         this.mask2 = capacity * 2 - 1;
+         this.fillFactor = fillFactor;
+         this.data = new int[capacity * 2];
+-        this.threshold = (int) (capacity * fillFactor);
++        this.threshold = (int)(capacity * fillFactor);
+     }
+ 
++    @Override
++    public boolean containsKey(int key) {
++        // TODO implement containsKey
++        return false;
++    }
++
+     @Override
+     public int get(final int key) {
+-        int ptr = (Bits.shuffle(key) & mask) << 1;
+-
+-        if (key == FREE_KEY)
+-            return hasFreeKey ? freeValue : NO_VALUE;
++        if (key == FREE_KEY) {
++            return isFreeKeySet ? freeValue : KEY_MISSING;
++        }
+ 
+-        int k = data[ptr];
++        int index = indexOf(key);
++        int k;
+ 
+-        if (k == FREE_KEY)
+-            return NO_VALUE;  //end of chain already
+-        if (k == key) //we check FREE prior to this call
+-            return data[ptr + 1];
+-
++        // key conflict, scan array
+         while (true) {
+-            ptr = (ptr + 2) & mask2; //that's next index
+-            k = data[ptr];
+-            if (k == FREE_KEY)
+-                return NO_VALUE;
+-            if (k == key)
+-                return data[ptr + 1];
++            k = data[index];
++            if (k == FREE_KEY) {
++                return KEY_MISSING;
++            }
++            if (k == key) {
++                return data[index + 1];
++            }
++            // skip index to next key/value pair
++            index = (index + 2) & mask2;
+         }
+     }
+ 
+     @Override
+     public int put(final int key, final int value) {
+         if (key == FREE_KEY) {
+-            final int ret = freeValue;
+-            if (!hasFreeKey)
++            final int previousValue = freeValue;
++            if (!isFreeKeySet) {
+                 ++size;
+-            hasFreeKey = true;
++            }
++            isFreeKeySet = true;
+             freeValue = value;
+-            return ret;
+-        }
+-
+-        int ptr = (Bits.shuffle(key) & mask) << 1;
+-        int k = data[ptr];
+-        if (k == FREE_KEY) //end of chain already
+-        {
+-            data[ptr] = key;
+-            data[ptr + 1] = value;
+-            if (size >= threshold)
+-                rehash(data.length * 2); //size is set inside
+-            else
+-                ++size;
+-            return NO_VALUE;
+-        } else if (k == key) //we check FREE prior to this call
+-        {
+-            final int ret = data[ptr + 1];
+-            data[ptr + 1] = value;
+-            return ret;
++            return previousValue;
+         }
+ 
++        int index = indexOf(key);
++        int k;
+         while (true) {
+-            ptr = (ptr + 2) & mask2; //that's next index calculation
+-            k = data[ptr];
++            k = data[index];
++            // check for empty slot
+             if (k == FREE_KEY) {
+-                data[ptr] = key;
+-                data[ptr + 1] = value;
+-                if (size >= threshold)
+-                    rehash(data.length * 2); //size is set inside
+-                else
++                data[index] = key;
++                data[index + 1] = value;
++                if (size >= threshold) {
++                    resize(data.length * 2);
++                } else {
+                     ++size;
+-                return NO_VALUE;
+-            } else if (k == key) {
+-                final int ret = data[ptr + 1];
+-                data[ptr + 1] = value;
+-                return ret;
++                }
++                return KEY_MISSING;
+             }
++            // found a matching key so replace
++            else if (k == key) {
++                final int previousValue = data[index + 1];
++                data[index + 1] = value;
++                return previousValue;
++            }
++            // skip index to next key/value pair
++            index = (index + 2) & mask2;
+         }
+     }
+ 
+     @Override
+     public int remove(final int key) {
+         if (key == FREE_KEY) {
+-            if (!hasFreeKey)
+-                return NO_VALUE;
+-            hasFreeKey = false;
++            if (!isFreeKeySet) {
++                return KEY_MISSING;
++            }
++            isFreeKeySet = false;
+             --size;
+             return freeValue; //value is not cleaned
+         }
+ 
+-        int ptr = (Bits.shuffle(key) & mask) << 1;
+-        int k = data[ptr];
+-        if (k == key) //we check FREE prior to this call
+-        {
+-            final int res = data[ptr + 1];
+-            shiftKeys(ptr);
+-            --size;
+-            return res;
+-        } else if (k == FREE_KEY)
+-            return NO_VALUE;  //end of chain already
++        int index = indexOf(key);
++        int k;
+         while (true) {
+-            ptr = (ptr + 2) & mask2; //that's next index calculation
+-            k = data[ptr];
++            k = data[index];
+             if (k == key) {
+-                final int res = data[ptr + 1];
+-                shiftKeys(ptr);
++                final int previousValue = data[index + 1];
++                // no need to set value - just shift other value down
++                shiftKeys(index);
+                 --size;
+-                return res;
+-            } else if (k == FREE_KEY)
+-                return NO_VALUE;
++                return previousValue;
++            } else if (k == FREE_KEY) {
++                return KEY_MISSING;
++            }
++            // skip index to next key/value pair
++            index = (index + 2) & mask2;
+         }
+     }
+ 
+@@ -178,29 +174,49 @@
+         return size;
+     }
+ 
+-    private int shiftKeys(int pos) {
++    /**
++     * Returns the array index for the given key
++     */
++    private int indexOf(int key) {
++        return (Bits.shuffle(key) & mask) << 1;
++    }
++
++    /**
++     * Entries with same key are shifted when we remove items from the array.
++     *
++     * Removals are more costly but array access using {@link #get(int)} remain optimal.
++     */
++    private int shiftKeys(int index) {
+         // Shift entries with the same hash.
+         int last, slot;
+         int k;
+-        final int[] data = this.data;
+         while (true) {
+-            pos = ((last = pos) + 2) & mask2;
++            index = ((last = index) + 2) & mask2;
+             while (true) {
+-                if ((k = data[pos]) == FREE_KEY) {
++                if ((k = data[index]) == FREE_KEY) {
+                     data[last] = FREE_KEY;
+                     return last;
+                 }
+-                slot = (Bits.shuffle(k) & mask) << 1; //calculate the starting slot for the current key
+-                if (last <= pos ? last >= slot || slot > pos : last >= slot && slot > pos) break;
+-                pos = (pos + 2) & mask2; //go to the next entry
++                slot = indexOf(k);
++                if (last <= index ? last >= slot || slot > index : last >= slot && slot > index) {
++                    break;
++                }
++                // skip index to next key/value pair
++                index = (index + 2) & mask2;
+             }
+             data[last] = k;
+-            data[last + 1] = data[pos + 1];
++            data[last + 1] = data[index + 1];
+         }
+     }
+ 
+-    private void rehash(final int newCapacity) {
+-        threshold = (int) (newCapacity / 2 * fillFactor);
++    /**
++     * Resize the array when the capacity is reached.
++     * This obviously a costly operation so ensuring that the collection is sized correctly
++     * when created is essential.
++     * @param newCapacity twice the original capacity since we are storing the key and value in the same array
++     */
++    private void resize(final int newCapacity) {
++        threshold = (int)(newCapacity / 2 * fillFactor);
+         mask = newCapacity / 2 - 1;
+         mask2 = newCapacity - 1;
+ 
+@@ -208,12 +224,13 @@
+         final int[] oldData = data;
+ 
+         data = new int[newCapacity];
+-        size = hasFreeKey ? 1 : 0;
++        size = isFreeKeySet ? 1 : 0;
+ 
+         for (int i = 0; i < oldCapacity; i += 2) {
+             final int oldKey = oldData[i];
+-            if (oldKey != FREE_KEY)
++            if (oldKey != FREE_KEY) {
+                 put(oldKey, oldData[i + 1]);
++            }
+         }
+     }
+ 
+Index: core/src/main/java/io/nano/core/collection/NanoIntObjMap.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/java/io/nano/core/collection/NanoIntObjMap.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core/src/main/java/io/nano/core/collection/NanoIntObjMap.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
+@@ -1,242 +0,0 @@
+-package io.nano.core.collection;
+-
+-import io.nano.core.util.Maths;
+-
+-import java.util.Arrays;
+-
+-/**
+- * Int-Object map based on ObjObjMap from the following repo:
+- * https://github.com/mikvor/hashmapTest
+- */
+-public class NanoIntObjMap<V> implements IntObjectMap<V> {
+-
+-    private static final int FREE_KEY = 0;
+-    private static final Object REMOVED_KEY = new Object();
+-
+-    /**
+-     * Keys and values
+-     */
+-    private Object[] data;
+-
+-    /**
+-     * Value for the null key (if inserted into a map)
+-     */
+-    private Object nullValue;
+-    private boolean hasNull;
+-
+-    /**
+-     * Fill factor, must be between (0 and 1)
+-     */
+-    private final float fillFactor;
+-
+-    /**
+-     * Resize map once it reaches this size
+-     */
+-    private int threshold;
+-
+-    /**
+-     * Current map size
+-     */
+-    private int size;
+-
+-    /**
+-     * Mask to calculate the original position
+-     */
+-    private int mask;
+-
+-    /**
+-     * Mask to wrap the actual array pointer
+-     */
+-    private int mask2;
+-
+-    public NanoIntObjMap(final int size, final float fillFactor) {
+-        if (fillFactor <= 0 || fillFactor >= 1)
+-            throw new IllegalArgumentException("FillFactor must be in (0, 1)");
+-        if (size <= 0)
+-            throw new IllegalArgumentException("Size must be positive!");
+-        if (!Maths.isPowerOfTwo(size))
+-            throw new IllegalArgumentException("Size must be a power of two!");
+-        final int capacity = NanoArrays.arraySize(size, fillFactor);
+-        this.mask = capacity - 1;
+-        this.mask2 = capacity * 2 - 1;
+-        this.fillFactor = fillFactor;
+-
+-        data = new Object[capacity * 2];
+-        Arrays.fill(data, FREE_KEY);
+-
+-        threshold = (int) (capacity * fillFactor);
+-    }
+-
+-    public V get(final int key) {
+-        if (key == FREE_KEY)
+-            return (V) nullValue; //we null it on remove, so safe not to check a flag here
+-
+-/*
+-        int ptr = (key.hashCode() & mask) << 1;
+-        Object k = data[ptr];
+-
+-        if (k == FREE_KEY)
+-            return null;  //end of chain already
+-        if (k.equals(key)) //we check FREE and REMOVED prior to this call
+-            return (V) data[ptr + 1];
+-        while (true) {
+-            ptr = (ptr + 2) & mask2; //that's next index
+-            k = data[ptr];
+-            if (k == FREE_KEY)
+-                return null;
+-            if (k.equals(key))
+-                return (V) data[ptr + 1];
+-        }
+-*/
+-        return null;
+-    }
+-
+-    public V put(final int key, final V value) {
+-/*
+-        if (key == null)
+-            return insertNullKey(value);
+-
+-        int ptr = getStartIndex(key) << 1;
+-        Object k = data[ptr];
+-
+-        if (k == FREE_KEY) //end of chain already
+-        {
+-            data[ptr] = key;
+-            data[ptr + 1] = value;
+-            if (size >= threshold)
+-                rehash(data.length * 2); //size is set inside
+-            else
+-                ++size;
+-            return null;
+-        } else if (k.equals(key)) //we check FREE and REMOVED prior to this call
+-        {
+-            final Object ret = data[ptr + 1];
+-            data[ptr + 1] = value;
+-            return (V) ret;
+-        }
+-
+-        int firstRemoved = -1;
+-        if (k == REMOVED_KEY)
+-            firstRemoved = ptr; //we may find a key later
+-
+-        while (true) {
+-            ptr = (ptr + 2) & mask2; //that's next index calculation
+-            k = data[ptr];
+-            if (k == FREE_KEY) {
+-                if (firstRemoved != -1)
+-                    ptr = firstRemoved;
+-                data[ptr] = key;
+-                data[ptr + 1] = value;
+-                if (size >= threshold)
+-                    rehash(data.length * 2); //size is set inside
+-                else
+-                    ++size;
+-                return null;
+-            } else if (k.equals(key)) {
+-                final Object ret = data[ptr + 1];
+-                data[ptr + 1] = value;
+-                return (V) ret;
+-            } else if (k == REMOVED_KEY) {
+-                if (firstRemoved == -1)
+-                    firstRemoved = ptr;
+-            }
+-        }
+-*/
+-return null;
+-    }
+-
+-    public V remove(final int key) {
+-/*
+-        if (key == null)
+-            return removeNullKey();
+-
+-        int ptr = getStartIndex(key) << 1;
+-        Object k = data[ptr];
+-        if (k == FREE_KEY)
+-            return null;  //end of chain already
+-        else if (k.equals(key)) //we check FREE and REMOVED prior to this call
+-        {
+-            --size;
+-            if (data[(ptr + 2) & mask2] == FREE_KEY)
+-                data[ptr] = FREE_KEY;
+-            else
+-                data[ptr] = REMOVED_KEY;
+-            final V ret = (V) data[ptr + 1];
+-            data[ptr + 1] = null;
+-            return ret;
+-        }
+-        while (true) {
+-            ptr = (ptr + 2) & mask2; //that's next index calculation
+-            k = data[ptr];
+-            if (k == FREE_KEY)
+-                return null;
+-            else if (k.equals(key)) {
+-                --size;
+-                if (data[(ptr + 2) & mask2] == FREE_KEY)
+-                    data[ptr] = FREE_KEY;
+-                else
+-                    data[ptr] = REMOVED_KEY;
+-                final V ret = (V) data[ptr + 1];
+-                data[ptr + 1] = null;
+-                return ret;
+-            }
+-        }
+-*/
+-    return null;
+-    }
+-
+-    private V insertNullKey(final V value) {
+-        if (hasNull) {
+-            final Object ret = nullValue;
+-            nullValue = value;
+-            return (V) ret;
+-        } else {
+-            nullValue = value;
+-            ++size;
+-            return null;
+-        }
+-    }
+-
+-    private V removeNullKey() {
+-        if (hasNull) {
+-            final Object ret = nullValue;
+-            nullValue = null;
+-            hasNull = false;
+-            --size;
+-            return (V) ret;
+-        } else {
+-            return null;
+-        }
+-    }
+-
+-    public int size() {
+-        return size;
+-    }
+-
+-    private void rehash(final int newCapacity) {
+-        threshold = (int) (newCapacity / 2 * fillFactor);
+-        mask = newCapacity / 2 - 1;
+-        mask2 = newCapacity - 1;
+-
+-        final int oldCapacity = data.length;
+-        final Object[] oldData = data;
+-
+-        data = new Object[newCapacity];
+-        Arrays.fill(data, FREE_KEY);
+-
+-        size = hasNull ? 1 : 0;
+-
+-/*
+-        for (int i = 0; i < oldCapacity; i += 2) {
+-            final int oldKey = oldData[i];
+-            if (oldKey != FREE_KEY && oldKey != REMOVED_KEY)
+-                put(oldKey, (V) oldData[i + 1]);
+-        }
+-*/
+-    }
+-
+-    public int getStartIndex(final Object key) {
+-        //key is not null here
+-        return key.hashCode() & mask;
+-    }
+-}
+Index: core/src/main/java/io/nano/core/collection/NanoIntObjectMap.java
+===================================================================
+--- core/src/main/java/io/nano/core/collection/NanoIntObjectMap.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
++++ core/src/main/java/io/nano/core/collection/NanoIntObjectMap.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -0,0 +1,246 @@
++package io.nano.core.collection;
++
++import io.nano.core.util.Bits;
++import io.nano.core.util.Maths;
++
++import java.util.Arrays;
++
++/**
++ * Int-Object map based on ObjObjMap from the following repo:
++ * https://github.com/mikvor/hashmapTest
++ */
++public class NanoIntObjectMap<V> implements IntObjectMap<V> {
++
++    private static final int FREE_KEY = 0;
++    private static final Object REMOVED_KEY = new Object();
++
++    /**
++     * Keys and values stored in same array for performance reasons
++     */
++    private Object[] data;
++
++    /**
++     * Value for the free key (if inserted into a map)
++     */
++    private V freeValue;
++
++    /**
++     * Indicates if value has been set using the free key
++     */
++    private boolean isFreeKeySet;
++
++    /**
++     * Fill factor, must be between (0 and 1)
++     */
++    private final float fillFactor;
++
++    /**
++     * Resize map once it reaches this size
++     */
++    private int threshold;
++
++    /**
++     * Current map size
++     */
++    private int size;
++
++    /**
++     * Mask to calculate the original position
++     */
++    private int mask;
++    private int mask2;
++
++    public NanoIntObjectMap(final int size, final float fillFactor) {
++        if (fillFactor <= 0 || fillFactor >= 1) {
++            throw new IllegalArgumentException("FillFactor must be in (0, 1)");
++        }
++        if (size <= 0) {
++            throw new IllegalArgumentException("Size must be positive!");
++        }
++        if (!Maths.isPowerOfTwo(size)) {
++            throw new IllegalArgumentException("Size must be a power of two!");
++        }
++        final int capacity = NanoArrays.arraySize(size, fillFactor);
++        this.mask = capacity - 1;
++        this.mask2 = capacity * 2 - 1;
++        this.fillFactor = fillFactor;
++
++        data = new Object[capacity * 2];
++        Arrays.fill(data, FREE_KEY);
++
++        threshold = (int)(capacity * fillFactor);
++    }
++
++    @Override
++    public boolean containsKey(int key) {
++        // TODO implement containsKey
++        return false;
++    }
++
++    @Override
++    public V get(final int key) {
++        int index = indexOf(key);
++
++        if (key == FREE_KEY) {
++            return isFreeKeySet ? freeValue : null;
++        }
++
++        int k = (int)data[index];
++
++        // key matches return value
++        if (k == key) {
++            return (V)data[index + 1];
++        }
++        // key conflict, scan array
++        while (true) {
++            index = (index + 2) & mask2;
++            k = (int) data[index];
++            if (k == FREE_KEY) {
++                return null;
++            }
++            if (k == key) {
++                return (V)data[index + 1];
++            }
++        }
++    }
++
++    @Override
++    public V put(final int key, final V value) {
++        if (key == FREE_KEY) {
++            return insertFreeKey(value);
++        }
++
++        int index = indexOf(key);
++        int k;
++        while (true) {
++            k = data[index] == null ? FREE_KEY : (int) data[index];
++            // check for empty slot
++            if (k == FREE_KEY) {
++                data[index] = key;
++                data[index + 1] = value;
++                if (size >= threshold) {
++                    resize(data.length * 2); //size is set inside
++                } else {
++                    ++size;
++                }
++                return null;
++            }
++
++            // found a matching key so replace
++            else if (k == key) {
++                final Object ret = data[index + 1];
++                data[index + 1] = value;
++                return (V)ret;
++            }
++            // skip index to next key/value pair
++            index = (index + 2) & mask2;
++        }
++    }
++
++    @Override
++    public V remove(final int key) {
++        if (key == FREE_KEY)
++            return removeFreeKey();
++
++        int index = indexOf(key);
++        int k;
++
++        while (true) {
++            k = (int) data[index];
++            if (k == FREE_KEY)
++                return null;
++            else if (k == key) {
++                final V previousValue = (V) data[index + 1];
++                --size;
++                // no need to set value - just shift other value down
++                shiftKeys(index);
++                return previousValue;
++            }
++            // skip index to next key/value pair
++            index = (index + 2) & mask2;
++        }
++    }
++
++    @Override
++    public int size() {
++        return size;
++    }
++
++    /**
++     * Returns the array index for the given key
++     */
++    private int indexOf(int key) {
++        return (Bits.shuffle(key) & mask) << 1;
++    }
++
++    private V insertFreeKey(final V value) {
++        final V previous = freeValue;
++        if (!isFreeKeySet)
++            ++size;
++        isFreeKeySet = true;
++        freeValue = value;
++        return previous;
++    }
++
++    private V removeFreeKey() {
++        final V previous = freeValue;
++        if (isFreeKeySet)
++            --size;
++        freeValue = null;
++        isFreeKeySet = false;
++        return previous;
++    }
++
++    /**
++     * Entries with same key are shifted when we remove items from the array.
++     *
++     * Removals are more costly but array access using {@link #get(int)} remain optimal.
++     */
++    private int shiftKeys(int index) {
++        // Shift entries with the same hash.
++        int last, slot;
++        int k;
++        while (true) {
++            index = ((last = index) + 2) & mask2;
++            while (true) {
++                if ((k = data[index] == null ? FREE_KEY : (int) data[index]) == FREE_KEY) {
++                    data[last] = FREE_KEY;
++                    return last;
++                }
++                slot = indexOf(k);
++                if (last <= index ? last >= slot || slot > index : last >= slot && slot > index) {
++                    break;
++                }
++                // skip index to next key/value pair
++                index = (index + 2) & mask2;
++            }
++            data[last] = k;
++            data[last + 1] = data[index + 1];
++        }
++    }
++
++    /**
++     * Resize the array when the capacity is reached.
++     * This obviously a costly operation so ensuring that the collection is sized correctly
++     * when created is essential.
++     * @param newCapacity twice the original capacity since we are storing the key and value in the same array
++     */
++    private void resize(final int newCapacity) {
++        threshold = (int)(newCapacity / 2 * fillFactor);
++        mask = newCapacity / 2 - 1;
++        mask2 = newCapacity - 1;
++
++        final int oldCapacity = data.length;
++        final Object[] oldData = data;
++
++        data = new Object[newCapacity];
++        size = isFreeKeySet ? 1 : 0;
++        int oldKey;
++        for (int i = 0; i < oldCapacity; i += 2) {
++            oldKey = oldData[i] == null ? FREE_KEY : (int) oldData[i];
++            if (oldKey != FREE_KEY)
++                put(oldKey, (V) oldData[i + 1]);
++        }
++    }
++
++}
+Index: core/src/main/java/io/nano/core/util/Bits.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/main/java/io/nano/core/util/Bits.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core/src/main/java/io/nano/core/util/Bits.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -2,13 +2,16 @@
+ 
+ public final class Bits {
+ 
+-    //taken from FastUtil
++    // borrowed from FastUtil
+     private static final int INT_PHI = 0x9E3779B9;
+ 
+     private Bits() {
+         // can't touch this
+     }
+ 
++    /**
++     * Scrambles bits well enough for a decent key distribution to avoid long array lookup chains
++     */
+     public static int shuffle(final int a) {
+         final int n = a * INT_PHI;
+         return n ^ (n >> 16);
+Index: core/src/test/java/io/nano/core/collection/NanoIntIntMapTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/src/test/java/io/nano/core/collection/NanoIntIntMapTest.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ core/src/test/java/io/nano/core/collection/NanoIntIntMapTest.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -3,53 +3,47 @@
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ 
+-import static org.junit.jupiter.api.Assertions.*;
++import static org.assertj.core.api.Assertions.assertThat;
+ 
+ class NanoIntIntMapTest {
+ 
+-    private final static float[] FILL_FACTORS = { 0.25f, 0.5f, 0.75f, 0.9f, 0.99f };
++    private final static float[] FILL_FACTORS = {0.25f, 0.5f, 0.75f, 0.9f, 0.99f};
++    private static final int COUNT = 500;
+ 
+-    protected IntIntMap makeMap( final int size, final float fillFactor ) {
++    private IntIntMap makeMap(final int size, final float fillFactor) {
+         return new NanoIntIntMap(size, fillFactor);
+     }
+ 
+-    public void testPut()
+-    {
+-        for ( final float ff : FILL_FACTORS )
+-            testPutHelper( ff );
+-    }
+-
+-    private void testPutHelper( final float fillFactor )
+-    {
+-        final IntIntMap map = makeMap(100, fillFactor);
+-        for ( int i = 0; i < 100000; ++i )
+-        {
+-            assertEquals(0, map.put(i, i) );
+-            assertEquals(i + 1, map.size());
+-            assertEquals(i, map.get( i ));
+-        }
+-        //now check the final state
+-        for ( int i = 0; i < 100000; ++i )
+-            assertEquals(i, map.get( i ));
+-    }
+-
+     @BeforeEach
+     void setUp() {
+     }
+ 
+-    @Test
+-    void get() {
++    private void mapTestHelper(final float fillFactor) {
++        final IntIntMap map = makeMap(128, fillFactor);
++        for (int i = 0; i < COUNT; ++i) {
++            assertThat(map.put(i, i)).as("put(%d,%d)", i, i).isEqualTo(-1);
++            assertThat(map.size()).as("size()").isEqualTo(i + 1);
++            assertThat(map.get(i)).as("get(%d)", i).isEqualTo(i);
++        }
++
++        // check the final state
++        for (int i = 0; i < COUNT; ++i) {
++            assertThat(map.get(i)).as("get(%d)", i).isEqualTo(i);
++        }
++
++        // now check the removal
++        for (int i = 0; i < COUNT; ++i) {
++            assertThat(map.remove(i)).as("remove(%d)", i).isEqualTo(i);
++            assertThat(map.remove(i)).as("remove(%d)", i).isEqualTo(-1);
++        }
++        assertThat(map.size()).as("size()").isZero();
+     }
+ 
+     @Test
+-    void put() {
+-    }
+-
+-    @Test
+-    void remove() {
++    void putAndGetCombined() {
++        for (final float ff : FILL_FACTORS) {
++            mapTestHelper(ff);
++        }
+     }
+ 
+-    @Test
+-    void size() {
+-    }
+ }
+\ No newline at end of file
+Index: core/src/test/java/io/nano/core/collection/NanoIntObjectMapTest.java
+===================================================================
+--- core/src/test/java/io/nano/core/collection/NanoIntObjectMapTest.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
++++ core/src/test/java/io/nano/core/collection/NanoIntObjectMapTest.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -0,0 +1,46 @@
++package io.nano.core.collection;
++
++import org.junit.jupiter.api.Test;
++
++import static org.assertj.core.api.Assertions.assertThat;
++
++class NanoIntObjectMapTest {
++
++    private final static float[] FILL_FACTORS = {0.25f, 0.5f, 0.75f, 0.9f, 0.99f};
++    private static final int COUNT = 500;
++
++    private IntObjectMap<String> makeMap(final int size, final float fillFactor) {
++        return new NanoIntObjectMap<>(size, fillFactor);
++    }
++
++    private void mapTestHelper(final float fillFactor) {
++        final IntObjectMap<String> map = makeMap(128, fillFactor);
++        for (int i = 0; i < COUNT; ++i) {
++            String value = String.valueOf(i);
++            assertThat(map.put(i, value)).as("put(%d,%d)", i, i).isEqualTo(null);
++            assertThat(map.size()).as("size()").isEqualTo(i + 1);
++            assertThat(map.get(i)).as("get(%d)", i).isEqualTo(value);
++        }
++        // check the final state
++        for (int i = 0; i < COUNT; ++i) {
++            String value = String.valueOf(i);
++            assertThat(map.get(i)).as("get(%d)", i).isEqualTo(value);
++        }
++
++        // now check the removal
++        for (int i = 0; i < COUNT; ++i) {
++            String value = String.valueOf(i);
++            assertThat(map.remove(i)).as("remove(%d)", i).isEqualTo(value);
++            assertThat(map.remove(i)).as("remove(%d)", i).isEqualTo(null);
++        }
++        assertThat(map.size()).as("size()").isZero();
++    }
++
++    @Test
++    void putAndGetCombined() {
++        for (final float ff : FILL_FACTORS) {
++            mapTestHelper(ff);
++        }
++    }
++
++}
+\ No newline at end of file
+Index: fix/core/src/main/java/net/nanofix/message/MsgTypes.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- fix/core/src/main/java/net/nanofix/message/MsgTypes.java	(revision 6048e9019a31f505ce3543f4eb0951d5e10edcbf)
++++ fix/core/src/main/java/net/nanofix/message/MsgTypes.java	(revision 025552975ebee3ac8185a481886b3c0539d03ab0)
+@@ -1,7 +1,5 @@
+ package net.nanofix.message;
+ 
+-import io.nano.core.collection.NanoIntObjMap;
+-
+ /**
+  * User: Mark
+  * Date: 13/04/12
