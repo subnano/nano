@@ -3,9 +3,10 @@ package net.subnano.codec.json.sample;
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
 import io.nano.core.collection.ByteStringArray;
+import io.nano.core.collection.IntObjectMap;
+import io.nano.core.collection.NanoIntObjectMap;
 import io.nano.core.lang.ByteString;
 import io.nano.core.util.ByteArrayUtil;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.subnano.codec.json.JsonByteParser;
 import net.subnano.codec.json.JsonVisitor;
 import org.decimal4j.api.DecimalArithmetic;
@@ -34,9 +35,7 @@ public class NanoPriceCodec2 {
 
     private class JsonPriceVisitor implements JsonVisitor {
 
-        // I forgot that IntObjectMap is broken - need to switch to fastutil for the test
-        //private final IntObjectMap<ByteString> nameMap = new NanoIntObjMap<>(16, 0.75f);
-        private final Int2ObjectArrayMap<ByteString> nameMap = new Int2ObjectArrayMap<>();
+        private final IntObjectMap<ByteString> nameMap = new NanoIntObjectMap<>(16, 0.75f);
         private MutablePrice price;
         private int attribute = 0;
         private MutablePrice.MutableLevel[] side;

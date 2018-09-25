@@ -3,31 +3,31 @@ package io.nano.core.collection;
 import io.nano.core.util.Bits;
 import io.nano.core.util.Maths;
 
+import java.util.Arrays;
+
 /**
- * Int-Int map based on IntIntMap4a from the following repo:
+ * Int-Object map based on ObjObjMap from the following repo:
  * https://github.com/mikvor/hashmapTest
  */
-public class NanoIntIntMap implements IntIntMap {
+public class NanoIntObjectMap<V> implements IntObjectMap<V> {
 
     private static final int FREE_KEY = 0;
-
-    private static final int KEY_MISSING = -1;
+    private static final Object REMOVED_KEY = new Object();
 
     /**
-     * Keys and values
+     * Keys and values stored in same array for performance reasons
      */
-    private int[] data;
+    private Object[] data;
 
     /**
-     * Do we have 'free' key in the map?
-     * We need to use zero to indicate an empty slot while still support using a key equal to zero
+     * Value for the free key (if inserted into a map)
+     */
+    private V freeValue;
+
+    /**
+     * Indicates if value has been set using the free key
      */
     private boolean isFreeKeySet;
-
-    /**
-     * Value of 'free' key
-     */
-    private int freeValue = KEY_MISSING;
 
     /**
      * Fill factor, must be between (0 and 1)
@@ -48,20 +48,15 @@ public class NanoIntIntMap implements IntIntMap {
      * Mask to calculate the original position
      */
     private int mask;
-
-    /**
-     * Mask to wrap the actual array pointer
-     */
     private int mask2;
 
-    public NanoIntIntMap(final int size, final float fillFactor) {
+    public NanoIntObjectMap(final int size, final float fillFactor) {
         if (fillFactor <= 0 || fillFactor >= 1) {
             throw new IllegalArgumentException("FillFactor must be in (0, 1)");
         }
         if (size <= 0) {
             throw new IllegalArgumentException("Size must be positive!");
         }
-        // Using power-of-two array capacity avoids expensive % operations
         if (!Maths.isPowerOfTwo(size)) {
             throw new IllegalArgumentException("Size must be a power of two!");
         }
@@ -69,8 +64,11 @@ public class NanoIntIntMap implements IntIntMap {
         this.mask = capacity - 1;
         this.mask2 = capacity * 2 - 1;
         this.fillFactor = fillFactor;
-        this.data = new int[capacity * 2];
-        this.threshold = (int)(capacity * fillFactor);
+
+        data = new Object[capacity * 2];
+        Arrays.fill(data, FREE_KEY);
+
+        threshold = (int)(capacity * fillFactor);
     }
 
     @Override
@@ -80,60 +78,59 @@ public class NanoIntIntMap implements IntIntMap {
     }
 
     @Override
-    public int get(final int key) {
+    public V get(final int key) {
+        int index = indexOf(key);
+
         if (key == FREE_KEY) {
-            return isFreeKeySet ? freeValue : KEY_MISSING;
+            return isFreeKeySet ? freeValue : null;
         }
 
-        int index = indexOf(key);
-        int k;
+        int k = (int)data[index];
 
+        // key matches return value
+        if (k == key) {
+            return (V)data[index + 1];
+        }
         // key conflict, scan array
         while (true) {
-            k = data[index];
+            index = (index + 2) & mask2;
+            k = (int) data[index];
             if (k == FREE_KEY) {
-                return KEY_MISSING;
+                return null;
             }
             if (k == key) {
-                return data[index + 1];
+                return (V)data[index + 1];
             }
-            // skip index to next key/value pair
-            index = (index + 2) & mask2;
         }
     }
 
     @Override
-    public int put(final int key, final int value) {
+    public V put(final int key, final V value) {
         if (key == FREE_KEY) {
-            final int previousValue = freeValue;
-            if (!isFreeKeySet) {
-                ++size;
-            }
-            isFreeKeySet = true;
-            freeValue = value;
-            return previousValue;
+            return insertFreeKey(value);
         }
 
         int index = indexOf(key);
         int k;
         while (true) {
-            k = data[index];
+            k = data[index] == null ? FREE_KEY : (int) data[index];
             // check for empty slot
             if (k == FREE_KEY) {
                 data[index] = key;
                 data[index + 1] = value;
                 if (size >= threshold) {
-                    resize(data.length * 2);
+                    resize(data.length * 2); //size is set inside
                 } else {
                     ++size;
                 }
-                return KEY_MISSING;
+                return null;
             }
+
             // found a matching key so replace
             else if (k == key) {
-                final int previousValue = data[index + 1];
+                final Object ret = data[index + 1];
                 data[index + 1] = value;
-                return previousValue;
+                return (V)ret;
             }
             // skip index to next key/value pair
             index = (index + 2) & mask2;
@@ -141,28 +138,23 @@ public class NanoIntIntMap implements IntIntMap {
     }
 
     @Override
-    public int remove(final int key) {
-        if (key == FREE_KEY) {
-            if (!isFreeKeySet) {
-                return KEY_MISSING;
-            }
-            isFreeKeySet = false;
-            --size;
-            return freeValue; //value is not cleaned
-        }
+    public V remove(final int key) {
+        if (key == FREE_KEY)
+            return removeFreeKey();
 
         int index = indexOf(key);
         int k;
+
         while (true) {
-            k = data[index];
-            if (k == key) {
-                final int previousValue = data[index + 1];
+            k = (int) data[index];
+            if (k == FREE_KEY)
+                return null;
+            else if (k == key) {
+                final V previousValue = (V) data[index + 1];
+                --size;
                 // no need to set value - just shift other value down
                 shiftKeys(index);
-                --size;
                 return previousValue;
-            } else if (k == FREE_KEY) {
-                return KEY_MISSING;
             }
             // skip index to next key/value pair
             index = (index + 2) & mask2;
@@ -181,6 +173,24 @@ public class NanoIntIntMap implements IntIntMap {
         return (Bits.shuffle(key) & mask) << 1;
     }
 
+    private V insertFreeKey(final V value) {
+        final V previous = freeValue;
+        if (!isFreeKeySet)
+            ++size;
+        isFreeKeySet = true;
+        freeValue = value;
+        return previous;
+    }
+
+    private V removeFreeKey() {
+        final V previous = freeValue;
+        if (isFreeKeySet)
+            --size;
+        freeValue = null;
+        isFreeKeySet = false;
+        return previous;
+    }
+
     /**
      * Entries with same key are shifted when we remove items from the array.
      *
@@ -193,7 +203,7 @@ public class NanoIntIntMap implements IntIntMap {
         while (true) {
             index = ((last = index) + 2) & mask2;
             while (true) {
-                if ((k = data[index]) == FREE_KEY) {
+                if ((k = data[index] == null ? FREE_KEY : (int) data[index]) == FREE_KEY) {
                     data[last] = FREE_KEY;
                     return last;
                 }
@@ -221,16 +231,15 @@ public class NanoIntIntMap implements IntIntMap {
         mask2 = newCapacity - 1;
 
         final int oldCapacity = data.length;
-        final int[] oldData = data;
+        final Object[] oldData = data;
 
-        data = new int[newCapacity];
+        data = new Object[newCapacity];
         size = isFreeKeySet ? 1 : 0;
-
+        int oldKey;
         for (int i = 0; i < oldCapacity; i += 2) {
-            final int oldKey = oldData[i];
-            if (oldKey != FREE_KEY) {
-                put(oldKey, oldData[i + 1]);
-            }
+            oldKey = oldData[i] == null ? FREE_KEY : (int) oldData[i];
+            if (oldKey != FREE_KEY)
+                put(oldKey, (V) oldData[i + 1]);
         }
     }
 

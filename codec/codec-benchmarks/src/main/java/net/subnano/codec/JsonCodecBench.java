@@ -16,6 +16,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -35,15 +36,15 @@ import static net.subnano.codec.json.sample.SampleData.SAMPLE_PRICE;
 //@BenchmarkMode(Mode.Throughput)
 //@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-@Warmup(iterations = 3)
-@Measurement(iterations = 3)
+@Warmup(iterations = 2)
+@Measurement(iterations = 2)
 @Fork(3)
 public class JsonCodecBench {
 
     public static void main(String[] args) throws RunnerException {
         System.setProperty("jmh.ignoreLock", "true");
         Options options = new OptionsBuilder().include(JsonCodecBench.class.getSimpleName())
-                //.addProfiler(GCProfiler.class)
+                .addProfiler(GCProfiler.class)
                 .build();
         new Runner(options).run();
     }
@@ -68,7 +69,7 @@ public class JsonCodecBench {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public void jacksonCodec(BenchmarkState state, Blackhole hole) throws IOException {
         state.buffer.reset();
         Price price = state.jacksonCodec.decode(state.buffer);
@@ -87,23 +88,23 @@ public class JsonCodecBench {
         state.nullCodec2.decode(state.buffer);
     }
 
-    //@Benchmark
+    @Benchmark
     public void strlenCodec(BenchmarkState state, Blackhole hole) {
         state.buffer.reset();
         hole.consume(state.strlenCodec.decode(state.buffer));
     }
 
-    //@Benchmark
+    @Benchmark
     public void nanoCodec(BenchmarkState state) {
         state.buffer.reset();
         state.nanoCodec.decode(state.buffer, state.mutablePrice);
     }
 
-//    @Benchmark
-//    public void nanoCodec2(BenchmarkState state) {
-//        state.buffer.reset();
-//        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
-//    }
+    @Benchmark
+    public void nanoCodec2(BenchmarkState state) {
+        state.buffer.reset();
+        state.nanoCodec2.decode(state.buffer, state.mutablePrice);
+    }
 
     /**
      * SoakRunner used to invoke a method continuously so can be profiled externally

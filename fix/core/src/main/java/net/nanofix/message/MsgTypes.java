@@ -1,7 +1,5 @@
 package net.nanofix.message;
 
-import io.nano.core.collection.NanoIntObjMap;
-
 /**
  * User: Mark
  * Date: 13/04/12
