@@ -8,7 +8,10 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Utility class used when encoding Ascii data in ByteBuffers.
+ *
  * Ascii here means than numbers are encoded as human readable bytes using US_ASCII Charset.
+ *
+ * For example, the number 12345 is encoded as the five bytes '12345' rather than an integer using putInt()
  *
  * @author Mark Wardell
  */

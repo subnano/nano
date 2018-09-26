@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import static net.nanofix.util.FIXBytes.PIPE;
 import static net.nanofix.util.FIXBytes.SOH;
 
+// Will not run unless class is public
 class NanoFIXMessageTest {
 
     private static final ByteString SENDER_COMP_ID = ByteString.of("CLIENT");
@@ -42,7 +43,6 @@ class NanoFIXMessageTest {
         msg.addIntField(Tags.HeartBtInt, 30);
         msg.addBooleanField(Tags.ResetSeqNumFlag, true);
         msg.addStringField(Tags.Username, ByteString.of("user1"));
-//        TagVisitor visitor = new LocalTagVisitor();
         assertBufferEncoding(
                 msg,
                 "8=FIX.4.2|9=84|35=A|49=CLIENT|56=BROKER|34=42|52=19700101-00:00:00.000|98=0|" +
@@ -59,7 +59,6 @@ class NanoFIXMessageTest {
         msg.header().targetCompId(TARGET_COMP_ID);
         msg.header().msgSeqNum(11);
         msg.addStringField(Tags.TestReqID, ByteString.of("test-req-id"));
-//        TagVisitor visitor = new LocalTagVisitor();
         assertBufferEncoding(
                 msg,
                 "8=FIX.4.3|9=72|35=0|49=CLIENT|56=BROKER|34=11|52=19700101-00:00:00.000|" +

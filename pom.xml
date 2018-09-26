@@ -35,10 +35,10 @@
     <modules>
         <module>time</module>
         <module>core</module>
+        <module>core-benchmarks</module>
         <module>codec</module>
         <module>kx</module>
         <module>fix</module>
-        <module>core-benchmarks</module>
     </modules>
 
     <distributionManagement>

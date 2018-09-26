@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <name>Nano Time</name>
+    <name>Nano/Time</name>
     <artifactId>nano-time</artifactId>
     <version>2018.09.5-SNAPSHOT</version>
 

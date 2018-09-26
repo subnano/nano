@@ -10,7 +10,8 @@ import java.nio.ByteBuffer;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-class NanoFIXMessageDecoderTest {
+@Disabled
+public class NanoFIXMessageDecoderTest {
 
     private MessageStringBuilder messageBuilder = new MessageStringBuilder();
     private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();

@@ -47,7 +47,7 @@ public class NanoFixMessageBench {
         System.setProperty("jmh.ignoreLock", "true");
         Options options = new OptionsBuilder()
                 .include(NanoFixMessageBench.class.getSimpleName())
-                .addProfiler(StackProfiler.class)
+                //.addProfiler(StackProfiler.class)
                 .addProfiler(GCProfiler.class)
                 .build();
         new Runner(options).run();
@@ -63,7 +63,7 @@ public class NanoFixMessageBench {
         ByteBuffer decodeBuffer = NanoFixMessageBench.createBuffer(LOGON_RESET);
     }
 
-    @Benchmark
+    //@Benchmark
     public void encodeLogon(BenchmarkState state, Blackhole hole) {
         state.buffer.clear();
         FIXMessage msg = state.msg;
@@ -80,7 +80,7 @@ public class NanoFixMessageBench {
         hole.consume(msg.encode(state.encodeBuffer, 0));
     }
 
-    @Benchmark
+    //@Benchmark
     public void encodeNewOrderSingle(BenchmarkState state, Blackhole hole) {
         // 8=FIX.4.4|9=132|35=D|34=4|49=BANZAI|52=20120331-10:26:33.264|56=EXEC|11=1333189593005|21=1|38=100|40=1|54=1|
         // 55=GOOG.N|59=0|60=20120331-10:26:33.257|10=219|

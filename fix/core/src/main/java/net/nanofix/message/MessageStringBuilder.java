@@ -34,7 +34,7 @@ public class MessageStringBuilder implements FIXMessageVisitor {
 
     @Override
     public boolean complete() {
-        return true;
+        return false;
     }
 
     public String asString() {

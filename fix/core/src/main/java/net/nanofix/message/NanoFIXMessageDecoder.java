@@ -64,6 +64,7 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
                 break;
             }
             int tagLen = equalIndex - tagIndex;
+            //int tagId = AsciiBufferUtil.getInt(buffer, tagIndex, tagLen);
             int valueIndex = equalIndex + 1;
 
             int startOfHeaderIndex = ByteBufferUtil.indexOf(buffer, valueIndex, SOH);
@@ -116,7 +117,6 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
                 int actualBodyLength = tagIndex - bodyStartIndex;
                 if (bodyLen != actualBodyLength) {
                     visitor.onError(tagIndex, BODY_LEN_INCORRECT_ERROR_MESSAGE);
-                    break;
                 }
                 // check that checksum value is correct
                 int checksum = AsciiBufferUtil.getInt(buffer, valueIndex, valueLen);
@@ -126,7 +126,6 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
                 if (checksum != calculatedChecksum) {
                     System.out.println("checksum:" + checksum + " calculatedChecksum: " + calculatedChecksum);
                     visitor.onError(tagIndex, CHECKSUM_INCORRECT_ERROR_MESSAGE);
-                    break;
                 }
             }
 
