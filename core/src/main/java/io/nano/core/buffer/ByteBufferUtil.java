@@ -5,7 +5,6 @@ import io.nano.core.util.ByteArrayUtil;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.util.Objects;
 
 /**
  * @author Mark Wardell
@@ -56,7 +55,7 @@ public final class ByteBufferUtil {
     public static byte[] asByteArray(ByteBuffer buffer, int index, int len) {
         byte[] bytes = new byte[len];
         //buffer.get(bytes);
-        if (len > buffer.remaining()) {
+        if (len > buffer.capacity()) {
             throw new BufferUnderflowException();
         }
         for (int i = 0; i < len; i++) {
@@ -124,12 +123,8 @@ public final class ByteBufferUtil {
     }
 
     // need to convey a FIX boolean of Y / N
-    public static boolean toBoolean(ByteBuffer buffer, int offset, int len) {
-        if (len != 1) {
-            throw new IllegalArgumentException("Len should be 1 when decoding a boolean");
-        }
-        byte aByte = buffer.get(offset);
-        return aByte == 'Y';
+    public static boolean toBoolean(ByteBuffer buffer, int offset) {
+        return buffer.get(offset) == 'Y';
     }
 
     public static void putBytes(ByteBuffer buffer, byte[] bytes) {

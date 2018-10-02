@@ -60,6 +60,14 @@ public class MessageHeaderReader extends MessageTypeReader implements FIXMessage
     }
 
     @Override
+    public void clear() {
+        messageHeader.senderCompId(null);
+        messageHeader.targetCompId(null);
+        messageHeader.sendingTime(0);
+        super.clear();
+    }
+
+    @Override
     public void copyFrom(MessageHeader other) {
         messageHeader.copyFrom(other);
     }

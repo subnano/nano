@@ -23,8 +23,9 @@ public class ByteArrayUtil {
 
     public static final int BYTE_ARRAY_SCALE = Unsafe.ARRAY_BYTE_INDEX_SCALE;
     //public static final int BYTE_ARRAY_OFFSET = UnsafeHolder.UNSAFE.arrayBaseOffset(byte[].class);
-    public static final int BYTE_ARRAY_OFFSET = Unsafe.ARRAY_BYTE_BASE_OFFSET;
+    private static final int BYTE_ARRAY_OFFSET = Unsafe.ARRAY_BYTE_BASE_OFFSET;
     private static final int M2 = 0x7A646E4D;
+    private static final int NOT_FOUND_INDEX = -1;
 
     static {
         // populate the 1 byte array
@@ -257,4 +258,14 @@ public class ByteArrayUtil {
         // TODO null check
         return hash(bytes, 0, bytes.length);
     }
+
+    public static int indexOf(byte[] bytes, int offset, byte wanted) {
+        for (int index = offset; index < bytes.length; index++) {
+            if (bytes[index] == wanted) {
+                return index;
+            }
+        }
+        return NOT_FOUND_INDEX;
+    }
+
 }

@@ -29,10 +29,18 @@ class KxConnectionTest {
     @Test
     void writeSingleRow() {
         KxTableWriter<KxSample> tableWriter = connection.newTableWriter(new KxSampleWriterSource());
-        KxSample sample = new KxSample("Arthur Dent", 42, System.currentTimeMillis());
+        KxSample sample = new KxSample("Arthur Dent (Single)", 42, System.currentTimeMillis());
         tableWriter.write(sample);
     }
 
+    @Test
+    void writeMultipleRows() {
+        KxTableWriter<KxSample> tableWriter = connection.newTableWriter(new KxSampleWriterSource());
+        KxSample sample = new KxSample("Arthur Dent (Married)", 42, System.currentTimeMillis() - 5);
+        tableWriter.write(sample);
+        sample.time = System.currentTimeMillis();
+        tableWriter.write(sample);
+    }
 
     @Test
     void queryTable()  {

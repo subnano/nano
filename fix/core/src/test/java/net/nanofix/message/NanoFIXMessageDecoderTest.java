@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-@Disabled
 public class NanoFIXMessageDecoderTest {
 
     private MessageStringBuilder messageBuilder = new MessageStringBuilder();
@@ -24,7 +23,7 @@ public class NanoFIXMessageDecoderTest {
         decodeHandler = spy(new LoggingDecodeHandler());
     }
 
-    @Test
+    @Test @Disabled("Implement junkAtStart")
     void junkAtStart() {
         // TODO junkAtStart
     }
@@ -45,7 +44,7 @@ public class NanoFIXMessageDecoderTest {
                 .onError(0, "Message must start with with the correct begin string 8=FIX.");
     }
 
-    @Test
+    @Test @Disabled("Implement bodyLengthMisisng")
     void bodyLengthMissing() {
         MessageTestHelper.prepareBuffer(buffer, "8=FIX.4.1|35=A|");
         decoder.decode(buffer, decodeHandler);
@@ -53,7 +52,7 @@ public class NanoFIXMessageDecoderTest {
                 .onError(10, "BodyLength(9) must be the second field in the message");
     }
 
-    @Test
+    @Test @Disabled("Implement bodyLengthTooShort")
     void bodyLengthTooShort() {
         MessageTestHelper.prepareBuffer(buffer, "8=FIX.4.1|9=1|35=A|");
         decoder.decode(buffer, decodeHandler);
@@ -61,7 +60,7 @@ public class NanoFIXMessageDecoderTest {
                 .onError(10, "BodyLength(9) value is invalid");
     }
 
-    @Test
+    @Test @Disabled("Implement bodyLengthTooLong")
     void bodyLengthTooLong() {
         MessageTestHelper.prepareBuffer(buffer, "8=FIX.4.1|9=999888777666|");
         decoder.decode(buffer, decodeHandler);
@@ -86,7 +85,7 @@ public class NanoFIXMessageDecoderTest {
 //                .onError(10,"BodyLength(9) value is invalid");
     }
 
-    @Test
+    @Test @Disabled("Implement msgTypeMissing")
     void msgTypeMissing() {
         MessageTestHelper.prepareBuffer(buffer, "8=FIX.4.1|9=24|49=ACME|");
         decoder.decode(buffer, decodeHandler);
@@ -94,32 +93,23 @@ public class NanoFIXMessageDecoderTest {
                 .onError(15, "MsgType(35) must be the third field in the message");
     }
 
-    @Test
+    @Test @Disabled("Implement checksumMissing")
     void checksumMissing() {
         // TODO checksumMissing
     }
 
-    @Test
+    @Test @Disabled("Implement checksumIncorrect")
     void checksumIncorrect() {
         // TODO checksumIncorrect
     }
 
     @Test
     void decodeHeartbeat() {
+        // TODO should this move out to a different test ?
         String msgText = FIXMessageStrings.HEARTBEAT;
         MessageTestHelper.prepareBuffer(buffer, msgText);
         decoder.decode(buffer, messageBuilder);
         Assertions.assertThat(messageBuilder.asString()).isEqualTo(msgText);
-    }
-
-    @Test
-    void decodeLogon() {
-        // TODO decodeLogon
-    }
-
-    @Test
-    void decodeMultipleMessages() {
-        // TODO decodeMultipleMessages
     }
 
 }

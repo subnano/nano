@@ -1,6 +1,7 @@
 package io.nano.core.buffer;
 
 import io.nano.core.util.Maths;
+import sun.misc.Unsafe;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -17,7 +18,7 @@ import java.nio.charset.StandardCharsets;
  */
 public final class AsciiBufferUtil {
 
-    public static final Charset ASCII_CHARSET = StandardCharsets.US_ASCII;
+    private static final Charset ASCII_CHARSET = StandardCharsets.US_ASCII;
 
     private AsciiBufferUtil() {
         // can't touch this
@@ -144,6 +145,17 @@ public final class AsciiBufferUtil {
     public static String getString(ByteBuffer buffer, int offset, int len) {
         byte[] bytes = ByteBufferUtil.asByteArray(buffer, offset, len);
         return new String(bytes, ASCII_CHARSET);
+    }
+
+    /**
+     * Specific use case when we know length is positive
+     */
+    public static int getInt(byte[] bytes, int offset, int len) {
+        int number = 0;
+        for (int i = offset; i < offset + len; i++) {
+            number = (number * 10) + (bytes[i] - '0');
+        }
+        return number;
     }
 
     public static int getInt(ByteBuffer buffer, int offset, int len) {

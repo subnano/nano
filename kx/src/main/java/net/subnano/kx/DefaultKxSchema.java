@@ -14,15 +14,14 @@ public class DefaultKxSchema implements KxSchema {
     private final String command;
     private final String[] columnNames;
     private final Object[] data;
+    private final int batchSize;
 
-    DefaultKxSchema(String tableName,
-                    String command,
-                    String[] columnNames,
-                    Object[] data) {
-        this.tableName = tableName;
-        this.command = command;
-        this.columnNames = columnNames;
-        this.data = data;
+    private DefaultKxSchema(Builder builder) {
+        this.tableName = builder.tableName;
+        this.command = builder.command;
+        this.columnNames = builder.columnNames.toArray(new String[0]);
+        this.data = builder.newTableData();
+        this.batchSize = builder.batchSize;
     }
 
     @Override
@@ -45,29 +44,37 @@ public class DefaultKxSchema implements KxSchema {
         return data;
     }
 
+    @Override
+    public int batchSize() {
+        return batchSize;
+    }
+
     public static class Builder {
 
         private static final String DEFAULT_COMMAND = "insert";
-
-        // Only supports single row for now
-        private final int rowCount = 1;
 
         private String tableName;
         private String command = DEFAULT_COMMAND;
         private final List<String> columnNames = new ArrayList<>();
         private final List<ColumnType> columnTypes = new ArrayList<>();
+        private int batchSize = 1;
 
         public Builder() {
             // nothing else to do
         }
 
-        public Builder forTable(String tableName) {
+        public Builder table(String tableName) {
             this.tableName = tableName;
             return this;
         }
 
         public Builder andCommand(String command) {
             this.command = command;
+            return this;
+        }
+
+        public Builder batchSize(int batchSize) {
+            this.batchSize = batchSize;
             return this;
         }
 
@@ -78,12 +85,7 @@ public class DefaultKxSchema implements KxSchema {
         }
 
         public KxSchema build() {
-            return new DefaultKxSchema(
-                    tableName,
-                    command,
-                    columnNames.toArray(new String[0]),
-                    newTableData()
-            );
+            return new DefaultKxSchema(this);
         }
 
         private Object[] newTableData() {
@@ -92,34 +94,34 @@ public class DefaultKxSchema implements KxSchema {
                 ColumnType type = columnTypes.get(i);
                 switch (type) {
                     case Boolean:
-                        data[i] = new boolean[rowCount];
+                        data[i] = new boolean[batchSize];
                         break;
                     case Byte:
-                        data[i] = new byte[rowCount];
+                        data[i] = new byte[batchSize];
                         break;
                     case Short:
-                        data[i] = new short[rowCount];
+                        data[i] = new short[batchSize];
                         break;
                     case Int:
-                        data[i] = new int[rowCount];
+                        data[i] = new int[batchSize];
                         break;
                     case Long:
-                        data[i] = new long[rowCount];
+                        data[i] = new long[batchSize];
                         break;
                     case Double:
-                        data[i] = new double[rowCount];
+                        data[i] = new double[batchSize];
                         break;
                     case Char:
-                        data[i] = new char[rowCount];
+                        data[i] = new char[batchSize];
                         break;
                     case String:
-                        data[i] = new String[rowCount];
+                        data[i] = new String[batchSize];
                         break;
                     case DateTime:
-                        data[i] = new Date[rowCount];
+                        data[i] = new Date[batchSize];
                         break;
                     case Timestamp:
-                        data[i] = new Timestamp[rowCount];
+                        data[i] = new Timestamp[batchSize];
                         break;
                     default:
                         throw new IllegalArgumentException("Unsupported column type: " + type);

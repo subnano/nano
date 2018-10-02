@@ -21,7 +21,7 @@ public class TestSchema {
     };
 
     static final KxSchema SCHEMA = new DefaultKxSchema.Builder()
-            .forTable(TestSchema.TABLE_NAME)
+            .table(TestSchema.TABLE_NAME)
             .addColumn("A", ColumnType.String)
             .addColumn("B", ColumnType.Short)
             .addColumn("C", ColumnType.Int)

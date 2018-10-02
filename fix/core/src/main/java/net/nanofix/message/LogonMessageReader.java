@@ -30,13 +30,13 @@ public class LogonMessageReader extends MessageHeaderReader implements FIXMessag
         // populate here
         int valueIndex = tagIndex + tagLen + 1;
         if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.EncryptMethod)) {
-            encryptMethod = ByteBufferUtil.toBoolean(buffer, valueIndex, valueLen);
+            encryptMethod = ByteBufferUtil.toBoolean(buffer, valueIndex);
             handled = true;
         } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.HeartBtInt)) {
             heartBeatInterval = AsciiBufferUtil.getInt(buffer, valueIndex, valueLen);
             handled = true;
         } else if (ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.ResetSeqNumFlag)) {
-            resetSeqNumFlag = ByteBufferUtil.toBoolean(buffer, valueIndex, valueLen);
+            resetSeqNumFlag = ByteBufferUtil.toBoolean(buffer, valueIndex);
             handled = true;
         }
         return handled;
@@ -50,6 +50,11 @@ public class LogonMessageReader extends MessageHeaderReader implements FIXMessag
     @Override
     public boolean complete() {
         return false;
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
     }
 
     public boolean encryptMethod() {

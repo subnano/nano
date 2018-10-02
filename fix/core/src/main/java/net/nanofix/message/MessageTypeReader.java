@@ -55,4 +55,9 @@ public class MessageTypeReader implements FIXMessageVisitor {
     public boolean complete() {
         return messageHeader.msgType() != null;
     }
+
+    public void clear() {
+        messageHeader.msgType(null);
+        messageHeader.msgSeqNum(0);
+    }
 }

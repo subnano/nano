@@ -18,6 +18,14 @@ public final class ChecksumCalculator {
         }
     }
 
+    public static int calculateChecksum(byte[] bytes, int offset, int len) {
+        int checksum = 0;
+        for (int index = offset; index < len; index++) {
+            checksum += bytes[index];
+        }
+        return checksum % 256;
+    }
+
     public static int calculateChecksum(ByteBuffer buffer, int offset, int len) {
         int checksum = 0;
         if (buffer != null) {

@@ -1,9 +1,8 @@
 package net.nanofix.message;
 
-import io.nano.core.buffer.ByteBufferUtil;
+import io.nano.core.lang.ByteString;
 import io.nano.core.time.TimeUtil;
 import io.nano.core.util.ByteArrayUtil;
-import io.nano.core.lang.ByteString;
 import net.nanofix.util.FIXBytes;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -16,7 +15,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.profile.GCProfiler;
-import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -25,15 +23,16 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
+import static net.nanofix.message.NanoFixBenchData.LOGON;
+import static net.nanofix.message.NanoFixBenchData.MD_SNAPSHOT;
+
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Benchmark)
 @Warmup(iterations = 5)
 @Measurement(iterations = 3)
 @Fork(3)
 public class NanoFixMessageBench {
-
-    static final String LOGON_RESET = "8=FIX.4.0|9=61|35=A|34=1|49=BANZAI|52=20120331-10:25:15.000|56=EXEC|98=0|108=30|141=Y|10=255|";
 
     private static final ByteString SENDER_COMP_ID = ByteString.of("CLIENT");
     private static final ByteString TARGET_COMP_ID = ByteString.of("BROKER");
@@ -45,11 +44,9 @@ public class NanoFixMessageBench {
 
     public static void main(String[] args) throws RunnerException {
         System.setProperty("jmh.ignoreLock", "true");
-        Options options = new OptionsBuilder()
-                .include(NanoFixMessageBench.class.getSimpleName())
+        Options options = new OptionsBuilder().include(NanoFixMessageBench.class.getSimpleName())
                 //.addProfiler(StackProfiler.class)
-                .addProfiler(GCProfiler.class)
-                .build();
+                .addProfiler(GCProfiler.class).build();
         new Runner(options).run();
     }
 
@@ -59,8 +56,12 @@ public class NanoFixMessageBench {
         ByteBuffer buffer = ByteBuffer.allocate(256);
         FIXMessage msg = new NanoFIXMessage(buffer);
         NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();
-        LogonMessageReader reader = new LogonMessageReader();
-        ByteBuffer decodeBuffer = NanoFixMessageBench.createBuffer(LOGON_RESET);
+        NanoFIXMessageDecoder2 decoder2 = new NanoFIXMessageDecoder2();
+        LogonMessageReader logonReader = new LogonMessageReader();
+        LogonMessageReader2 logonReader2 = new LogonMessageReader2();
+        ByteBuffer decodeBuffer = NanoFixBenchData.createBuffer(LOGON);
+        ByteBuffer marketDataBuffer = NanoFixBenchData.createBuffer(MD_SNAPSHOT);
+        byte[] intBytes = ByteArrayUtil.asByteArray(743);
     }
 
     //@Benchmark
@@ -103,17 +104,36 @@ public class NanoFixMessageBench {
         hole.consume(msg.encode(state.encodeBuffer, 0));
     }
 
-    @Benchmark
+    //@Benchmark
     public void decodeLogonMessage(BenchmarkState state) {
-        state.decodeBuffer.reset();
-        state.decoder.decode(state.decodeBuffer, state.reader);
+        //state.decodeBuffer.reset();
+        state.logonReader.clear();
+        state.decoder.decode(state.decodeBuffer, state.logonReader);
     }
 
-    static ByteBuffer createBuffer(String msgString) {
-        ByteBuffer buffer = ByteBuffer.allocate(msgString.length());
-        ByteBufferUtil.putBytes(buffer, ByteArrayUtil.asByteArray(msgString.replaceAll("\\|", String.valueOf((char) FIXBytes.SOH))));
-        buffer.flip();
-        buffer.mark();
-        return buffer;
+    @Benchmark
+    public void decodeMarketDataSnapshot(BenchmarkState state) {
+        //state.marketDataBuffer.reset();
+        state.logonReader.clear();
+        state.decoder.decode(state.marketDataBuffer, state.logonReader);
     }
+
+    @Benchmark
+    public void decodeMarketDataSnapshot2(BenchmarkState state) {
+        //state.marketDataBuffer.reset();
+        state.logonReader2.clear();
+        state.decoder2.decode(state.marketDataBuffer, state.logonReader2);
+    }
+
+    static class SoakRunner {
+
+        public static void main(String[] args) {
+            BenchmarkState state = new BenchmarkState();
+            NanoFixMessageBench bench = new NanoFixMessageBench();
+            while (true) {
+                bench.decodeMarketDataSnapshot2(state);
+            }
+        }
+    }
+
 }

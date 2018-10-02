@@ -28,6 +28,16 @@ public class NanoMessageHeader implements MessageHeader {
     private long sendingTime;
 
     @Override
+    public void clear() {
+        this.beginString = null;
+        this.msgType = null;
+        this.senderCompId = null;
+        this.targetCompId = null;
+        this.msgSeqNum = 0;
+        this.sendingTime = 0;
+    }
+
+    @Override
     public void copyFrom(MessageHeader other) {
         this.beginString = other.beginString();
         this.msgType = other.msgType();

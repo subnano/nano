@@ -56,7 +56,7 @@ public class DefaultKxConnection implements KxConnection {
     @Override
     public void sync(String table, String command, Object data) {
         try {
-            LOGGER.trace("sync: table:{} command:{} date:{}", table, command, data);
+            LOGGER.trace("sync: table:{} command:{} data:{}", table, command, data);
             Object response = c.k(command, table, data);
             // TODO need a more sensible return object
             LOGGER.trace("Kx response: {}", response);

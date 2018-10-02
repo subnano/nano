@@ -2,9 +2,8 @@ package net.nanofix.message;
 
 import io.nano.core.buffer.AsciiBufferUtil;
 import io.nano.core.buffer.ByteBufferUtil;
+import io.nano.core.util.ByteArrayUtil;
 import net.nanofix.message.util.ChecksumCalculator;
-import net.nanofix.util.FIXBytes;
-import net.nanofix.util.TagBytes;
 
 import java.nio.ByteBuffer;
 
@@ -31,7 +30,7 @@ import static net.nanofix.util.FIXBytes.SOH;
  * <p>
  * @author Mark Wardell
  */
-public class NanoFIXMessageDecoder implements FIXMessageDecoder {
+public class NanoFIXMessageDecoder2 implements FIXMessageDecoder2 {
 
     private static final String EQUAL_NOT_FOUND_ERROR_MESSAGE = "Tag value delimiter '=' not found after index";
     private static final String SOH_NOT_FOUND_ERROR_MESSAGE = "Field delimiter 'SOH' not found after index";
@@ -45,9 +44,19 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
     private static final int MIN_BODY_LEN = 5; // 8=FIX.4.x|9=NN|35=X|10=nnn|
     private static final int MAX_BODY_LEN = 1024 * 1024;
 
-    @Override
-    public void decode(ByteBuffer buffer, FIXMessageVisitor visitor) {
+    private final byte[] tagBytes = new byte[16];
 
+    @Override
+    public void decode(ByteBuffer buffer, FIXMessageVisitor2 visitor) {
+        // TODO different implementations for different ByteBuffer implementations
+        if (buffer.hasArray())
+            decodeByteArray(buffer, visitor, buffer.position());
+        else
+            decodeDirectBuffer(buffer, visitor);
+    }
+
+    private void decodeByteArray(ByteBuffer buffer, FIXMessageVisitor2 visitor, int endIndex) {
+        byte[] bytes = buffer.array();
         // start at current position?
         int initialOffset = 0;
 
@@ -56,7 +65,107 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
         int bodyStartIndex = 0;
         int tagIndex = initialOffset;
         int tagCount = 0;
-        while (tagIndex < buffer.position()) {
+        while (tagIndex < endIndex) {
+            int equalIndex = ByteArrayUtil.indexOf(bytes, tagIndex, EQUALS);
+            if (equalIndex == NOT_FOUND_INDEX) {
+                visitor.onError(tagIndex, EQUAL_NOT_FOUND_ERROR_MESSAGE);
+                break;
+            }
+
+            int valueIndex = equalIndex + 1;
+            int sohIndex = ByteArrayUtil.indexOf(bytes, valueIndex, SOH);
+            if (sohIndex == NOT_FOUND_INDEX) {
+                visitor.onError(valueIndex, SOH_NOT_FOUND_ERROR_MESSAGE);
+                break;
+            }
+
+            int tag = AsciiBufferUtil.getInt(bytes, tagIndex, equalIndex - tagIndex);
+            int valueLen = sohIndex - valueIndex;
+
+            // check first three tags are correct
+            if (tagCount <= 2) {
+
+                // check first tag is the FIX BeginString
+                if (tagCount == 0) {
+                    if (tag != Tags.BeginString) {
+                        visitor.onError(tagIndex, BEGIN_STRING_ERROR_MESSAGE);
+                        break;
+                    }
+                }
+                // check second tag is MsgBody
+                else if (tagCount == 1) {
+                    if (tag != Tags.BodyLength) {
+                        visitor.onError(tagIndex, BODY_LEN_SECOND_FIELD_ERROR_MESSAGE);
+                        break;
+                    }
+                    if (valueLen > 4) {
+                        visitor.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
+                        break;
+                    }
+                    bodyLen = AsciiBufferUtil.getInt(bytes, valueIndex, valueLen);
+
+                    if (bodyLen < MIN_BODY_LEN || bodyLen > MAX_BODY_LEN) {
+                        visitor.onError(tagIndex, BODY_LEN_INVALID_ERROR_MESSAGE);
+                        break;
+                    }
+
+                    // return and wait for more data
+                    // TODO need to account for bytes already read + test
+                    if (bodyLen > bytes.length) {
+                        break;
+                    }
+
+                    // keep a record of when the body starts
+                    bodyStartIndex = sohIndex + 1;
+                }
+
+                // check third tag is MsgType
+                else if (tagCount == 2) {
+                    if (tag != Tags.MsgType) {
+                        visitor.onError(tagIndex, MSG_TYPE_THIRD_FIELD_ERROR_MESSAGE);
+                        break;
+                    }
+                }
+            }
+
+            // last consistency check for checksum field
+            else if (tag == Tags.CheckSum) {
+                int actualBodyLength = tagIndex - bodyStartIndex;
+                if (bodyLen != actualBodyLength) {
+                    visitor.onError(tagIndex, BODY_LEN_INCORRECT_ERROR_MESSAGE);
+                }
+                // check that checksum value is correct
+                int checksum = AsciiBufferUtil.getInt(bytes, valueIndex, valueLen);
+                int calculatedChecksum = ChecksumCalculator.calculateChecksum(
+                        bytes, initialOffset, tagIndex - initialOffset);
+
+                if (checksum != calculatedChecksum) {
+                    visitor.onError(tagIndex, CHECKSUM_INCORRECT_ERROR_MESSAGE);
+                }
+            }
+
+            // notify visitor of next tag value pair
+            visitor.onTag(buffer, tag, valueIndex, valueLen);
+
+            // move offset to next available byte
+            tagIndex = sohIndex + 1;
+
+            // increment the tag counter
+            tagCount++;
+        }
+    }
+
+    private void decodeDirectBuffer(ByteBuffer buffer, FIXMessageVisitor2 visitor) {
+        // start at current position?
+        int initialOffset = 0;
+
+        // initialise a few counters
+        int bodyLen = 0;
+        int bodyStartIndex = 0;
+        int tagIndex = initialOffset;
+        int tagCount = 0;
+        int endIndex = buffer.position();
+        while (tagIndex < endIndex) {
             int equalIndex = ByteBufferUtil.indexOf(buffer, tagIndex, EQUALS);
             if (equalIndex == NOT_FOUND_INDEX) {
                 visitor.onError(tagIndex, EQUAL_NOT_FOUND_ERROR_MESSAGE);
@@ -65,23 +174,27 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
             int tagLen = equalIndex - tagIndex;
             int valueIndex = equalIndex + 1;
 
-            int startOfHeaderIndex = ByteBufferUtil.indexOf(buffer, valueIndex, SOH);
-            if (startOfHeaderIndex == NOT_FOUND_INDEX) {
+            // Read the tag bytes into our array before we create the integer
+            buffer.get(tagBytes, tagIndex, tagLen);
+            int tag = AsciiBufferUtil.getInt(tagBytes, 0, tagLen);
+
+            int sohIndex = ByteBufferUtil.indexOf(buffer, valueIndex, SOH);
+            if (sohIndex == NOT_FOUND_INDEX) {
                 visitor.onError(valueIndex, SOH_NOT_FOUND_ERROR_MESSAGE);
                 break;
             }
-            int valueLen = startOfHeaderIndex - valueIndex;
+            int valueLen = sohIndex - valueIndex;
 
             // check first tag is the FIX BeginString
             if (tagCount == 0) {
-                if (!ByteBufferUtil.hasBytes(buffer, tagIndex, FIXBytes.BEGIN_STRING_PREFIX)) {
+                if (tag != Tags.BeginString) {
                     visitor.onError(tagIndex, BEGIN_STRING_ERROR_MESSAGE);
                     break;
                 }
             }
             // check MsgBody
             else if (tagCount == 1) {
-                if (!ByteBufferUtil.hasByte(buffer, tagIndex, FIXBytes.BODY_LEN_TAG)) {
+                if (tag != Tags.BodyLength) {
                     visitor.onError(tagIndex, BODY_LEN_SECOND_FIELD_ERROR_MESSAGE);
                     break;
                 }
@@ -104,14 +217,14 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
 
             // check MsgType is the third field
             else if (tagCount == 2) {
-                if (!ByteBufferUtil.hasBytes(buffer, tagIndex, TagBytes.MsgType)) {
+                if (tag != Tags.MsgType) {
                     visitor.onError(tagIndex, MSG_TYPE_THIRD_FIELD_ERROR_MESSAGE);
                     break;
                 }
             }
 
             // last consistency check for checksum field
-            if (ByteBufferUtil.hasBytes(buffer, tagIndex, FIXBytes.CHECKSUM_PREFIX)) {
+            else if (tag == Tags.CheckSum) {
                 int actualBodyLength = tagIndex - bodyStartIndex;
                 if (bodyLen != actualBodyLength) {
                     visitor.onError(tagIndex, BODY_LEN_INCORRECT_ERROR_MESSAGE);
@@ -122,13 +235,13 @@ public class NanoFIXMessageDecoder implements FIXMessageDecoder {
                         buffer, initialOffset, tagIndex - initialOffset);
 
                 if (checksum != calculatedChecksum) {
-                    System.out.println("checksum:" + checksum + " calculatedChecksum: " + calculatedChecksum);
+                    //System.out.println("checksum:" + checksum + " calculatedChecksum: " + calculatedChecksum);
                     visitor.onError(tagIndex, CHECKSUM_INCORRECT_ERROR_MESSAGE);
                 }
             }
 
             // notify visitor of next tag value pair
-            visitor.onTag(buffer, tagIndex, tagLen, valueLen);
+            visitor.onTag(buffer, tag, valueIndex, valueLen);
 
             // move offset to next available byte
             tagIndex += (tagLen + valueLen + 2);

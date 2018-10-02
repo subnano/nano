@@ -3,6 +3,9 @@ package net.nanofix.message;
 import io.nano.core.lang.ByteString;
 
 public interface MessageHeader {
+
+    void clear();
+
     void copyFrom(MessageHeader other);
 
     ByteString beginString();

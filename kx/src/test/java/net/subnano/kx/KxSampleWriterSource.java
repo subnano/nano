@@ -10,10 +10,11 @@ package net.subnano.kx;
     @Override
     public KxSchema schema() {
         return new DefaultKxSchema.Builder()
-                .forTable(SAMPLE_TABLE_NAME)
+                .table(SAMPLE_TABLE_NAME)
                 .addColumn("sym", ColumnType.String)
                 .addColumn("age", ColumnType.Int)
                 .addColumn("time", ColumnType.Timestamp)
+                .batchSize(2)
                 .build();
     }
 
@@ -32,5 +33,6 @@ package net.subnano.kx;
         buffer.addString(source.name);
         buffer.addInt(source.age);
         buffer.addTimestamp(source.time);
+        buffer.completeRow();
     }
 }

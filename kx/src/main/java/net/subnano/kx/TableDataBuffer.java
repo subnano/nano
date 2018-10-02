@@ -5,24 +5,27 @@ import java.util.Date;
 
 /**
  * Not so much a buffer as a utility method to access the Object[][]
+ * Overall class hierarchy needs a review as it has evolved into something less intuitive
+ * especially since the introduction of batching.
  */
 public class TableDataBuffer {
 
-    // We may want to support writing multiple rows
-    private final int rowIndex = 0;
     private final String[] columnNames;
     private final Object[] tableData;
+    private final int size;
 
-    // pointer to column to be updated
+    // pointers to row and column to be updated
+    private int rowIndex = 0;
     private int colIndex = 0;
 
-    TableDataBuffer(String[] columnNames, Object[] tableData) {
+    TableDataBuffer(String[] columnNames, Object[] tableData, int size) {
         this.columnNames = columnNames;
         this.tableData = tableData;
+        this.size = size;
     }
 
     public static TableDataBuffer fromSchema(KxSchema schema) {
-        return new TableDataBuffer(schema.columnNames(), schema.data());
+        return new TableDataBuffer(schema.columnNames(), schema.data(), schema.batchSize());
     }
 
     /**
@@ -111,12 +114,46 @@ public class TableDataBuffer {
         colIndex++;
     }
 
+    public void completeRow() {
+        rowIndex++;
+    }
+
     public String[] columnNames() {
         return columnNames;
     }
 
     public Object[] tableData() {
         return tableData;
+    }
+
+    /**
+     * Clear all row and column pointers
+     */
+    public void clear() {
+        rowIndex = 0;
+        colIndex = 0;
+    }
+
+    /**
+     * Returns the number of records currently stored in the buffer ready to be written to Kx
+     *
+     * @return count as a positive integer
+     */
+    public int count() {
+        return rowIndex;
+    }
+
+    /**
+     * Returns the number of records that can be inserted into the buffer before writing to Kx
+     *
+     * @return size as a positive integer
+     */
+    public int size() {
+        return size;
+    }
+
+    public boolean isFull() {
+        return rowIndex == size;
     }
 }
 
