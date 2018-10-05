@@ -11,7 +11,7 @@
     <parent>
         <groupId>net.subnano</groupId>
         <artifactId>codec</artifactId>
-        <version>2018.10.3-SNAPSHOT</version>
+        <version>2018.10.3</version>
     </parent>
 
     <dependencies>
