@@ -1,5 +1,7 @@
 package net.subnano.kx;
 
+import kx.c;
+import kx.c.Timespan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +30,9 @@ class TableDataBufferTest {
                 .addDouble(6.0d)
                 .addByte((byte) 7)
                 .addChar('8')
-                .addBoolean(true);
+                .addBoolean(true)
+                .addTimespan(132);
+        ;
 
         assertThat(buffer.columnNames()).isEqualTo(TestSchema.COLUMN_NAMES);
         assertThat(buffer.tableData()).isEqualTo(new Object[] {
@@ -40,6 +44,7 @@ class TableDataBufferTest {
                 new byte[]{7},
                 new char[]{'8'},
                 new boolean[]{true},
+                new Timespan[]{new Timespan(132)},
         });
     }
 }

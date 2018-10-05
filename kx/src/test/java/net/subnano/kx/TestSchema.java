@@ -1,5 +1,7 @@
 package net.subnano.kx;
 
+import kx.c.Timespan;
+
 /**
  * @author Mark Wardell
  */
@@ -18,6 +20,7 @@ public class TestSchema {
             new byte[]{0},
             new char[]{0},
             new boolean[]{false},
+            new Timespan[]{new Timespan(132)}
     };
 
     static final KxSchema SCHEMA = new DefaultKxSchema.Builder()
@@ -30,6 +33,7 @@ public class TestSchema {
             .addColumn("F", ColumnType.Byte)
             .addColumn("G", ColumnType.Char)
             .addColumn("H", ColumnType.Boolean)
+            .addColumn("I", ColumnType.Timespan)
             .build();
 
 }

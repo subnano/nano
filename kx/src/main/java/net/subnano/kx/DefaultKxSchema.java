@@ -1,5 +1,8 @@
 package net.subnano.kx;
 
+import kx.c;
+import kx.c.Timespan;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -122,6 +125,9 @@ public class DefaultKxSchema implements KxSchema {
                         break;
                     case Timestamp:
                         data[i] = new Timestamp[batchSize];
+                        break;
+                    case Timespan:
+                        data[i] = new Timespan[batchSize];
                         break;
                     default:
                         throw new IllegalArgumentException("Unsupported column type: " + type);

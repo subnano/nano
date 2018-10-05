@@ -1,5 +1,8 @@
 package net.subnano.kx;
 
+import kx.c;
+import kx.c.Timespan;
+
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -110,6 +113,25 @@ public class TableDataBuffer {
             ((Timestamp[]) colData)[rowIndex] = timestamp;
         } else {
             timestamp.setTime(value);
+        }
+        colIndex++;
+    }
+
+    /**
+     * Add Timespan value to buffer
+     *
+     * @param value Timespan long values are in nanoseconds
+     */
+    public void addTimespan(long value) {
+        Object colData = tableData[colIndex];
+        if (!(colData instanceof Timespan[]))
+            throw new ClassCastException(colData.getClass() + " cannot be cast to Timespan[] when updating column " + columnNames[colIndex]);
+        Timespan timespan = ((Timespan[]) colData)[rowIndex];
+        if (timespan == null) {
+            timespan= new Timespan(value);
+            ((Timespan[]) colData)[rowIndex] = timespan;
+        } else {
+            timespan.j = value;
         }
         colIndex++;
     }

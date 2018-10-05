@@ -10,5 +10,6 @@ public enum ColumnType {
     Char,
     String,
     DateTime,
-    Timestamp
+    Timestamp,
+    Timespan
 }
