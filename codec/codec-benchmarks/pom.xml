@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.subnano</groupId>
         <artifactId>codec</artifactId>
-        <version>2018.10.2-SNAPSHOT</version>
+        <version>2018.10.2</version>
     </parent>
 
     <properties>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>net.subnano.codec</groupId>
             <artifactId>json-codec</artifactId>
-            <version>2018.10.2-SNAPSHOT</version>
+            <version>2018.10.2</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
