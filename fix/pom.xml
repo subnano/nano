@@ -15,7 +15,7 @@
     <parent>
         <groupId>net.subnano</groupId>
         <artifactId>nano</artifactId>
-        <version>2018.10.2</version>
+        <version>2018.10.3-SNAPSHOT</version>
     </parent>
 
     <modules>
@@ -72,7 +72,7 @@
             <dependency>
                 <groupId>net.nanofix</groupId>
                 <artifactId>nanofix-core</artifactId>
-                <version>2018.10.2</version>
+                <version>2018.10.3-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
