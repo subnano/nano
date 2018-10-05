@@ -1,5 +1,14 @@
 package io.nano.core.collection;
 
+/**
+ * A high performance, zero allocation primitive map
+ *
+ * Does not implement {@link java.util.Map#keySet()} and {@link java.util.Map#values()} which would result in object allocation.
+ *
+ * Uses a mutable iterator instead.
+ *
+ * TODO putIfAbsent
+ */
 public interface IntIntMap {
 
     /**
@@ -25,7 +34,7 @@ public interface IntIntMap {
     int put(final int key, final int value);
 
     /**
-     * Removed the entry referenced by the given key from the map.
+     * Removes the entry referenced by the given key from the map.
      *
      * @param key the key of the map entry.
      * @return the previous value for this key or {@code -1} if there was no previous mapping.
@@ -38,5 +47,10 @@ public interface IntIntMap {
      * @return the size of the map.
      */
     int size();
+
+    /**
+     * Custom iterator that avoids object allocation
+     */
+    IntIterator iterator();
 
 }

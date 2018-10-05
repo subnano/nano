@@ -1,8 +1,13 @@
 package io.nano.core.collection;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class NanoIntObjectMapTest {
 
@@ -41,6 +46,24 @@ class NanoIntObjectMapTest {
         for (final float ff : FILL_FACTORS) {
             mapTestHelper(ff);
         }
+    }
+
+    @Test
+    void iterator() {
+        IntObjectMap<String> map = makeMap(32, 0.75f);
+        map.put(1, "11");
+        map.put(2, "22");
+        map.put(3, "33");
+        Map<Integer, String> newMap = Mockito.mock(Map.class);
+        IntIterator iterator = map.iterator();
+        int key;
+        while ((key = iterator.nextKey()) != -1) {
+            newMap.put(key, map.get(key));
+        }
+        verify(newMap).put(1, "11");
+        verify(newMap).put(2, "22");
+        verify(newMap).put(3, "33");
+        verifyNoMoreInteractions(newMap);
     }
 
 }

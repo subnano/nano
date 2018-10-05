@@ -54,6 +54,11 @@ public class NanoIntIntMap implements IntIntMap {
      */
     private int mask2;
 
+    /**
+     * mutable iterator used to iterate through entire collection
+     */
+    private final NanoIntIterator iterator;
+
     public NanoIntIntMap(final int size, final float fillFactor) {
         if (fillFactor <= 0 || fillFactor >= 1) {
             throw new IllegalArgumentException("FillFactor must be in (0, 1)");
@@ -71,6 +76,7 @@ public class NanoIntIntMap implements IntIntMap {
         this.fillFactor = fillFactor;
         this.data = new int[capacity * 2];
         this.threshold = (int)(capacity * fillFactor);
+        this.iterator = new NanoIntIterator();
     }
 
     @Override
@@ -174,6 +180,12 @@ public class NanoIntIntMap implements IntIntMap {
         return size;
     }
 
+    @Override
+    public IntIterator iterator() {
+        iterator.reset();
+        return iterator;
+    }
+
     /**
      * Returns the array index for the given key
      */
@@ -234,4 +246,30 @@ public class NanoIntIntMap implements IntIntMap {
         }
     }
 
+    class NanoIntIterator implements IntIterator {
+
+        // an index of -1 indicates state prior to start
+        private int index = -2;
+
+        @Override
+        public int nextKey() {
+            while ((index += 2) < mask2) {
+                int key = data[index];
+                if (key == FREE_KEY && isFreeKeySet) {
+                    return key;
+                }
+                if (key != FREE_KEY) {
+                    return key;
+                }
+            }
+            return KEY_MISSING;
+        }
+
+        /**
+         * Not visible to API through interface but called by the collection
+         */
+        void reset() {
+            index = -2;
+        }
+    }
 }

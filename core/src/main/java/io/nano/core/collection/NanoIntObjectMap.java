@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class NanoIntObjectMap<V> implements IntObjectMap<V> {
 
     private static final int FREE_KEY = 0;
-    private static final Object REMOVED_KEY = new Object();
+    private static final int KEY_MISSING = -1;
 
     /**
      * Keys and values stored in same array for performance reasons
@@ -50,6 +50,11 @@ public class NanoIntObjectMap<V> implements IntObjectMap<V> {
     private int mask;
     private int mask2;
 
+    /**
+     * Mutable iterator used to iterate through entire collection
+     */
+    private final NanoIntIterator iterator;
+
     public NanoIntObjectMap(final int size, final float fillFactor) {
         if (fillFactor <= 0 || fillFactor >= 1) {
             throw new IllegalArgumentException("FillFactor must be in (0, 1)");
@@ -69,6 +74,7 @@ public class NanoIntObjectMap<V> implements IntObjectMap<V> {
         Arrays.fill(data, FREE_KEY);
 
         threshold = (int)(capacity * fillFactor);
+        this.iterator = new NanoIntIterator();
     }
 
     @Override
@@ -166,6 +172,12 @@ public class NanoIntObjectMap<V> implements IntObjectMap<V> {
         return size;
     }
 
+    @Override
+    public IntIterator iterator() {
+        iterator.reset();
+        return iterator;
+    }
+
     /**
      * Returns the array index for the given key
      */
@@ -243,4 +255,30 @@ public class NanoIntObjectMap<V> implements IntObjectMap<V> {
         }
     }
 
+    class NanoIntIterator implements IntIterator {
+
+        // an index of -1 indicates state prior to start
+        private int index = -2;
+
+        @Override
+        public int nextKey() {
+            while ((index += 2) < mask2) {
+                int key = (int) data[index];
+                if (key == FREE_KEY && isFreeKeySet) {
+                    return key;
+                }
+                if (key != FREE_KEY) {
+                    return key;
+                }
+            }
+            return KEY_MISSING;
+        }
+
+        /**
+         * Not visible to API through interface but called by the collection
+         */
+        void reset() {
+            index = -2;
+        }
+    }
 }

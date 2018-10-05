@@ -62,7 +62,7 @@ public class DefaultKxConnection implements KxConnection {
             LOGGER.trace("Kx response: {}", response);
             listener.onMessage(response);
         } catch (Exception e) {
-            LOGGER.error("Error writing record to kx: {}", e);
+            LOGGER.error("Error writing record to kx: {}", e, e);
             listener.onError(e);
         }
     }
