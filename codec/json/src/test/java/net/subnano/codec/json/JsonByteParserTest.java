@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Mark Wardell
  */
-class JsonByteParserTest {
+public class JsonByteParserTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
     private JsonByteParser parser;

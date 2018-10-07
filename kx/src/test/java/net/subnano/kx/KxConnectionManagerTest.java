@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
  * Might make this a manual test.
  */
 @Disabled
-class KxConnectionManagerTest {
+public class KxConnectionManagerTest {
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
     }

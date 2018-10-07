@@ -13,7 +13,7 @@ import static net.nanofix.util.FIXBytes.PIPE;
 import static net.nanofix.util.FIXBytes.SOH;
 
 // Will not run unless class is public
-class NanoFIXMessageTest {
+public class NanoFIXMessageTest {
 
     private static final ByteString SENDER_COMP_ID = ByteString.of("CLIENT");
     private static final ByteString TARGET_COMP_ID = ByteString.of("BROKER");

@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.TimeZone;
 
-class ISODateTimeDecoderTest {
+public class ISODateTimeDecoderTest {
 
     private ByteBuffer buffer;
     private DateFormat formatter;

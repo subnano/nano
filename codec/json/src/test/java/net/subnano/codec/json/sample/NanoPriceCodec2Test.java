@@ -10,7 +10,7 @@ import static net.subnano.codec.json.sample.SampleData.SAMPLE_PRICE;
 /**
  * @author Mark Wardell
  */
-class NanoPriceCodec2Test {
+public class NanoPriceCodec2Test {
 
     @Test
     void name() {

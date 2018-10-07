@@ -1,16 +1,18 @@
 package net.subnano.kx;
 
-import kx.c;
 import kx.c.Timespan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Mark Wardell
  */
-class TableDataBufferTest {
+public class TableDataBufferTest {
 
     private TableDataBuffer buffer;
 
@@ -22,29 +24,35 @@ class TableDataBufferTest {
     @Test
     void fromSchema() {
         buffer
-                .reset()
-                .addString("1")
-                .addShort((short) 2)
-                .addInt(3)
-                .addLong(4L)
-                .addDouble(6.0d)
-                .addByte((byte) 7)
-                .addChar('8')
-                .addBoolean(true)
-                .addTimespan(132);
+            .reset()
+            .addBoolean(true)
+            .addByte((byte) 17)
+            .addChar('3')
+            .addShort((short) 11)
+            .addInt(111)
+            .addLong(1111L)
+            .addDouble(1.1d)
+            .addString("11111111")
+            .addDateTime(1234)
+            .addTimestamp(12345)
+            .addTimespan(123456)
+            .addCharArray("1234567".toCharArray())
         ;
 
         assertThat(buffer.columnNames()).isEqualTo(TestSchema.COLUMN_NAMES);
         assertThat(buffer.tableData()).isEqualTo(new Object[] {
-                new String[]{"1"},
-                new short[]{2},
-                new int[]{3},
-                new long[]{4L},
-                new double[]{6.0d},
-                new byte[]{7},
-                new char[]{'8'},
-                new boolean[]{true},
-                new Timespan[]{new Timespan(132)},
+                new boolean[]{true, false},
+                new byte[]{17, 0},
+                new char[]{'3', 0},
+                new short[]{11, 0},
+                new int[]{111, 0},
+                new long[]{1111L, 0L},
+                new double[]{1.1d, 0.0D},
+                new String[]{"11111111", null},
+                new Date[]{new Date(1234), null},
+                new Timestamp[]{new Timestamp(12345), null},
+                new Timespan[]{new Timespan(123456), null},
+                new char[][]{ "1234567".toCharArray(), null}
         });
     }
 }

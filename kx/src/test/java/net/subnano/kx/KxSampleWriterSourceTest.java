@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Mark Wardell
  */
-class KxSampleWriterSourceTest {
+public class KxSampleWriterSourceTest {
 
     private KxWriterSource<KxSample> kxWriterSource;
     private KxSample kxSample;

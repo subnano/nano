@@ -1,5 +1,8 @@
 package net.subnano.kx;
 
+/**
+ * @author Mark Wardell
+ */
 public enum ColumnType {
     Boolean,
     Byte,
@@ -11,5 +14,6 @@ public enum ColumnType {
     String,
     DateTime,
     Timestamp,
-    Timespan
+    Timespan,
+    CharArray
 }

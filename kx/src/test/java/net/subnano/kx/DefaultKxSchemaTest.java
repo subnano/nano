@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Mark Wardell
  */
-class DefaultKxSchemaTest {
+public class DefaultKxSchemaTest {
 
     private KxSchema schema;
 
@@ -16,14 +16,19 @@ class DefaultKxSchemaTest {
     void setUp() {
         this.schema = new DefaultKxSchema.Builder()
                 .table(TestSchema.TABLE_NAME)
-                .addColumn("A", ColumnType.String)
-                .addColumn("B", ColumnType.Short)
-                .addColumn("C", ColumnType.Int)
-                .addColumn("D", ColumnType.Long)
-                .addColumn("E", ColumnType.Double)
-                .addColumn("F", ColumnType.Byte)
-                .addColumn("G", ColumnType.Char)
-                .addColumn("H", ColumnType.Boolean)
+                .addColumn("A", ColumnType.Boolean)
+                .addColumn("B", ColumnType.Byte)
+                .addColumn("C", ColumnType.Char)
+                .addColumn("D", ColumnType.Short)
+                .addColumn("E", ColumnType.Int)
+                .addColumn("F", ColumnType.Long)
+                .addColumn("G", ColumnType.Double)
+                .addColumn("H", ColumnType.String)
+                .addColumn("I", ColumnType.DateTime)
+                .addColumn("J", ColumnType.Timestamp)
+                .addColumn("K", ColumnType.Timespan)
+                .addColumn("L", ColumnType.CharArray)
+                .batchSize(2)
                 .build();
     }
 
@@ -39,7 +44,7 @@ class DefaultKxSchemaTest {
 
     @Test
     void data() {
-        assertThat(schema.data()).isEqualTo(TestSchema.TABLE_DATA);
+        assertThat(schema.data()).isEqualTo(TestSchema.EMPTY_TABLE_DATA);
     }
 
 }

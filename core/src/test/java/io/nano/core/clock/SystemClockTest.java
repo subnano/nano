@@ -6,7 +6,7 @@ import java.util.function.LongSupplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SystemClockTest {
+public class SystemClockTest {
 
     private static final int THOUSAND = 1_000;
     private static final int MILLION = 1_000_000;

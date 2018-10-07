@@ -129,6 +129,9 @@ public class DefaultKxSchema implements KxSchema {
                     case Timespan:
                         data[i] = new Timespan[batchSize];
                         break;
+                    case CharArray:
+                        data[i] = new char[batchSize][];
+                        break;
                     default:
                         throw new IllegalArgumentException("Unsupported column type: " + type);
                 }

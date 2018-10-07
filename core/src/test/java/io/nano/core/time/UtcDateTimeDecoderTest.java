@@ -10,7 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-class UtcDateTimeDecoderTest {
+public class UtcDateTimeDecoderTest {
 
     private ByteBuffer buffer;
     private DateFormat formatter;

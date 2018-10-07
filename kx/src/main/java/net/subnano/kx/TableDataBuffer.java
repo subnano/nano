@@ -1,6 +1,5 @@
 package net.subnano.kx;
 
-import kx.c;
 import kx.c.Timespan;
 
 import java.sql.Timestamp;
@@ -10,6 +9,8 @@ import java.util.Date;
  * Not so much a buffer as a utility method to access the Object[][]
  * Overall class hierarchy needs a review as it has evolved into something less intuitive
  * especially since the introduction of batching.
+ *
+ * @author Mark Wardell
  */
 public class TableDataBuffer {
 
@@ -90,7 +91,7 @@ public class TableDataBuffer {
         return this;
     }
 
-    public void addDateTime(long value) {
+    public TableDataBuffer addDateTime(long value) {
         Object colData = tableData[colIndex];
         if (!(colData instanceof Date[]))
             throw new ClassCastException(colData.getClass() + " cannot be cast to Date[] when updating column " + columnNames[colIndex]);
@@ -101,9 +102,10 @@ public class TableDataBuffer {
         }
         date.setTime(value);
         colIndex++;
+        return this;
     }
 
-    public void addTimestamp(long value) {
+    public TableDataBuffer addTimestamp(long value) {
         Object colData = tableData[colIndex];
         if (!(colData instanceof Timestamp[]))
             throw new ClassCastException(colData.getClass() + " cannot be cast to Timestamp[] when updating column " + columnNames[colIndex]);
@@ -115,6 +117,7 @@ public class TableDataBuffer {
             timestamp.setTime(value);
         }
         colIndex++;
+        return this;
     }
 
     /**
@@ -122,7 +125,7 @@ public class TableDataBuffer {
      *
      * @param value Timespan long values are in nanoseconds
      */
-    public void addTimespan(long value) {
+    public TableDataBuffer addTimespan(long value) {
         Object colData = tableData[colIndex];
         if (!(colData instanceof Timespan[]))
             throw new ClassCastException(colData.getClass() + " cannot be cast to Timespan[] when updating column " + columnNames[colIndex]);
@@ -134,6 +137,22 @@ public class TableDataBuffer {
             timespan.j = value;
         }
         colIndex++;
+        return this;
+    }
+
+    /**
+     * Add char[] value to buffer
+     *
+     * @param value char array
+     */
+    public TableDataBuffer addCharArray(char[] value) {
+        Object colData = tableData[colIndex];
+        if (!(colData instanceof char[][]))
+            throw new ClassCastException(colData.getClass() + " cannot be cast to char[][] when updating column " + columnNames[colIndex]);
+        char[][] charArray = ((char[][])colData);
+        charArray[rowIndex] = value;
+        colIndex++;
+        return this;
     }
 
     public void completeRow() {

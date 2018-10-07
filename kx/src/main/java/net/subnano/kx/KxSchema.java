@@ -1,5 +1,8 @@
 package net.subnano.kx;
 
+/**
+ * @author Mark Wardell
+ */
 public interface KxSchema {
 
     /**

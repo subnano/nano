@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Mark Wardell
  */
-class ByteStringTest {
+public class ByteStringTest {
 
     @Test
     void equalityOfNullStrings() {

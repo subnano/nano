@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ThreadFactoriesTest {
+public class ThreadFactoriesTest {
 
     @Test
     void newDaemonThreadFactory() {

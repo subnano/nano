@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MathsTest {
+public class MathsTest {
 
     @Test
     void pow10() {

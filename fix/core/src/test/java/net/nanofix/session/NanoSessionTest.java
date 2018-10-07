@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class NanoSessionTest implements SessionListener {
+public class NanoSessionTest implements SessionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NanoSessionTest.class);
 

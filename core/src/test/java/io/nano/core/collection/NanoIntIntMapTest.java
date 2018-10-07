@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class NanoIntIntMapTest {
+public class NanoIntIntMapTest {
 
     private final static float[] FILL_FACTORS = {0.25f, 0.5f, 0.75f, 0.9f, 0.99f};
     private static final int COUNT = 500;

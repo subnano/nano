@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-class LogonMessageReaderTest {
+public class LogonMessageReaderTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
     private NanoFIXMessageDecoder decoder = new NanoFIXMessageDecoder();

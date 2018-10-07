@@ -10,7 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-class UtcDateTimeEncoderTest {
+public class UtcDateTimeEncoderTest {
 
     private static final int TIMESTAMP_LENGTH = 21;
 

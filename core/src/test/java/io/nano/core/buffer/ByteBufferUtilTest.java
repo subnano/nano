@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ByteBufferUtilTest {
+public class ByteBufferUtilTest {
 
     @Test
     void hexDump() {

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Mark Wardell
  */
-class AsciiBufferUtilTest {
+public class AsciiBufferUtilTest {
 
     private ByteBuffer buffer = ByteBuffer.allocate(32);
 
