@@ -9,6 +9,7 @@ public final class StringUtil {
     public static String formatNumber(double value, int precision) {
         // special use cases are when precision is zero or when number has a leading zero
         // TODO handle half up rounding if require or a separate methos
+        // TODO move most of this to BAU.putDouble(v,p)
         if (value < 0.0)
             throw new IllegalArgumentException("Negative numbers not supported");
         long scaledNumber = (long) (value * (double) Maths.pow10(precision));
