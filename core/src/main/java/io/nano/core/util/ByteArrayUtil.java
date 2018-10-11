@@ -268,4 +268,25 @@ public class ByteArrayUtil {
         return NOT_FOUND_INDEX;
     }
 
+    public static void putInt(int value, byte[] bytes, int offset) {
+        int len = Maths.numberDigits(value);
+        for (int i = 0; i < len; i++) {
+            int power = Maths.pow10(len - i - 1);
+            byte digit = (byte) Math.floorDiv(value, power);
+            bytes[offset + i] = (byte) (digit + '0');
+            value -= (digit * power);
+        }
+    }
+
+    public static void putLong(long value, byte[] bytes, int offset) {
+        int len = Maths.numberDigits(value);
+        for (int i = 0; i < len; i++) {
+            int power = Maths.pow10(len - i - 1);
+            byte digit = (byte) Math.floorDiv(value, power);
+            bytes[offset + i] = (byte) (digit + '0');
+            value -= (digit * power);
+        }
+    }
+
+
 }

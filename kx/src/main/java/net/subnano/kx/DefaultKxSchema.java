@@ -1,6 +1,5 @@
 package net.subnano.kx;
 
-import kx.c;
 import kx.c.Timespan;
 
 import java.sql.Timestamp;
