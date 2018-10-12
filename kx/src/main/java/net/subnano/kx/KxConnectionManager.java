@@ -90,7 +90,7 @@ public class KxConnectionManager implements KxConnection {
     }
 
     @Override
-    public Object subscribe(String table) {
+    public KxTableReader subscribe(String table) {
         return connection.subscribe(table);
     }
 

@@ -74,7 +74,6 @@ public class DefaultKxConnection implements KxConnection {
             c.ks(command, table, data);
         } catch (IOException e) {
             // commonly see a SocketException when kx process dies
-            // TODO buffer record for offline persistence
             LOGGER.error("Error writing record to kx: {}", e);
             listener.onError(e);
         }
@@ -101,9 +100,20 @@ public class DefaultKxConnection implements KxConnection {
     }
 
     @Override
-    public Object subscribe(String table) {
+    public KxTableReader subscribe(String table) {
         // TODO WIP since it's all been about writing data not too much thought gone into reading/subscription
+        try {
+            c.ks(".u.sub[" + table + ";`]");
+            return newTableReader(table);
+        } catch (IOException e) {
+            LOGGER.error("Error subscribing to kx table {} : {}", table, e);
+            listener.onError(e);
+        }
         return null;
+    }
+
+    private KxTableReader newTableReader(String table) {
+        return new KxTableReader(this, this.c, table);
     }
 
     String host() {

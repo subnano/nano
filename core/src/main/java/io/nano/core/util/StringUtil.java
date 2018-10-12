@@ -6,13 +6,19 @@ public final class StringUtil {
         // can't touch this
     }
 
+    /**
+     * Returns a string representation of a number rounded to the given number of digits.
+     * Negative numbers are currently not supported.
+     * @param value double value
+     * @param precision precision or decimal places
+     * @return string representation of given value
+     */
     public static String formatNumber(double value, int precision) {
         // special use cases are when precision is zero or when number has a leading zero
-        // TODO handle half up rounding if require or a separate methos
         // TODO move most of this to BAU.putDouble(v,p)
         if (value < 0.0)
             throw new IllegalArgumentException("Negative numbers not supported");
-        long scaledNumber = (long) (value * (double) Maths.pow10(precision));
+        long scaledNumber = Maths.scaledLong(value, precision);
         boolean lessThanOne = value < 1.0;
         int extraDigits = precision > 0 ? 1 : 0;
         int stringLen = Maths.numberDigits(scaledNumber) + (lessThanOne ? extraDigits + 1 : extraDigits);

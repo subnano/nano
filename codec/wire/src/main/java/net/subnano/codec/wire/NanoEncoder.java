@@ -13,26 +13,38 @@ public class NanoEncoder implements WireEncoder {
     }
 
     public void addByte(int tag, byte value) {
-        bufferEncoder.addByte((byte)WireType.Byte.ordinal());
-        bufferEncoder.addShort(tag);
+        bufferEncoder.addByte(WireType.BYTE);
+        bufferEncoder.addShort((short) tag);
         bufferEncoder.addByte(value);
     }
 
+    public void addShort(int tag, short value) {
+        bufferEncoder.addByte(WireType.SHORT);
+        bufferEncoder.addShort((short) tag);
+        bufferEncoder.addShort(value);
+    }
+
     public void addInt(int tag, int value) {
-        bufferEncoder.addByte((byte)WireType.Int.ordinal());
-        bufferEncoder.addShort(tag);
+        bufferEncoder.addByte(WireType.INT);
+        bufferEncoder.addShort((short) tag);
         bufferEncoder.addInt(value);
     }
 
     public void addLong(int tag, long value) {
-        bufferEncoder.addByte((byte)WireType.Long.ordinal());
-        bufferEncoder.addShort(tag);
+        bufferEncoder.addByte(WireType.LONG);
+        bufferEncoder.addShort((short) tag);
         bufferEncoder.addLong(value);
     }
 
+    public void addDouble(int tag, double value) {
+        bufferEncoder.addByte(WireType.LONG);
+        bufferEncoder.addShort((short) tag);
+        bufferEncoder.addDouble(value);
+    }
+
     public void addString(int tag, String value) {
-        bufferEncoder.addByte((byte)WireType.String.ordinal());
-        bufferEncoder.addShort(tag);
+        bufferEncoder.addByte(WireType.STRING);
+        bufferEncoder.addShort((short) tag);
         bufferEncoder.addString(value);
     }
 }

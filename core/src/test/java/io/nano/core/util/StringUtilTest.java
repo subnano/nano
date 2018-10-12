@@ -17,6 +17,11 @@ class StringUtilTest {
         assertFormat(456D, 0, "456");
     }
 
+    @Test
+    void formatANotoriouslyDifficultNumber() {
+        assertFormat((29.0 * 0.01) * 100, 1, "29.0");
+    }
+
     private void assertFormat(double value, int precision, String expected) {
         String actual = StringUtil.formatNumber(value, precision);
         assertThat(actual).isEqualTo(expected);

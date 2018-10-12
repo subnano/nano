@@ -49,7 +49,7 @@ public interface KxConnection {
      */
     void async(String table, String command, Object data);
 
-    Object subscribe(String table);
+    KxTableReader subscribe(String table);
 
     enum Mode {
         Sync,
