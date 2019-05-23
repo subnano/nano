@@ -1,6 +1,6 @@
 package net.subnano.codec.wire;
 
-import io.nano.core.buffer.AsciiBufferUtil;
+import io.nano.core.lang.ByteString;
 
 import java.nio.ByteBuffer;
 
@@ -38,7 +38,7 @@ public class ByteBufferEncoder implements BufferEncoder {
     }
 
     @Override
-    public void addString(String value) {
-        AsciiBufferUtil.putCharSequence(value, buffer);
+    public void addBytes(byte[] value) {
+        buffer.put(value);
     }
 }

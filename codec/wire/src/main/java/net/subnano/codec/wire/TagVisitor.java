@@ -10,5 +10,5 @@ public interface TagVisitor<T> {
      * @param offset the pointer into the source or buffer offset
      * @param len the length of data to be read
      */
-    void onTag(T source, int tag, byte type, int offset, int len);
+    void onTag(BufferReader source, int tag, byte type, int offset, int len);
 }

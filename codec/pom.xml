@@ -13,6 +13,7 @@
     </parent>
 
     <modules>
+        <module>common</module>
         <module>wire</module>
         <module>json</module>
         <module>codec-benchmarks</module>

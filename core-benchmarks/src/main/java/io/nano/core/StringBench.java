@@ -1,7 +1,6 @@
 package io.nano.core;
 
-import io.nano.core.util.Maths;
-import io.nano.core.util.StringUtil;
+import io.nano.core.util.Strings;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -28,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(3)
 public class StringBench {
 
+    private static final String ARG_NAME = "Fred";
+
     public static void main(String[] args) throws RunnerException {
         System.setProperty("jmh.ignoreLock", "true");
         Options options = new OptionsBuilder()
@@ -38,13 +39,23 @@ public class StringBench {
     }
 
     @Benchmark
-    public void StringUtil_formatNumber(Blackhole hole) {
-        hole.consume(StringUtil.formatNumber(123456.678905, 3));
+    public void Strings_formatNumber(Blackhole hole) {
+        hole.consume(Strings.formatNumber(123456.678905, 3));
     }
 
     @Benchmark
-    public void String_format(Blackhole hole) {
+    public void Strings_combine(Blackhole hole) {
+        hole.consume(Strings.combine("Some prefix for ", ARG_NAME, " with a suffix"));
+    }
+
+    @Benchmark
+    public void String_formatNumber(Blackhole hole) {
         hole.consume(String.format("%.3f", 123456.678905));
+    }
+
+    @Benchmark
+    public void String_formatCombine(Blackhole hole) {
+        hole.consume(String.format("Some prefix for %s with a suffix", ARG_NAME));
     }
 
 }

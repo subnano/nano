@@ -1,7 +1,6 @@
 package io.nano.core.time;
 
 import io.nano.core.buffer.AsciiBufferUtil;
-import io.nano.core.time.TimeUtil;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +22,7 @@ public class UtcDateTimeEncoder {
 
     public int encode(final long epochMillis, final ByteBuffer buffer, final int offset) {
 
-        final boolean differentDay = isDifferentDat(epochMillis);
+        final boolean differentDay = isDifferentDate(epochMillis);
         if (differentDay) {
             long epochDays = TimeUtil.epochDays(epochMillis, TimeUnit.MILLISECONDS);
             encodeDate(epochDays, buffer, offset);
@@ -34,7 +33,7 @@ public class UtcDateTimeEncoder {
         return LENGTH_OF_DATE_AND_TIME;
     }
 
-    private boolean isDifferentDat(long epochMillis) {
+    private boolean isDifferentDate(long epochMillis) {
         return midnightMillis == nextMidnightMillis
                 || epochMillis < midnightMillis
                 || epochMillis >= nextMidnightMillis;

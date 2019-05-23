@@ -14,8 +14,8 @@ public final class WireUtil {
      * @param tag
      * @return
      */
-    public static int encodeTag(byte type, int tag) {
-        return (type << TAG_BITS) | (tag & 0xfff);
+    public static short encodeTag(byte type, int tag) {
+        return (short)((type << TAG_BITS) | (tag & 0xfff));
     }
 
     public static int decodeTag(int packed) {

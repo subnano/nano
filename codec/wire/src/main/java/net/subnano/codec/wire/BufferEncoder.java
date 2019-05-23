@@ -12,5 +12,5 @@ public interface BufferEncoder {
 
     void addDouble(double value);
 
-    void addString(String value);
+    void addBytes(byte[] value);
 }

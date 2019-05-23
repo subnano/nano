@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -27,11 +28,15 @@ import java.util.concurrent.TimeUnit;
 public class ThrownBench {
 
     private static final Optional<String> OPTION_OK = Optional.of("Pass");
+    private static final String WHO = "Arthur Dent";
+
+    private static long COUNTER = 0;
 
     public static void main(String[] args) throws RunnerException {
         System.setProperty("jmh.ignoreLock", "true");
         Options options = new OptionsBuilder()
                 .include(ThrownBench.class.getSimpleName())
+                .addProfiler(GCProfiler.class)
                 .build();
         new Runner(options).run();
     }
@@ -51,7 +56,8 @@ public class ThrownBench {
     }
 
     private void methodThrows() {
-        throw new IllegalArgumentException("here");
+        COUNTER = COUNTER == Long.MAX_VALUE ? 0 : COUNTER++;
+        throw new IllegalArgumentException("Some very specific string explaining the problem for " + WHO + " at " + COUNTER);
     }
 
     private Optional<String> methodReturns() {

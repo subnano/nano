@@ -1,6 +1,5 @@
 package io.nano.core.time;
 
-import io.nano.core.time.ISODateTimeDecoder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,11 @@ public class ISODateTimeDecoderTest {
     @Test
     void decodeIsoTimestamp() {
         assertDateTimeDecoding("2018-08-06T10:49:02.971Z");
+    }
+
+    @Test
+    void decodeIsoTimestampWithMicros() {
+        assertDateTimeDecoding("2018-12-06T07:57:34.602456Z");
     }
 
     private void assertDateTimeDecoding(String expected) {
